@@ -353,26 +353,27 @@ function stockMethod({stockno,stockname,method,stockdata}) {
     return stockKdFn(stockdata,stockno,stockname,method,'D')
   }
 };
-function getNowTime(){
+function getNowTimeObj(){
   const dt = new Date();
   const year = Number(dt.getFullYear());//取幾年-2022
   let month = Number(dt.getMonth())+1;//取幾月-8
-  month = month>9?month:'0'+month
+  month = month>9?month:'0'+month//08
   let day = dt.getDate();//取幾號-30
-  day = day>9?day:'0'+day
-  // const hours = dt.getHours();//取現在時
+  day = day>9?day:'0'+day//01
+  const hours = dt.getHours();//取現在時
   const endDay = `${year}-${month}-${day}` //現在日期
   return {
     "year": year,
     "month" :month,
     "day": day,
-    "time":endDay,
+    "days":endDay,
+    "hours": hours
   }
 }
 async function stockdataFn(stockno,stockdata){
     console.log('跑stockdataFn')
-    const timObj = getNowTime()
-    const endDay = timObj['time']
+    const timObj = getNowTimeObj()
+    const endDay = timObj['days']
     const year = timObj['year']
     //stockdata(日)
     if(stockdata){
@@ -533,5 +534,6 @@ module.exports={
   stockExdividend,
   stockYield,
   stockGrap,
-  stockPromise
+  stockPromise,
+  getNowTimeObj
 }

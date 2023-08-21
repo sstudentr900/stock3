@@ -1,7 +1,7 @@
 const express = require('express');
 const engine = require("ejs-locals");
 const { query } = require('./plugin/db')
-const { stockPromise,stockGrap } = require("./plugin/stock");
+const { stockPromise,stockGrap,getNowTimeObj } = require("./plugin/stock");
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -41,18 +41,19 @@ app.get('/remuneration', async function (req, res) {
   for (const row of rows) {
     // console.log(row['yielddata'])
     // if(!row['stockdata'] || !row['yielddata'] || row['yielddata']!=0){
-    console.log(row['stockno']+'-----------')
-    const recult = await stockGrap(row)
-    const sql1 = 'UPDATE stock SET price = ?,networth = ?,stockdata = ?,stockdata_w = ?,yielddata = ? WHERE id = ?'
-    const values1 = [
-      recult['price'],
-      recult['networth'],
-      JSON.stringify(recult['stockdata']),
-      JSON.stringify(recult['stockdata_w']),
-      recult['yielddata'],
-      row['id']
-    ]
-    const row1 = await query( sql1,values1 )
+      console.log(row['stockno']+'-----------')
+      const recult = await stockGrap(row)
+      const sql1 = 'UPDATE stock SET price = ?,networth = ?,stockdata = ?,stockdata_w = ?,yielddata = ? WHERE id = ?'
+      const values1 = [
+        recult['price'],
+        recult['networth'],
+        JSON.stringify(recult['stockdata']),
+        JSON.stringify(recult['stockdata_w']),
+        recult['yielddata'],
+        row['id']
+      ]
+      const row1 = await query( sql1,values1 )
+    // }
     // console.log(recult['price'])
   }
   // }
