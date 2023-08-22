@@ -1,7 +1,7 @@
 const express = require('express');
 const engine = require("ejs-locals");
 const { query } = require('./plugin/db')
-const { stockPromise,stockGrap,getNowTimeObj } = require("./plugin/stock");
+const { stockPayMoreYear,stockPayTodayYearMonth,stockCagr,stockGrap,getNowTimeObj } = require("./plugin/stock");
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -36,32 +36,45 @@ app.get('/', function (req, res) {
 
 //報酬 get all data
 app.get('/remuneration', async function (req, res) {
-  const sql = 'SELECT * from stock'
-  const rows = await query( sql )
+  const rows = await query( 'SELECT id,stockname,stockno,stockdata,updated_at from stock' )
+  // stockPayTodayYearMonth(rows[0]['stockdata']) //test
+  const nowTimeObj = getNowTimeObj()
+  // console.log(nowTimeObj['date'])
   for (const row of rows) {
-    // console.log(row['yielddata'])
-    // if(!row['stockdata'] || !row['yielddata'] || row['yielddata']!=0){
-      console.log(row['stockno']+'-----------')
+    let dataDate = new Date(row['updated_at']);
+    dataDate = dataDate.getFullYear()+'-'+('0'+(dataDate.getMonth()+1)).slice(-2)+'-'+('0'+dataDate.getDate()).slice(-2)
+    //時間不一樣更新
+    if(nowTimeObj['date']!=dataDate){
+      console.log('時間不一樣更新'+row['stockno']+'資料-----------')
       const recult = await stockGrap(row)
-      const sql1 = 'UPDATE stock SET price = ?,networth = ?,stockdata = ?,stockdata_w = ?,yielddata = ? WHERE id = ?'
       const values1 = [
         recult['price'],
         recult['networth'],
         JSON.stringify(recult['stockdata']),
         JSON.stringify(recult['stockdata_w']),
-        recult['yielddata'],
+        JSON.stringify(recult['yielddata']),
         row['id']
       ]
-      const row1 = await query( sql1,values1 )
-    // }
-    // console.log(recult['price'])
+      const sql1 = 'UPDATE stock SET price = ?,networth = ?,stockdata = ?,stockdata_w = ?,yielddata = ? WHERE id = ?'
+      await query( sql1,values1 )
+      //補資料
+      row['stockdata'] = recult['stockdata']
+    }
+
+
+    //年報酬
+    row['stockPayYear'] = stockPayMoreYear(row['stockdata'],8)
+    //年化報酬率
+    row['stockCagr'] = stockCagr(row['stockPayYear'])
+    //月報酬
+    row['stockPayMonth'] = stockPayTodayYearMonth(row['stockdata'])
   }
-  // }
-  // res.render('remuneration',{
-  //   'active': 'remuneration',
-  //   'data': rows,
-  // })
-  res.send(rows)
+  // console.log(rows)
+  res.render('remuneration',{
+    'active': 'remuneration',
+    'data': rows,
+  })
+  // res.send(rows)
 })
 //報酬 get one data
 app.get('/remuneration/:id', function (req, res) {

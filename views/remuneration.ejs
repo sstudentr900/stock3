@@ -103,6 +103,7 @@
         font-size: 16px;
         position: relative;
         background: #1f2127;
+        user-select: none;
     }
 
     *,
@@ -182,6 +183,7 @@
       padding: 16px 0;
       border-bottom: 1px solid #4A4C55;
       background: #1F2127;
+      z-index: 99;
     }
     .publicNav .publicWidth{
       align-items: center;
@@ -232,7 +234,7 @@
       font-size: 18px;
       margin-bottom: 24px;
     }
-    .publicTable{
+    /* .publicTable{
       border: 1px solid #4A4C55;
     }
     .publicTable .title{
@@ -245,50 +247,86 @@
       display: flex;
     }
     .publicTable li{
-      flex: 1;
+      flex: 1 0;
       padding: 12px;
-    }
-    .publicTable ul+ul{
+      display: flex;
+      align-items: center;
       border-top: 1px solid #4A4C55;
+    }
+    .publicTable ul:nth-child(1) li{
+      border-top: none;
     }
     .publicTable li+li{
       border-left: 1px solid #4A4C55;
+    } */
+    /* 單行 */
+    .publicEllipsis1 {
+      overflow: hidden;
+      white-space: normal;
+      display: -webkit-box;
+      /* 行數 */
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+
+    /* 多行 */
+    .publicEllipsis2 {
+      overflow: hidden;
+      white-space: normal;
+      display: -webkit-box;
+      /* 行數 */
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
     /*remuneration--------------------------------------------------------------------*/
-    .remuneration .publicBox{
+    .remuneration .publicContent{
+      padding-bottom: 0;
+    }
+    /* .remuneration .publicBox{
       margin-top: 30px;
       width: 100%;
-    }
-    .remuneration .publicTable li:nth-child(1){
-      flex: 0 0 80px;
-    }
-    .publicTable .control li{
+    } */
+    .remuneration .customTable{
+      border: 1px solid #4A4C55;
       display: flex;
     }
-    .publicTable .control li a+a{
-      margin-left: 5px;
+    .remuneration .customTable ul{
+      flex: 0 0 120px;
     }
-    .publicTable .control li a{
-      color: #3A61F6;
-      border: 1px solid #3A61F6;
-      font-size: 13px;
-      border-radius: 3px;
-      padding: 4px 16px;
+    .remuneration .customTable ul+ul{
+      border-left: 1px solid #4A4C55;
     }
-    .publicTable .control li a:hover{
-      color: #fff;
-      background-color: #3A61F6;
+    .remuneration .customTable li{
+      padding: 12px;
+      display: flex;
+      /* align-items: center; */
+      height: 50px;
     }
-    .publicTable .control li a.delet{
-      color: #F95F53;
-      border: 1px solid #F95F53;
+    .remuneration .customTable li+li{
+      border-top: 1px solid #4A4C55;
     }
-    .publicTable .control li a.delet:hover{
-      color: #fff;
-      background-color: #F95F53;
+    .remuneration .customTable li.name{
+      height: 75px;
     }
-    
-    
+    .remuneration .customTable .control a{
+      width: 26px;
+      display: flex;
+      align-items: center;
+    }
+    .remuneration .customTable .control a svg{
+      margin-top: 1px;
+      width: 18px;
+      height: auto;
+      fill: #3A61F6;
+    }
+    .remuneration .customTable .control a.delet svg{
+      fill: #F95F53;
+    } 
+    .remuneration .table_content_div{
+      overflow: auto;
+      display: flex;
+      border-left: 1px solid #4A4C55;
+    }
   </style>
 </head>
 <body>
@@ -313,48 +351,48 @@
       <div class="publicWidth">
         <div class="publicBox">
           <h4 class="publictitle">股票報酬統計</h4>
-          <p><%= data %></p>
-          <div class="publicTable">
-            <ul class="title">
-              <li><p>名稱</p></li>
-              <li><p>元大高股息<br>0056</p></li>
-              <li><p>富邦公司治理<br>00692</p></li>
+          <div class="customTable">
+            <ul class="table_title">
+              <li class="name">
+                <!-- <div class="control">
+                  <a href="#" class="add">
+                    <svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.002 2c5.518 0 9.998 4.48 9.998 9.998 0 5.517-4.48 9.997-9.998 9.997-5.517 0-9.997-4.48-9.997-9.997 0-5.518 4.48-9.998 9.997-9.998zm0 1.5c-4.69 0-8.497 3.808-8.497 8.498s3.807 8.497 8.497 8.497 8.498-3.807 8.498-8.497-3.808-8.498-8.498-8.498zm-.747 7.75h-3.5c-.414 0-.75.336-.75.75s.336.75.75.75h3.5v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5h3.5c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-3.5v-3.5c0-.414-.336-.75-.75-.75s-.75.336-.75.75z" fill-rule="nonzero"/></svg>
+                  </a>
+                </div> -->
+                <p>名稱</p>
+              </li>
+              <% data[0]['stockPayYear'].forEach(function(y) { %>
+                <li class="<%= y.year %>"><p><%= y.year %>年</p></li>
+              <% }); %>
+              <li>年化</li>
+              <% data[0]['stockPayMonth'].forEach(function(m) { %>
+                <li class="<%= m.month %>"><p><%= m.month %>月</p></li>
+              <% }); %>
             </ul>
-            <ul class="year">
-              <li><p>2015</p></li>
-              <li><p>-1.5%</p></li>
-              <li><p></p></li>
-            </ul>
-            <ul class="year">
-              <li><p>2016</p></li>
-              <li><p>10.2%</p></li>
-              <li><p></p></li>
-            </ul>
-            <ul class="annualized">
-              <li><p>年化</p></li>
-              <li><p>8.49%</p></li>
-              <li><p>8.49%</p></li>
-            </ul>
-            <ul class="week">
-              <li><p>6/9</p></li>
-              <li><p>11.0%</p></li>
-              <li><p></p></li>
-            </ul>
-            <ul class="week">
-              <li><p>6/19</p></li>
-              <li><p></p></li>
-              <li><p></p></li>
-            </ul>
-            <ul class="week">
-              <li><p>6/21</p></li>
-              <li><p>10.2%</p></li>
-              <li><p></p></li>
-            </ul>
-            <ul class="control">
-              <li></li>
-              <li><a href="#" class="add">新增</a><a href="#" class="delet">刪除</a></li>
-              <li><a href="#" class="add">新增</a><a href="#" class="delet">刪除</a></li>
-            </ul>
+            <div class="table_content_div">
+              <% data.forEach(function(d) { %>
+                <ul class="table_content">
+                  <li class="name">
+                    <!-- <div class="control">
+                      <a href="#" class="delet">
+                        <svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.002 2.005c5.518 0 9.998 4.48 9.998 9.997 0 5.518-4.48 9.998-9.998 9.998-5.517 0-9.997-4.48-9.997-9.998 0-5.517 4.48-9.997 9.997-9.997zm0 1.5c-4.69 0-8.497 3.807-8.497 8.497s3.807 8.498 8.497 8.498 8.498-3.808 8.498-8.498-3.808-8.497-8.498-8.497zm4.253 7.75h-8.5c-.414 0-.75.336-.75.75s.336.75.75.75h8.5c.414 0 .75-.336.75-.75s-.336-.75-.75-.75z" fill-rule="nonzero"/></svg>
+                      </a>
+                    </div> -->
+                    <div class="text">
+                      <p class="publicEllipsis1"><%= d.stockname %></p>
+                      <p><%= d.stockno %></p>
+                    </div>
+                  </li>
+                  <% d.stockPayYear.forEach(function(y) { %>
+                    <li class="<%= y.year %>"><p><%= y.avenge %></p></li>
+                  <% }); %>
+                  <li>年化</li>
+                  <% d.stockPayMonth.forEach(function(m) { %>
+                    <li class="<%= m.month %>"><p><%= m.avenge %></p></li>
+                  <% }); %>
+                </ul>
+              <% }); %>
+            </div>
           </div>
         </div>
       </div>

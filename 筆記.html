@@ -7,6 +7,32 @@
   <title>Document</title>
 </head>
 <body>
+  <h2>JavaScript 中未定義的屬性</h2>
+  <pre class="prettyprint">
+    <xmp>
+      const arr = [];
+      console.log(arr[0].name); //會報錯
+      console.log(arr[0] && arr[0].name);//不會報錯 
+      console.log(arr[0]?.name);//等同上面
+    </xmp>
+  </pre>
+  <h4>參考</h4>
+  <ul>
+    <li><a href="https://bobbyhadz.com/blog/javascript-cannot-read-property-of-undefined">JavaScript 中未定義的屬性</a></li>
+  </ul>
+  <hr>
+
+  <h2>JavaScript 陣列</h2>
+  <pre class="prettyprint">
+    <xmp>
+    </xmp>
+  </pre>
+  <h4>參考</h4>
+  <ul>
+    <li><a href="https://www.casper.tw/javascript/2017/06/29/es6-native-array/">JavaScript 陣列</a></li>
+  </ul>
+  <hr>
+
   <h2>同時運行Node.js服務器和Apache服務器</h2>
   <h3>1.Apache httpd.conf<h3>
   <p>/stock2/會轉成http://localhost:3000/</p>
@@ -21,6 +47,7 @@
   </ul>
   <hr>
   
+
   <h2>爬蟲 用 request + cheerio</h2>
   <h3>1.安裝</h3>
   <pre class="prettyprint">
@@ -33,6 +60,7 @@
     <li><a href="https://andy6804tw.github.io/2018/02/11/nodejs-crawler/">[Node.js 爬蟲] 用 request + cheerio 抓取地震資訊</a></li>
   </ul>
   <hr>
+
 
   <h2>yahoo-finance 股票</h2>
   <h3>1.安裝</h3>
@@ -103,7 +131,15 @@
       });
     </xmp>
   </pre>
-  <h3>變數導入頁面</h3>
+  <h3>將 JSON 對像傳遞給模板之前，您需要將其轉換回字符串</h3>
+  <pre class="prettyprint">
+    <xmp>
+      var str = JSON.parse('[{"name":"bill", "age":"26"}, {"name":"jeff", "age":"32"}]');
+      app.get('/data', function(req, res){
+        res.render('data', { str: JSON.stringify(str) });
+      });
+    </xmp>
+  </pre>
   <h4>參考</h4>
   <ul>
     <li>
@@ -113,9 +149,38 @@
       <a href="https://medium.com/web-design-zone/ejs%E6%A8%A3%E6%9D%BF%E5%BC%95%E6%93%8E%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F-40873ea2dfae"
       target="_blank">Node.js — EJS樣板引擎的使用方式</a>
     </li>
+    <li>
+      <a href="https://stackoverflow.com/questions/47066222/can-i-render-json-parse-data-to-ejs"
+      target="_blank">將 JSON 數據渲染到 EJS 嗎？</a>
+    </li>
+    <li>
+      <a href="https://ejs.co/"
+      target="_blank">EJS</a>
+    </li>
   </ul>
   <hr>
 
+  <h2>mysql</h2>
+  <h3>sql datetime to node.js</h3>
+  <p>sql時間轉換</p>
+  <pre class="prettyprint">
+    <xmp>
+      var datee = new Date('dateTime');
+      console.log(
+        datee.getFullYear()+'-'+
+        ('0'+(datee.getMonth()+1)).slice(-2)+'-'+
+        ('0'+datee.getDate()).slice(-2)+' '+
+        ('0'+(datee.getHours())).slice(-2)+':'+
+        ('0'+(datee.getMinutes())).slice(-2)+':'+
+        ('0'+(datee.getSeconds())).slice(-2)
+      );
+    </xmp>
+  </pre>
+  <h4>參考</h4>
+  <ul>
+    <li><a href="https://stackoverflow.com/questions/62120309/sql-datetime-to-nodejs">SQL DATETIME to Nodejs</a></li>
+  </ul>
+  <hr>
 
 
   <h2>Node.js-Express+MySQL</h2>
