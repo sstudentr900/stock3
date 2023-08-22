@@ -33,19 +33,22 @@ app.listen(port,()=>{console.log(`port ${port}`)});
 app.get('/', function (req, res) {
   res.send('home')
 })
-
-//報酬 get all data
+app.get('/table', function (req, res) {
+  res.render('table')
+})
+//報酬
 app.get('/remuneration', async function (req, res) {
   const rows = await query( 'SELECT id,stockname,stockno,stockdata,updated_at from stock' )
   // stockPayTodayYearMonth(rows[0]['stockdata']) //test
   const nowTimeObj = getNowTimeObj()
   // console.log(nowTimeObj['date'])
   for (const row of rows) {
+    console.log(row['stockno']+'-----------')
     let dataDate = new Date(row['updated_at']);
     dataDate = dataDate.getFullYear()+'-'+('0'+(dataDate.getMonth()+1)).slice(-2)+'-'+('0'+dataDate.getDate()).slice(-2)
     //時間不一樣更新
     if(nowTimeObj['date']!=dataDate){
-      console.log('時間不一樣更新'+row['stockno']+'資料-----------')
+      console.log('時間不一樣更新資料')
       const recult = await stockGrap(row)
       const values1 = [
         recult['price'],
@@ -60,8 +63,8 @@ app.get('/remuneration', async function (req, res) {
       //補資料
       row['stockdata'] = recult['stockdata']
     }
-
-
+    //更新時間
+    row['dataDate'] = dataDate
     //年報酬
     row['stockPayYear'] = stockPayMoreYear(row['stockdata'],8)
     //年化報酬率
@@ -76,79 +79,11 @@ app.get('/remuneration', async function (req, res) {
   })
   // res.send(rows)
 })
-//報酬 get one data
-app.get('/remuneration/:id', function (req, res) {
-  pool.getConnection((err,connection)=>{
-    if(err) throw err
-    // console.log(`connection ${connection.threadId}`)
-    //query
-    connection.query('SELECT * from stock WHERE id = ?',[req.params.id],(err,rows)=>{
-      connection.release() //
-      if(!err){
-        res.send(rows)
-      }else{
-        console.log(err)
-      }
-    })
-  })
+app.delete('/remuneration/:id',async function (req, res) {
+  const rows = await query( 'DELETE from class WHERE id = ?',[req.params.id] )
+  console.log(rows)
 })
-//報酬 delet one data
-app.delete('/remuneration/:id', function (req, res) {
-  pool.getConnection((err,connection)=>{
-    if(err) throw err
-    // console.log(`connection ${connection.threadId}`)
 
-    //query
-    connection.query('DELETE from stock WHERE id = ?',[req.params.id],(err,rows)=>{
-      connection.release() //
-      if(!err){
-        res.send(`${[req.params.id]} remove`)
-      }else{
-        console.log(err)
-      }
-    })
-  })
-})
-//報酬 add one data
-app.post('/remuneration/', function (req, res) {
-  pool.getConnection((err,connection)=>{
-    if(err) throw err
-    // console.log(`connection ${connection.threadId}`)
-
-    //query
-    const params = req.body
-    connection.query('INSERT INTO stock SET ?',params,(err,rows)=>{
-      connection.release() //
-      if(!err){
-        res.send(`${params.menuitemid} add`)
-      }else{
-        console.log(err)
-      }
-    })
-  })
-})
-//報酬 update one data
-app.put('/remuneration/', function (req, res) {
-  pool.getConnection((err,connection)=>{
-    if(err) throw err
-    // console.log(`connection ${connection.threadId}`)
-
-    //query
-    const {id,menuitemid,weekday,start,end,delete_flag,teacher_id} = req.body
-    connection.query(
-      'UPDATE stock SET menuitemid = ?,weekday = ?,start = ?,end = ?,delete_flag = ?,teacher_id = ? WHERE id = ?',
-      [menuitemid,weekday,start,end,delete_flag,teacher_id,id],
-      (err,rows)=>{
-        connection.release() //
-        if(!err){
-          res.send(`${id} update`)
-        }else{
-          console.log(err)
-        }
-      }
-    )
-  })
-})
 //error
 app.get('/error', function (req, res) {
   notDefined(); // 執行一個沒有定義的函式跳去500
