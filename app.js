@@ -39,8 +39,10 @@ app.get('/table', function (req, res) {
 })
 //報酬
 async function updataStockFn(obj){
-  const row = {}
   const jsons = await stockGrap(obj)
+  console.log(`updataStockFn,${JSON.stringify(jsons)}`)
+  if(!jsons)return;
+  const row = {}
   const values1 = []
   const sqlSet1 = []
   Object.entries(jsons).forEach((json) => {
@@ -117,7 +119,7 @@ app.post('/remuneration',async function (req, res) {
   const params = req.body
   const stockNo = params.stockNo
   const stockNoArray = await query( 'SELECT id from stock WHERE stockno = ?',[stockNo])
-  console.log(`stockNoArray,${stockNoArray.length}`)
+  // console.log(`stockNoArray,${stockNoArray.length}`)
   if(stockNoArray.length){
     console.log('false,資料重複')
     res.json({result:'false',error:'資料重複'})

@@ -653,7 +653,7 @@ async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
   //   result.methodReturn = stockMethod({stockno,stockname,method,stockdata})
   // }
 
-  return result
+  return (result && result !== 'null' && result !== 'undefined')?result:false;
 }
 module.exports={
   stockMethod,
