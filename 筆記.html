@@ -23,6 +23,42 @@
       </li>
     </ul>
     <hr>
+
+    <h2>JavaScript 獲取數組的最後一個元素</h2>
+    <pre class="prettyprint">
+      <xmp>
+        let arry = [2, 4, 6, 8, 10, 12, 14, 16];
+
+        console.time('array length property');
+        let lastElement = arry[arry.length - 1];
+        console.log(lastElement); //16
+        console.timeEnd('array length property');
+
+        console.time('array slice method');
+        let lastElement1 = arry.slice(-1);
+        console.log(lastElement1); //[16]
+        console.timeEnd('array slice method');
+
+        console.time('array pop method');
+        let lastElement2 = arry.pop();
+        console.log(lastElement2); //16
+        console.timeEnd('array pop method');
+
+
+        //Output:
+        //array length property: 13.798ms
+        //array slice method: 8.839ms
+        //array pop method: 0.138ms
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://flexiple.com/javascript/get-last-array-element-javascript/">最後一個元素</a>
+      </li>
+    </ul>
+    <hr>
+
     <h2>JavaScript 陣列</h2>
     <pre class="prettyprint">
       <xmp></xmp>
@@ -34,6 +70,7 @@
       </li>
     </ul>
     <hr>
+
     <h2>同時運行Node.js服務器和Apache服務器</h2>
     <h3>1.在Apache->httpd.conf 加入ProxyPass</h3>
     <p>/stock2/會轉成->http://localhost:3000/</p>

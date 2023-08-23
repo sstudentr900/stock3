@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;500;700;900&family=Noto+Serif+TC:wght@300;500;700;900&display=swap');
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+body {
+    font-family: 'Noto Sans TC',sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #7d7b8a;
+    font-size: 16px;
+    position: relative;
+    background: #1f2127;
+    user-select: none;
+}
+
+*,
+*::before,
+*::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 86%;
+    max-width: 1200px;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+}
+
+ul {
+    list-style: none;
+}
+
+.list-unstyled {
+    padding-left: 0;
+    list-style: none
+}
+
+.list-inline {
+    padding-left: 0;
+    list-style: none
+}
+
+.list-inline>li {
+    display: inline-block;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+img {
+    border: 0;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+textarea:focus,
+input:focus{
+    outline: none;
+}
+/*共用--------------------------------------------------------------------*/
+/*publicWidth*/
+.publicWidth{
+  max-width: 1280px;
+  margin: auto;
+  padding: 0 20px;
+  display: flex;
+}
+@media (max-width: 1360px){
+  .publicWidth {
+    max-width: calc(100% - 60px);
+  }
+}
+@media (max-width: 576px){
+  .publicWidth {
+    max-width: 576px;
+  }
+} 
+.publicPage{
+  background: #1f2127;
+}
+.publicContent{
+  padding: 100px 0;
+}
+.publicBox{
+  padding: 24px;
+  background-color: #252730;
+  border-radius: 15px;
+}
+.publictitle{
+  color: #D8D9E3;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+/* .publicTable{
+  border: 1px solid #4A4C55;
+}
+.publicTable .title{
+  border-bottom: 2px solid #808191;
+}
+.publicTable p{
+  font-size: 14px;
+}
+.publicTable ul{
+  display: flex;
+}
+.publicTable li{
+  flex: 1 0;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #4A4C55;
+}
+.publicTable ul:nth-child(1) li{
+  border-top: none;
+}
+.publicTable li+li{
+  border-left: 1px solid #4A4C55;
+} */
+/* 單行 */
+.publicEllipsis1 {
+  overflow: hidden;
+  white-space: normal;
+  display: -webkit-box;
+  /* 行數 */
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+/* 多行 */
+.publicEllipsis2 {
+  overflow: hidden;
+  white-space: normal;
+  display: -webkit-box;
+  /* 行數 */
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

@@ -79,6 +79,7 @@ async function stockGetDataX(stockno,monthLength=3){
   return stockdata
 }
 async function stockGetData(stockno,from,to){
+  // console.log(`stockGetData: ${stockno,from,to}`)
   return await yahooFinance.historical({
     symbol: `${stockno}.TW`,
     from: from,
@@ -86,26 +87,33 @@ async function stockGetData(stockno,from,to){
     period: 'd'
     // period: 'd'  // 'd' (daily), 'w' (weekly), 'm' (monthly), 'v' (dividends only)
   }).then(jsons=>{
-    console.log('array',jsons)
-    if(!jsons){
+    // console.log(`jsons資料: ${JSON.stringify(jsons)}`)
+    if(!jsons.length){
+      console.log(`沒有jsons資料`)
       return false
     }
 
-    //修改 jsons
-    const array = jsons.map(json=>{
+    //修改和移除空白 jsons
+    const array = [] 
+    jsons.forEach(json=>{
       // const date = new Date(json['date']).toLocaleDateString().replace(/\//g,'-')
-      let date = new Date(json['date']).toLocaleDateString().split('/')
-      date = `${date[0]}-${date[1]>9?date[1].toString():'0'+ date[1]}-${date[2]>9?date[2].toString():'0'+ date[2]}`
-      return {
-        'Date': date,
-        // 'Open':json['open'],
-        // 'Hight':json['high'],
-        // 'Low':json['low'],
-        'Close':json['close'].toFixed(2),
-        // 'symbol': json['symbol']
-        // 'Volume':json['volume']
-      };
+      if(json['close']){
+        let date = new Date(json['date']).toLocaleDateString().split('/')
+        date = `${date[0]}-${date[1]>9?date[1].toString():'0'+ date[1]}-${date[2]>9?date[2].toString():'0'+ date[2]}`
+        let close = Number(json['close']).toFixed(2)
+        array.push({
+          'Date': date,
+          // 'Open':json['open'],
+          // 'Hight':json['high'],
+          // 'Low':json['low'],
+          'Close': close,
+          // 'symbol': json['symbol']
+          // 'Volume':json['volume']
+        })
+      }
     })
+    // console.log(`抓取資料: ${JSON.stringify(array)}`)
+
     //排小到大
     const stringTryNumber = (text)=>{
       let array = text['Date'].split('-')
@@ -174,6 +182,7 @@ async function stockYield(stockno,stockdata,yielddata){
       year -=1
       await stockPromise({url: jsonUrl,method: "POST",form:{stkNo: stockno,startYear: year,endYear: year}})
       .then(body=>{
+        console.log(body)
         const $ = cheerio.load(body);
         const grid_trs = $(".grid tr");
         let exdividends = [];
@@ -287,8 +296,9 @@ function stockPay(stockdata,time){
   }
 }
 function stockPayOneYear(stockdata,year){
+  if(!stockdata.length)return;
   // console.log(`跑${year}報酬`)
-  stockdata = JSON.parse(stockdata)
+  // stockdata = JSON.parse(stockdata)
   const array = stockdata.filter(({Date})=>{
     return Date>=`${year}-01-01` && Date<=`${year}-12-31`;
   })
@@ -304,27 +314,30 @@ function stockPayOneYear(stockdata,year){
   }
 }
 function stockPayMoreYear(stockdata,yearNumber){
+  if(!stockdata.length)return;
   console.log(`跑最近${yearNumber}年每年報酬`)
   const row = []
   const nowTimeObj = getNowTimeObj()
   let year = nowTimeObj['year'] - yearNumber;
+
   while (year <= nowTimeObj['year']){
     const obj = {}
     // obj[`${year}`] = stockPayOneYear(stockdata,year)
-    obj['year'] = year+''
-    obj['avenge'] = stockPayOneYear(stockdata,year)
+    obj['year'] = year+'';
+    obj['avenge'] = stockPayOneYear(stockdata,year);
     row.push(obj)
     year++
   }
   return row;
 }
 function stockPayTodayYearMonth(stockdata){
+  if(!stockdata.length)return;
   console.log(`跑今年每月報酬`)
   const row = []
   const nowTimeObj = getNowTimeObj()
   const year = nowTimeObj['year']
   const nowMonth = nowTimeObj['month']
-  stockdata = JSON.parse(stockdata)
+  // stockdata = JSON.parse(stockdata)
   for(let i=1;i<=nowMonth;i++){
     const obj = {}
     const month = ('0'+i).slice(-2)
@@ -345,6 +358,7 @@ function stockPayTodayYearMonth(stockdata){
   return row;
 }
 function stockCagr(stockdata){
+  if(!stockdata.length)return;
   //年化報酬率(%) = (總報酬率+1)^(1/年數) -1
   // 投資案A. 費時10年，總報酬率200%
   // (200%+1)^(1/10)-1 = 3^(0.1)-1 = (1.116–1)*100 = 11.6%
@@ -447,8 +461,8 @@ function stockMethod({stockno,stockname,method,stockdata}) {
     return stockKdFn(stockdata,stockno,stockname,method,'D')
   }
 };
-function getNowTimeObj(){
-  const dt = new Date();
+function getNowTimeObj(enterDate){
+  const dt = enterDate?new Date(enterDate):new Date();
   // const year = Number(dt.getFullYear());//取幾年-2022
   // let month = Number(dt.getMonth())+1;//取幾月-8
   // month = month>9?month:'0'+month//08
@@ -473,83 +487,97 @@ function getNowTimeObj(){
     "datetime": datetime
   }
 }
+function dateAdd (date,days){
+  const dt = new Date(date);
+  dt.setDate(dt.getDate()+days);
+  const m = ('0'+ (dt.getMonth()+1)).slice(-2);
+  const d = ('0'+ dt.getDate()).slice(-2);
+  return `${dt.getFullYear()}-${m}-${d}`
+}
 async function stockdataFn(stockno,stockdata){
-    console.log('跑stockdataFn')
-    const timObj = getNowTimeObj()
-    const nowDate = timObj['date']
-    //stockdata(日)
-    if(stockdata){
-      // console.log('have value')
-      stockdata = JSON.parse(stockdata)
-      const dataDate = stockdata[stockdata.length-1]['Date']
-  
-      //資料日期和今天日期不一樣
-      if(dataDate!=nowDate){
-        // if(typeof datas=='string')return message.push(datas);//回傳錯誤請求
-        console.log('stockno',stockno,'資料日期:',dataDate,'今天日期:',nowDate)
-        const datas = await stockGetData(stockno,dataDate,nowDate)
-        if(datas.length){
-          // console.log('抓取資料數',datas.length)
-          const dataDateLast = datas[datas.length-1]['Date']
-          //資料日期和抓取最後一天日期不一樣
-          if(dataDate!=dataDateLast){
-            console.log('抓取日期和資料最後一天日期不一樣')
-            //刪除第一筆
-            if(datas.length>1){
-              console.log('刪除第一筆')
-              datas.splice(0,1)
-            }
-            for(data of datas){
-              console.log('抓取資料存入:',data)
-              stockdata.push(data)
-            }
-          }
-        }else{
-          console.log('抓取不到資料跳出')
+  console.log('跑stockdataFn')
+  const timObj = getNowTimeObj()
+  const nowDate = timObj['date']
+  if(stockdata){
+    // console.log('have value')
+    stockdata = JSON.parse(stockdata)
+    let dataDate = stockdata[stockdata.length-1]['Date']
+    dataDate = dateAdd(dataDate,1)
+    //資料日期和今天日期不一樣且資料日期不能大於今天日期
+    if(dataDate!=nowDate && dataDate<nowDate){
+      // if(typeof datas=='string')return message.push(datas);//回傳錯誤請求
+      console.log(`要抓取日期:${dataDate} ~ ${nowDate}`)
+      const datas = await stockGetData(stockno,dataDate,nowDate)
+      // console.log(`datas:${Boolean(datas.length)}`)
+      if(datas.length){
+        for(data of datas){
+          console.log('抓取資料存入:',data)
+          stockdata.push(data)
         }
-      }
-      return stockdata;
-      // if(stockdata.length>1300){
-      //   console.log('當前資料數加抓取資料數'+stockdata.length+'超過1300筆')
-      //   //刪除筆數
-      //   stockdata.splice(0,stockdata.length-1300)
-      // }
-      // result.stockdata = JSON.stringify(stockdata)
-    }
-    if(!stockdata){
-      // let starDay = `${year-5}-${month}-${day}`
-      const starDate = `2015-01-01`
-      console.log(`沒有資料抓取 ${starDate}-${nowDate}`)
-      stockdata = await stockGetData(stockno,starDate,nowDate)
-      if(stockdata.length){
-        console.log('stockdata,length:',stockdata.length)
-        // result.stockdata = JSON.stringify(stockdata)
-        return stockdata
+        //updata stockdata
+        return stockdata;
+        // // console.log('抓取資料數',datas.length)
+        // const dataDateLast = datas[datas.length-1]['Date']
+        // //資料日期和抓取最後一天日期不一樣
+        // if(dataDate!=dataDateLast){
+        //   console.log('抓取日期和資料最後一天日期不一樣')
+        //   //刪除第一筆
+        //   if(datas.length>1){
+        //     console.log('刪除第一筆')
+        //     datas.splice(0,1)
+        //   }
+        //   for(data of datas){
+        //     console.log('抓取資料存入:',data)
+        //     stockdata.push(data)
+        //   }
+        // }
       }else{
         console.log('抓取不到資料跳出')
         return false;
       }
-      // if(typeof value=='string')return message.push(value);//回傳錯誤請求
     }
-    // return {
-    //   "stockdata": stockdata,
-    //   "stockdata_w": stockdata_w
+    // else
+    // {
+    //   //old stockdata
+    //   return stockdata;
     // }
-    // return stockdata
+    // console.log(`stockdata:${stockdata[0].Date}`)
+    // if(stockdata.length>1300){
+    //   console.log('當前資料數加抓取資料數'+stockdata.length+'超過1300筆')
+    //   //刪除筆數
+    //   stockdata.splice(0,stockdata.length-1300)
+    // }
+    // result.stockdata = JSON.stringify(stockdata)
+  }
+  if(!stockdata){
+    // let starDay = `${year-5}-${month}-${day}`
+    const starDate = `2015-01-01`
+    console.log(`沒有資料抓取 ${starDate}-${nowDate}`)
+    stockdata = await stockGetData(stockno,starDate,nowDate)
+    if(stockdata.length){
+      console.log('stockdata,length:',stockdata.length)
+      // result.stockdata = JSON.stringify(stockdata)
+      return stockdata
+    }else{
+      console.log('抓取不到資料跳出')
+      return false;
+    }
+    // if(typeof value=='string')return message.push(value);//回傳錯誤請求
+  }
 }
 function stockdataFn_w(stockdata){
   console.log('跑stockdata_w(周)')
-  if(!stockdata){
+  if(!stockdata.length){
     console.log('沒有stockdata_w(周)資料跳出')
     return false;
   }
-  // const stockdata_w = stockdata.filter(data=>new Date(data.Date).getDay()==5)
+  const stockdata_w = stockdata.filter(data=>new Date(data.Date).getDay()==5)
   // result.stockdata_w = JSON.stringify(stockdata_w)
-  return stockdata.filter(({Date})=>new Date(Date).getDay()==5);
+  return stockdata_w
 }
 function stockNowPrice(stockdata){
   console.log('跑今日收盤價')
-  if(!stockdata){
+  if(!stockdata.length){
     console.log('沒有今日收盤價跳出')
     return false;
   }
@@ -566,11 +594,25 @@ async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
   const result = {}
 
   //stockdata
-  result.stockdata = await stockdataFn(stockno,stockdata)
-  result.stockdata_w = await stockdataFn_w(result.stockdata)
+  const stockdataValue = await stockdataFn(stockno,stockdata)
+  stockdataValue?result.stockdata = JSON.stringify(stockdataValue):'';
+  stockdataValue?result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue)):'';
   
   //price
-  result.price = await stockNowPrice(result.stockdata)
+  stockdataValue?result.price = await stockNowPrice(stockdataValue):'';
+
+  //netWorth 目前淨值
+  const networth = await stockNetWorth(stockno) 
+  networth?result.networth = networth:'';
+
+  //yield 殖利率
+  // const yield = await stockYield(stockno,stockdata,yielddata)
+  // result.yielddata = yield['yearArray'] //殖利率資料
+  // result.cheapPrice = yield['cheapPrice'] //便宜 
+  // result.fairPrice = yield['fairPrice'] //合理
+  // result.expensivePrice = yield['expensivePrice'] //昂貴
+  // result.nowYield = yield['nowYield'] //殖利率
+  // result.exdividendAverage= yield['exdividendAverage'] //平均股利
 
   //volume
   // if(!todayData?.Volume || todayData.Volume<201){
@@ -578,10 +620,6 @@ async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
   //   return false;
   // }
   // result.volume = todayData['Volume']
-
-
-  //netWorth 目前淨值
-  result.networth = await stockNetWorth(stockno) 
   
   //股票報酬
   // console.log('跑3,5,20,120,240,480,720日股票報酬')
@@ -601,16 +639,6 @@ async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
 
   //exdividend 除息
   // result.exdividendDay = await stockExdividend(stockno)
-
-  //yield 殖利率
-  const yield = await stockYield(stockno,result.stockdata,yielddata)
-  result.yielddata = yield['yearArray'] //殖利率資料
-  result.cheapPrice = yield['cheapPrice'] //便宜 
-  result.fairPrice = yield['fairPrice'] //合理
-  result.expensivePrice = yield['expensivePrice'] //昂貴
-  result.nowYield = yield['nowYield'] //殖利率
-  result.exdividendAverage= yield['exdividendAverage'] //平均股利
-  
 
   //周kd
   // console.log('跑周kd')
