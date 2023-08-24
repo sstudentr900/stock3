@@ -29,7 +29,11 @@
   .publicNav .nav a{
     color: #7d7b8a;
     font-size: 14px;
+    font-weight: 300;
     padding: 0 16px;
+  }
+  .publicNav .nav a:hover{
+    color: #fff;
   }
   .publicNav .nav a.active{
     color: #fff;
@@ -45,9 +49,9 @@
     </div>
     <div class="nav">
       <ul>
-        <li><a href="remuneration">股票報酬</a></li>
-        <li><a href="yield">股票殖利率</a></li>
-        <li><a href="backtest">股票回測</a></li>
+        <li><a href="remuneration" class="<%if(active=='remuneration'){%>active<%}%>">股票報酬</a></li>
+        <li><a href="yield" class="<%if(active=='yield'){%>active<%}%>">股票殖利率</a></li>
+        <li><a href="backtest" class="<%if(active=='backtest'){%>active<%}%>">股票回測</a></li>
       </ul>
     </div>
   </div>

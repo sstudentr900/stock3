@@ -1,6 +1,6 @@
 const express = require('express');
-const { query } = require('./plugin/db')
-const { stockPayMoreYear,stockPayTodayYearMonth,stockCagr,stockGrap,getNowTimeObj } = require("./plugin/stock");
+const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('./plugin/db')
+const { stockPayMoreYear,stockPayTodayYearMonth,stockCagr,stockStart,getNowTimeObj } = require("./plugin/stock");
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -37,77 +37,35 @@ app.get('/', function (req, res) {
 app.get('/table', function (req, res) {
   res.render('table')
 })
-//報酬
-async function updataStockFn(obj){
-  const jsons = await stockGrap(obj)
-  console.log(`updataStockFn,${JSON.stringify(jsons)}`)
-  if(!jsons)return;
-  const row = {}
-  const values1 = []
-  const sqlSet1 = []
-  Object.entries(jsons).forEach((json) => {
-    sqlSet1.push(json[0]+' = ?')
-    values1.push(json[1])
-  });
-  values1.push(row['id'])
-  // console.log(`values1: ${JSON.stringify(values1)}`)
-  // console.log(`sqlSet1: ${JSON.stringify(sqlSet1)}`)
-  // const values1 = [
-  //   recult['price'],
-  //   recult['networth'],
-  //   JSON.stringify(recult['stockdata']),
-  //   JSON.stringify(recult['stockdata_w']),
-  //   JSON.stringify(recult['yielddata']),
-  //   row['id']
-  // ]
-  // const sql1 = `UPDATE stock SET stockdata = ?,stockdata_w = ?,price = ?,networth = ? WHERE id = ?`
-  const sql1 = `UPDATE stock SET ${sqlSet1.join(',')} WHERE id = ?`
-  await query( sql1,values1 )
-
-  //更新stockdata
-  const stockdata = JSON.parse(jsons['stockdata'])
-  row['stockdata'] = jsons['stockdata']
-  //更新時間
-  row['dataDate'] = getNowTimeObj()['date']
-  //最近8年每年報酬
-  row['stockPayYear'] = stockPayMoreYear(stockdata,8)
-  //年化報酬率
-  row['stockCagr'] = stockCagr(row['stockPayYear'])
-  //今年每月報酬
-  row['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
-
-  return row;
-}
+//查詢股票報酬
 app.get('/remuneration', async function (req, res) {
-  const rows = await query( 'SELECT id,stockname,stockno,stockdata,updated_at from stock' )
+  console.log(`---------查詢股票---------`)
+  const rows = await dbQuery( 'SELECT id,sort,stockname,stockno,stockdata,updated_at from stock' )
   const nowDate = getNowTimeObj()['date']
   for (const row of rows) {
-    console.log(row['stockno']+'-----------')
+    console.log(`--stockno:${row['stockno']}--`)
     const dataDate = getNowTimeObj(row['updated_at'])['date']
+    //不更新時間
+    row['dataDate'] = dataDate
     //資料日期和今天日期不一樣更新
     if(dataDate!=nowDate && dataDate<nowDate || !row['stockdata']){
-      console.log(`今天日期:${nowDate},和更新日期不一樣${dataDate}`)
-      const updataStockObj = await updataStockFn(row)
-      row['stockdata'] = updataStockObj['stockdata']
-      //更新時間
-      row['dataDate'] = updataStockObj['dataDate']
-      //最近8年每年報酬
-      row['stockPayYear'] = updataStockObj['stockPayYear']
-      //年化報酬率
-      row['stockCagr'] = updataStockObj['stockCagr']
-      //今年每月報酬
-      row['stockPayMonth'] = updataStockObj['stockPayMonth']
-    }else{
-      const stockdata = JSON.parse(row['stockdata'])
-      //不更新時間
-      row['dataDate'] = dataDate
-      //最近8年每年報酬
-      row['stockPayYear'] = stockPayMoreYear(stockdata,8)
-      //年化報酬率
-      row['stockCagr'] = stockCagr(row['stockPayYear'])
-      //今年每月報酬
-      row['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
+      console.log(`資料日期${dataDate}和今天日期${nowDate}不一樣`)
+      const jsons = await stockStart(row)
+      jsons?await dbUpdata('stock',jsons,row['id']):''
+      jsons?row['stockdata'] = jsons['stockdata']:''
+      jsons?row['dataDate'] = nowDate:''
     }
+    const stockdata = JSON.parse(row['stockdata'])
+    //今年每月報酬
+    row['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
+    //最近8年每年報酬
+    row['stockPayYear'] = await stockPayMoreYear(stockdata,8)
+    //年化報酬率
+    row['stockCagr'] = stockCagr(row['stockPayYear'])
+
+    //移除不需要的值
+    delete row.stockdata
+    delete row.updated_at
   }
   // res.send(rows)
   res.render('remuneration',{
@@ -115,27 +73,76 @@ app.get('/remuneration', async function (req, res) {
     'data': rows,
   })
 })
+//增加股票報酬
 app.post('/remuneration',async function (req, res) {
+  console.log(`---------增加股票---------`)
   const params = req.body
-  const stockNo = params.stockNo
-  const stockNoArray = await query( 'SELECT id from stock WHERE stockno = ?',[stockNo])
-  // console.log(`stockNoArray,${stockNoArray.length}`)
-  if(stockNoArray.length){
+  if(!params.stockname || !params.stockno){
+    console.log(`來源資料錯誤:${params.stockname}-${params.stockno}-${JSON.stringify(params)}`)
+    res.json({result:'false',message:'來源資料錯誤'})
+    return false;
+  }
+  const stockno = params.stockno
+  const stocknoArray = await dbQuery( 'SELECT id from stock WHERE stockno = ?',[stockno])
+  // console.log(`stocknoArray,${stocknoArray.length}`)
+  if(stocknoArray.length){
     console.log('false,資料重複')
-    res.json({result:'false',error:'資料重複'})
+    res.json({result:'false',message:'資料重複'})
+    return false;
   }else{
-    console.log('INSERT')
-    const rows = await query( 'INSERT INTO stock SET ?',params)
-    // console.log(`insertId,${rows.insertId}`) 
-    const updataStockObj = await updataStockFn(stockNo)
-    console.log(updataStockObj)
+    console.log(`stockno:${stockno}`)
+    const jsons = await stockStart({'stockno':stockno})
+    if(!jsons){
+      console.log('找不到資料')
+      res.json({result:'false',message:'找不到資料'})
+      return false;
+    }else{
+      // console.log(jsons)
+      const data = {}
+      //stockdata 轉換 parse
+      const stockdata = JSON.parse(jsons['stockdata'])
+      console.log(`抓取數量:${stockdata.length}`)
+      //今年每月報酬
+      data['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
+      //最近8年每年報酬
+      data['stockPayYear'] = await stockPayMoreYear(stockdata,8)
+      //年化報酬率
+      data['stockCagr'] = stockCagr(data['stockPayYear'])
+      //儲存資料
+      const rows = await dbInsert('stock',params)
+      const insertId = rows.insertId
+      jsons['sort'] = insertId
+      await dbUpdata('stock',jsons,insertId)
+      //id
+      data['id'] = insertId
+
+      //移除不需要的值
+      delete data.stockdata
+      delete data.updated_at
+
+      res.json({result:'true',data: data })
+    }
   }
 })
+//刪除股票報酬
 app.delete('/remuneration/:id',async function (req, res) {
-  console.log(req.params.id)
-  // const rows = await query( 'DELETE from class WHERE id = ?',[req.params.id] )
-  // console.log(rows)
+  console.log(`---------刪除股票-----------`)
+  const params = req.params
+  const id = params.id
+  console.log(`id:${id}`)
+  if(!id){
+    console.log(`來源資料錯誤:${params}`)
+    res.json({result:'false',message:'來源資料錯誤'})
+    return false;
+  }
+  const rows = await dbDelete('stock',id)
+  if(rows){
+    res.json({result:'true',message:'刪除股票成功'})
+  }else{
+    res.json({result:'false',message:'刪除股票失敗'})
+  }
 })
+//拖移股票報酬
 
 // //error
 // app.get('/error', function (req, res) {

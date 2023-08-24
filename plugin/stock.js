@@ -347,10 +347,10 @@ function stockPayTodayYearMonth(stockdata){
     })
     if(date.length){
       obj['month'] = month
-      obj['Date_s'] = date[0]['Date']
-      obj['Date_e'] = date[date.length-1]['Date']
-      obj['Close_s'] = date[0]['Close'].toString()
-      obj['Close_e'] = date[date.length-1]['Close'].toString()
+      // obj['Date_s'] = date[0]['Date']
+      // obj['Date_e'] = date[date.length-1]['Date']
+      // obj['Close_s'] = date[0]['Close'].toString()
+      // obj['Close_e'] = date[date.length-1]['Close'].toString()
       obj['avenge'] = stockAvenge(date[0]['Close'],date[date.length-1]['Close'])
       row.push(obj)
     }
@@ -494,19 +494,20 @@ function dateAdd (date,days){
   const d = ('0'+ dt.getDate()).slice(-2);
   return `${dt.getFullYear()}-${m}-${d}`
 }
-async function stockdataFn(stockno,stockdata){
-  console.log('跑stockdataFn')
+async function stockdataFn_d(stockno,stockdata){
+  console.log('跑stockdataFn_d(日)')
   const timObj = getNowTimeObj()
   const nowDate = timObj['date']
   if(stockdata){
     // console.log('have value')
+    console.log(`資料庫有資料`)
     stockdata = JSON.parse(stockdata)
     let dataDate = stockdata[stockdata.length-1]['Date']
     dataDate = dateAdd(dataDate,1)
     //資料日期和今天日期不一樣且資料日期不能大於今天日期
     if(dataDate!=nowDate && dataDate<nowDate){
       // if(typeof datas=='string')return message.push(datas);//回傳錯誤請求
-      console.log(`要抓取日期:${dataDate} ~ ${nowDate}`)
+      console.log(`抓取範圍:${dataDate}~${nowDate}`)
       const datas = await stockGetData(stockno,dataDate,nowDate)
       // console.log(`datas:${Boolean(datas.length)}`)
       if(datas.length){
@@ -552,10 +553,11 @@ async function stockdataFn(stockno,stockdata){
   if(!stockdata){
     // let starDay = `${year-5}-${month}-${day}`
     const starDate = `2015-01-01`
-    console.log(`沒有資料抓取 ${starDate}-${nowDate}`)
+    console.log(`資料庫沒有資料`)
+    console.log(`抓取範圍${starDate}~${nowDate}`)
     stockdata = await stockGetData(stockno,starDate,nowDate)
-    if(stockdata.length){
-      console.log('stockdata,length:',stockdata.length)
+    if(stockdata){
+      console.log('抓取資料數量:',stockdata.length)
       // result.stockdata = JSON.stringify(stockdata)
       return stockdata
     }else{
@@ -565,17 +567,17 @@ async function stockdataFn(stockno,stockdata){
     // if(typeof value=='string')return message.push(value);//回傳錯誤請求
   }
 }
-function stockdataFn_w(stockdata){
-  console.log('跑stockdata_w(周)')
+async function stockdataFn_w(stockdata){
+  console.log('跑stockdataFn_w(周)')
   if(!stockdata.length){
-    console.log('沒有stockdata_w(周)資料跳出')
+    console.log('沒有資料跳出')
     return false;
   }
   const stockdata_w = stockdata.filter(data=>new Date(data.Date).getDay()==5)
   // result.stockdata_w = JSON.stringify(stockdata_w)
   return stockdata_w
 }
-function stockNowPrice(stockdata){
+async function stockNowPrice(stockdata){
   console.log('跑今日收盤價')
   if(!stockdata.length){
     console.log('沒有今日收盤價跳出')
@@ -589,18 +591,17 @@ function stockNowPrice(stockdata){
   // }
 
 }
-async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
+async function stockStart({stockno,stockdata,yielddata,stockname,method}){
+  console.log(`stockStart`)
   //result
   const result = {}
 
   //stockdata
-  const stockdataValue = await stockdataFn(stockno,stockdata)
-  stockdataValue?result.stockdata = JSON.stringify(stockdataValue):'';
-  stockdataValue?result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue)):'';
+  const stockdataValue = await stockdataFn_d(stockno,stockdata)
+  if(!stockdataValue)return false;
+  result.stockdata = JSON.stringify(stockdataValue);
+  result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue));
   
-  //price
-  stockdataValue?result.price = await stockNowPrice(stockdataValue):'';
-
   //netWorth 目前淨值
   const networth = await stockNetWorth(stockno) 
   networth?result.networth = networth:'';
@@ -613,6 +614,9 @@ async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
   // result.expensivePrice = yield['expensivePrice'] //昂貴
   // result.nowYield = yield['nowYield'] //殖利率
   // result.exdividendAverage= yield['exdividendAverage'] //平均股利
+
+  //price
+  // result.price = await stockNowPrice(stockdataValue);
 
   //volume
   // if(!todayData?.Volume || todayData.Volume<201){
@@ -653,7 +657,7 @@ async function stockGrap({stockno,stockdata,yielddata,stockname,method}){
   //   result.methodReturn = stockMethod({stockno,stockname,method,stockdata})
   // }
 
-  return (result && result !== 'null' && result !== 'undefined')?result:false;
+  return Object.values(result).length?result:false;
 }
 module.exports={
   stockMethod,
@@ -663,7 +667,7 @@ module.exports={
   stockNetWorth,
   stockExdividend,
   stockYield,
-  stockGrap,
+  stockStart,
   stockPromise,
   getNowTimeObj,
   stockPayMoreYear,

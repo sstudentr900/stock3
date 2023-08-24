@@ -71,6 +71,34 @@
     </ul>
     <hr>
 
+    <h2>object values null</h2>
+    <pre class="prettyprint">
+      <xmp>
+        var a = {}
+        var b = {
+          'a':'12'
+        }
+        console.log( Object.values(a).length) //0
+        console.log( Object.values(b).length) //1
+      </xmp>
+    </pre>
+    <hr>
+
+    <h2>Remove object values </h2>
+    <pre class="prettyprint">
+      <xmp>
+        var person = {
+          name: "Harry",
+          age: 16,
+          gender: "Male"
+        };
+        delete person.age;
+        console.log(person.age);  // Prints: undefined
+        console.log(person);  // Prints: {name: "Harry", gender: "Male"}
+      </xmp>
+    </pre>
+    <hr>
+
     <h2>同時運行Node.js服務器和Apache服務器</h2>
     <h3>1.在Apache->httpd.conf 加入ProxyPass</h3>
     <p>/stock2/會轉成->http://localhost:3000/</p>
@@ -156,16 +184,17 @@
       </li>
     </ul>
     <hr>
+
     <h2>EJS</h2>
     <p>是一個簡易的模板語法</p>
-    <h3>1.安裝</h3>
+    <h3>安裝</h3>
     <pre class="prettyprint">
       <xmp>
         npm i -D ejs
       npm i -D ejs-locals
       </xmp>
     </pre>
-    <h3>2.引入 EJS</h3>
+    <h3>引入EJS</h3>
     <pre class="prettyprint">
       <xmp>
         <!-- EJS 核心 -->
@@ -181,13 +210,19 @@
       });
       </xmp>
     </pre>
-    <h3>將 JSON 對像傳遞給模板之前，您需要將其轉換回字符串</h3>
+    <h3>將JSON對像傳遞給模板之前，您需要將其轉換回字符串</h3>
     <pre class="prettyprint">
       <xmp>
         var str = JSON.parse('[{"name":"bill", "age":"26"}, {"name":"jeff", "age":"32"}]');
-      app.get('/data', function(req, res){
-        res.render('data', { str: JSON.stringify(str) });
-      });
+        app.get('/data', function(req, res){
+            res.render('data', { str: JSON.stringify(str) });
+        });
+      </xmp>
+    </pre>
+    <h3>將JSON對像轉換字符串存才能存在js，之後再轉對像使用</h3>
+    <pre class="prettyprint">
+      <xmp>
+        JSON.parse('<%- JSON.stringify(data) %>').forEach(d=>creatStrockHtml(d))
       </xmp>
     </pre>
     <h4>參考</h4>
