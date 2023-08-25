@@ -1,0 +1,85 @@
+.remuneration .publicContent{
+  padding-bottom: 0;
+}
+.remuneration .customTable{
+  border: 1px solid #4A4C55;
+  display: flex;
+  height: calc(100vh - 100px - 77px - 48px - 67px);
+  overflow: auto;
+}
+.remuneration .customTable ul{
+  flex: 0 0 140px;
+}
+.remuneration .customTable ul.table_title{
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.remuneration .customTable ul.table_title li{
+  background-color: #252730;
+  border-right: 1px solid #4A4C55;
+}
+.remuneration .customTable ul.table_content+.table_content li{
+  border-left: 1px solid #4A4C55;
+}
+.remuneration .customTable ul li:first-child{
+  border-bottom: 1px solid #4A4C55;
+  background-color: #252730;
+  position: sticky;
+  top: 0;
+  cursor: move;
+}
+.remuneration .customTable li{
+  padding: 12px;
+  height: 50px;
+}
+.remuneration .customTable li+li{
+  border-top: 1px solid #4A4C55;
+}
+.remuneration .customTable li.name{
+  height: 75px;
+}
+.remuneration .customTable li p.green{
+  color: #198754;
+}
+.remuneration .publictitle{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.remuneration .publictitle .time{
+  font-size: 12px;
+  color: #7d7b8a;
+}
+.remuneration .control a.add{
+  font-size: 14px;
+  font-weight: 300;
+  padding: 3px 16px;
+  color: #feeeaf;
+  border: 1px solid #DEB103;
+}
+.remuneration .control a.add:hover{
+  font-size: 15px;
+  font-weight: 600;
+  color: #252730;
+  background: #DEB103;
+}
+/* .remuneration .control a.add{
+  margin-left: 5px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+} */
+/* .remuneration .control a.add svg{
+  margin-top: 1px;
+  fill: #3A61F6;
+} */
+.remuneration .control a.delet{
+  width: 18px;
+  position: absolute;
+  right: 5px;
+  bottom: 8px;
+}
+.remuneration .control a.delet svg{
+  fill: #F95F53;
+} 

@@ -40,8 +40,9 @@ app.get('/table', function (req, res) {
 //查詢股票報酬
 app.get('/remuneration', async function (req, res) {
   console.log(`---------查詢股票---------`)
-  const rows = await dbQuery( 'SELECT id,sort,stockname,stockno,stockdata,updated_at from stock' )
-  const nowDate = getNowTimeObj()['date']
+  const rows = await dbQuery( 'SELECT id,sort,stockname,stockno,stockdata,updated_at from stock ORDER BY sort ASC' )
+  const nowTimeObj = getNowTimeObj()
+  const nowDate = nowTimeObj['date']
   for (const row of rows) {
     console.log(`--stockno:${row['stockno']}--`)
     const dataDate = getNowTimeObj(row['updated_at'])['date']
@@ -50,8 +51,12 @@ app.get('/remuneration', async function (req, res) {
     //資料日期和今天日期不一樣更新
     if(dataDate!=nowDate && dataDate<nowDate || !row['stockdata']){
       console.log(`資料日期${dataDate}和今天日期${nowDate}不一樣`)
+      //跑股票
       const jsons = await stockStart(row)
-      jsons?await dbUpdata('stock',jsons,row['id']):''
+      //更新資料或時間
+      const updataValue =  jsons?jsons:{'updated_at':nowTimeObj['datetime']}
+      await dbUpdata('stock',updataValue,row['id'])
+      //更新row
       jsons?row['stockdata'] = jsons['stockdata']:''
       jsons?row['dataDate'] = nowDate:''
     }
@@ -142,7 +147,16 @@ app.delete('/remuneration/:id',async function (req, res) {
     res.json({result:'false',message:'刪除股票失敗'})
   }
 })
-//拖移股票報酬
+//排序股票報酬
+app.post('/remuneration/sort',async function (req, res) {
+  console.log(`---------排序股票報酬---------`)
+  const params = req.body
+  for (const param of params) {
+    console.log(param['sort'],param['id'])
+    await dbUpdata('stock',{'sort':param['sort']},param['id'])
+  }
+  res.json({result:'true',message: '股票排序成功'})
+})
 
 // //error
 // app.get('/error', function (req, res) {
