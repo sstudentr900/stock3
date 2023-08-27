@@ -26,6 +26,44 @@ function getTimes(monthLength){
     return year.toString()+monthFn(month)+date
   }); 
 } 
+function dateAdd (date,days){
+  const dt = new Date(date);
+  dt.setDate(dt.getDate()+days);
+  const m = ('0'+ (dt.getMonth()+1)).slice(-2);
+  const d = ('0'+ dt.getDate()).slice(-2);
+  return `${dt.getFullYear()}-${m}-${d}`
+}
+function getNowTimeObj(obj){
+  const objDate = obj?.date
+  const objDay = obj?.day
+  const objYear= obj?.year
+  const dt = objDate?new Date(objDate):new Date();
+  objDay?dt.setDate(dt.getDate()+objDay):'';//加減日
+  objYear?dt.setDate(dt.getFullYear()+objYear):'';//加減日
+  // const year = Number(dt.getFullYear());//取幾年-2022
+  // let month = Number(dt.getMonth())+1;//取幾月-8
+  // month = month>9?month:'0'+month//08
+  const year = dt.getFullYear()+'';
+  const month = ('0'+(dt.getMonth()+1)).slice(-2);
+  const day = ('0'+dt.getDate()).slice(-2);
+  const date = `${year}-${month}-${day}`;
+  const hours = ('0'+(dt.getHours())).slice(-2);
+  const min = ('0'+(dt.getMinutes())).slice(-2);
+  const sec = ('0'+(dt.getSeconds())).slice(-2);
+  const time = `${hours}:${min}:${sec}`;
+  const datetime = `${date} ${time}`;
+  return {
+    "year": year,
+    "month" :month,
+    "day": day,
+    "date": date,
+    "hours": hours,
+    "min": min,
+    "sec": sec,
+    "time": time,
+    "datetime": datetime
+  }
+}
 function stockPromise(obj){
   return new Promise( (resolve, reject) => {
     setTimeout(()=>{
@@ -133,6 +171,7 @@ async function stockGetData(stockno,from,to){
 }
 async function stockExdividend(stockno){
   //除息
+  console.log('跑除息')
   const jsonUrl = 'https://openapi.twse.com.tw/v1/exchangeReport/TWT48U_ALL'
   const result = 0
   let exdividend = await stockPromise({url: jsonUrl,method: "GET"})
@@ -146,12 +185,12 @@ async function stockExdividend(stockno){
 async function stockNetWorth(stockno){
   console.log('跑淨值')
   //淨值
+  const result = '';
   const jsonUrl = 'https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433'
   return await stockPromise({url: jsonUrl,method: "GET"})
   .then(body=>JSON.parse(body))
   .then(data=>data.a1)
   .then(a1s=>{
-    let result = 0;
     for(a1 of a1s){
       const msgs = a1.msgArray
       if(msgs){
@@ -165,8 +204,12 @@ async function stockNetWorth(stockno){
     }
     return result;
   })
+  .catch(error=>{
+    console.log(`抓取${stockno}淨值錯誤,${error}`)
+    return false;
+  })
 }
-async function stockYield(stockno,stockdata,yielddata){
+async function stockYieldX(stockno,stockdata,yielddata){
   console.log('跑殖利率,股利,便宜昂貴價')
   const dt = new Date();
   const month = Number(dt.getMonth())+1;
@@ -279,6 +322,86 @@ async function stockYield(stockno,stockdata,yielddata){
     exdividendAverage: exdividendAverage //平均股利
   }
 }
+async function stockYield(stockno,yielddata){
+  console.log('跑殖利率')
+  const dt = getNowTimeObj();
+  const before_year = ((dt['year']*1)-1)+''; //前年
+  const json = []
+  if( !yielddata || yielddata.slice(-1)[0]['year']<before_year ){
+    console.log(`沒有值或前年${before_year}和資料年${yielddata.slice(-1)[0]['year']}不同就抓取股利`)
+    const options  = {
+      url: `https://goodinfo.tw/tw/StockDividendPolicy.asp?STOCK_ID=${stockno}`,
+      method: 'GET',
+      headers:{
+        'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+      }
+    }
+    await stockPromise(options)
+    .then(body=>{
+      console.log(body)
+      // console.log(body)
+      const $ = cheerio.load(body);
+      const table = $("#tblDetail tbody tr");
+      for (let i = 1; i < table.length; i++) {
+        const tr = table.eq(i); 
+        const td = tr.find('td');
+        if(!td.html())continue;
+        const nowYear = td.eq(0).find('b').text();//除息年
+        // console.log(判斷年是數字)
+        if(!isNaN(Number(nowYear,10)) && nowYear<= year){
+          const dividend = td.eq(1).text();//現金股利
+          console.log(dividend,!(!isNaN(Number(dividend,10)) && dividend>0))
+          if(!(!isNaN(Number(dividend,10)) && dividend>0))break;//判斷現金是數字大於0
+          const yield = td.eq(18).text();//平均殖利率
+          json.push(Object.assign({ nowYear, dividend, yield }))
+          if(json.length>4)break; //最多抓5年
+        }
+      }
+      // return JSON.stringify(json)
+    })
+    .catch((error)=>{
+      console.log(`抓取${stockno}殖利率錯誤,${error}`)
+    })
+  }
+  console.log(`抓取殖利率:${json}`)
+  return json;
+}
+function stockYieldPrice(yielddata,stockdata){
+  console.log('跑股利便宜昂貴價')
+  //(5年)平均股利
+  const yearTotle = yielddata.reduce((previous,current)=>previous+Number(current.dividend),0)
+  const yearLength = yielddata.length
+  const average = Number((yearTotle/yearLength).toFixed(2))
+
+  //n天殖利率(股票殖利率 = 現金股利 ÷ 股價)
+  const yieldFn = (stockdata,average,day)=>{
+    const nowClose = stockdata[stockdata.length-day]?.Close
+    if(nowClose){
+      const num = ((average/nowClose)*100).toFixed(2)+'%'
+      return {yield:num,close:nowClose};
+    }else{
+      return {yield:'0%',close:0};
+    }
+  }
+
+  return {
+    // monthYield: yieldFn(stockdata,average,20)['yield'],
+    // threeMonthYield: yieldFn(stockdata,average,60)['yield'],
+    // halfYearYield: yieldFn(stockdata,average,120)['yield'],
+    // yearYield: yieldFn(stockdata,average,240)['yield'],
+    // exdividendBefore: yearArray[0]?yearArray[0].yearExdividend:0,
+    // exdividendBefore1: yearArray[1]?yearArray[1].yearExdividend:0,
+    // exdividendBefore2: yearArray[2]?yearArray[2].yearExdividend:0,
+    // average,
+    // yearArray:JSON.stringify(yearArray), //殖利率資料
+    yearLength: yearLength,//前年
+    average: average, //平均股利
+    nowYield: yieldFn(stockdata,average,1)['yield'],//目前殖利率
+    cheapPrice: average*16, //便宜 
+    fairPrice: average*20, //合理
+    expensivePrice: average*32, //昂貴
+  }
+}
 function stockAvenge(startPrice,endPrice){
   return (((endPrice-startPrice)/startPrice)*100).toFixed(2)+'%'
 }
@@ -359,11 +482,11 @@ function stockPayTodayYearMonth(stockdata){
 }
 function stockCagr(stockdata){
   if(!stockdata.length)return;
+  console.log(`跑年化報酬率`)
   //年化報酬率(%) = (總報酬率+1)^(1/年數) -1
   // 投資案A. 費時10年，總報酬率200%
   // (200%+1)^(1/10)-1 = 3^(0.1)-1 = (1.116–1)*100 = 11.6%
   // 3^(0.1)==3**(0.1) 指數運算子 js寫法
-  console.log(`跑年化報酬率`)
 
   //year
   const date = stockdata.filter(({avenge})=>{
@@ -461,50 +584,17 @@ function stockMethod({stockno,stockname,method,stockdata}) {
     return stockKdFn(stockdata,stockno,stockname,method,'D')
   }
 };
-function getNowTimeObj(enterDate){
-  const dt = enterDate?new Date(enterDate):new Date();
-  // const year = Number(dt.getFullYear());//取幾年-2022
-  // let month = Number(dt.getMonth())+1;//取幾月-8
-  // month = month>9?month:'0'+month//08
-  const year = dt.getFullYear();
-  const month = ('0'+(dt.getMonth()+1)).slice(-2);
-  const day = ('0'+dt.getDate()).slice(-2);
-  const date = `${year}-${month}-${day}`;
-  const hours = ('0'+(dt.getHours())).slice(-2);
-  const min = ('0'+(dt.getMinutes())).slice(-2);
-  const sec = ('0'+(dt.getSeconds())).slice(-2);
-  const time = `${hours}:${min}:${sec}`;
-  const datetime = `${date} ${time}`;
-  return {
-    "year": year,
-    "month" :month,
-    "day": day,
-    "date": date,
-    "hours": hours,
-    "min": min,
-    "sec": sec,
-    "time": time,
-    "datetime": datetime
-  }
-}
-function dateAdd (date,days){
-  const dt = new Date(date);
-  dt.setDate(dt.getDate()+days);
-  const m = ('0'+ (dt.getMonth()+1)).slice(-2);
-  const d = ('0'+ dt.getDate()).slice(-2);
-  return `${dt.getFullYear()}-${m}-${d}`
-}
 async function stockdataFn_d(stockno,stockdata){
   console.log('跑stockdataFn_d(日)')
   const timObj = getNowTimeObj()
   const nowDate = timObj['date']
   if(stockdata){
-    // console.log('have value')
-    console.log(`資料庫有資料`)
     stockdata = JSON.parse(stockdata)
     let dataDate = stockdata[stockdata.length-1]['Date']
-    dataDate = dateAdd(dataDate,1)
+    // dataDate = dateAdd(dataDate,1)
+    // dataDate = getNowTimeObj({'date':dataDate,'day':1})['date']
     //資料日期和今天日期不一樣且資料日期不能大於今天日期
+    console.log(`有資料資料時間${dataDate}今天時間${nowDate}`)
     if(dataDate!=nowDate && dataDate<nowDate){
       // if(typeof datas=='string')return message.push(datas);//回傳錯誤請求
       console.log(`抓取範圍:${dataDate}~${nowDate}`)
@@ -600,14 +690,16 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
   const stockdataValue = await stockdataFn_d(stockno,stockdata)
   if(!stockdataValue)return false;
   result.stockdata = JSON.stringify(stockdataValue);
-  result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue));
+  result.stockdata_w = JSON.stringify( await stockdataFn_w(stockdataValue));
   
   //netWorth 目前淨值
   const networth = await stockNetWorth(stockno) 
   networth?result.networth = networth:'';
 
   //yield 殖利率
-  // const yield = await stockYield(stockno,stockdata,yielddata)
+  const yield = await stockYield(stockno,stockdata,yielddata)
+  yield.length?result.yielddata = yield:'';
+  // yield.length?result.yieldPrice = stockYieldPrice(yield,stockdata):''
   // result.yielddata = yield['yearArray'] //殖利率資料
   // result.cheapPrice = yield['cheapPrice'] //便宜 
   // result.fairPrice = yield['fairPrice'] //合理

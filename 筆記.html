@@ -59,6 +59,29 @@
     </ul>
     <hr>
 
+  
+
+    <h2>JavaScript 陣列</h2>
+    <pre class="prettyprint">
+      <xmp>
+        function f(a){
+          if(isNaN(Number(a,10))){
+            console.log("不是数字");
+          }
+          else{
+            console.log("是数字");
+          }
+        }
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://www.cnblogs.com/heibaiqi/p/16628787.html"> javascript判断字符串是否是数字</a>
+      </li>
+    </ul>
+    <hr>
+
     <h2>JavaScript 陣列</h2>
     <pre class="prettyprint">
       <xmp></xmp>
@@ -71,7 +94,7 @@
     </ul>
     <hr>
 
-    <h2>object values null</h2>
+    <h2>JavaScript object values null</h2>
     <pre class="prettyprint">
       <xmp>
         var a = {}
@@ -84,7 +107,26 @@
     </pre>
     <hr>
 
-    <h2>Remove object values </h2>
+    <h2>JavaScript 自組json</h2>
+    <pre class="prettyprint">
+      <xmp>
+        json = []
+        const name = 'king';
+        const age = '20';
+        json.push(Object.assign({ name, age }))
+        console.log(json)
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://www.cnblogs.com/heibaiqi/p/16628787.html"> javascript判断字符串是否是数字</a>
+      </li>
+    </ul>
+    <hr>
+
+
+    <h2>JavaScript Remove object values </h2>
     <pre class="prettyprint">
       <xmp>
         var person = {
@@ -125,11 +167,19 @@
       </li>
     </ul>
     <hr>
+
     <h2>爬蟲 用 request + cheerio</h2>
-    <h3>1.安裝</h3>
+    <h3>安裝</h3>
     <pre class="prettyprint">
       <xmp>
         npm install request cheerio
+      </xmp>
+    </pre>
+    <h3>一般網站的防爬蟲機制</h3>
+    <p>直接偵測requests的header</p>
+    <pre class="prettyprint">
+      <xmp>
+        headers:{'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
       </xmp>
     </pre>
     <h4>參考</h4>
@@ -137,8 +187,13 @@
       <li>
         <a href="https://andy6804tw.github.io/2018/02/11/nodejs-crawler/">[Node.js 爬蟲] 用 request + cheerio 抓取地震資訊</a>
       </li>
+      <li>
+        <a href="https://ithelp.ithome.com.tw/articles/10191165">html檔的取得及常見問題</a>
+      </li>
     </ul>
     <hr>
+
+
     <h2>yahoo-finance 股票</h2>
     <h3>1.安裝</h3>
     <pre class="prettyprint">

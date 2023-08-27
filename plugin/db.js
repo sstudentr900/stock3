@@ -32,7 +32,7 @@ let dbInsert = async function( dataName ,objs ) {
   return await dbQuery( `INSERT INTO ${dataName} SET ?`,objs);
 }
 let dbUpdata = async function( dataName, objs ,id ) {
-  console.log(`dbUpdata`)
+  // console.log(`dbUpdata`)
   if(!Object.values(objs).length){console.log('dbUpdata->objs錯誤');return false;}
   const val = []
   const sqlText = []

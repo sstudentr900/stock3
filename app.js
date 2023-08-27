@@ -45,12 +45,12 @@ app.get('/remuneration', async function (req, res) {
   const nowDate = nowTimeObj['date']
   for (const row of rows) {
     console.log(`--stockno:${row['stockno']}--`)
-    const dataDate = getNowTimeObj(row['updated_at'])['date']
+    const dataDate = getNowTimeObj({'date':row['updated_at']})['date']
     //不更新時間
     row['dataDate'] = dataDate
     //資料日期和今天日期不一樣更新
+    console.log(`資料日期${dataDate}和今天日期${nowDate}`)
     if(dataDate!=nowDate && dataDate<nowDate || !row['stockdata']){
-      console.log(`資料日期${dataDate}和今天日期${nowDate}不一樣`)
       //跑股票
       const jsons = await stockStart(row)
       //更新資料或時間
@@ -64,7 +64,7 @@ app.get('/remuneration', async function (req, res) {
     //今年每月報酬
     row['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
     //最近8年每年報酬
-    row['stockPayYear'] = await stockPayMoreYear(stockdata,8)
+    row['stockPayYear'] = stockPayMoreYear(stockdata,8)
     //年化報酬率
     row['stockCagr'] = stockCagr(row['stockPayYear'])
 
