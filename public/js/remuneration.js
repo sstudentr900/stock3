@@ -108,6 +108,7 @@ function creatStrockHtml(data){
     <li><p>${data['average']}</p></li>
     <li><p>${data['averageYield']}</p></li>
     <li><p>${data['nowYield']}</p></li>
+    <li><p>${data['networth']}</p></li>
     <li><p>${data['cheapPrice']}</p></li>
     <li><p>${data['fairPrice']}</p></li>
     <li><p>${data['expensivePrice']}</p></li>

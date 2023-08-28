@@ -57,6 +57,9 @@ function getNowTimeObj(obj){
     "datetime": datetime
   }
 }
+function sleep(ms) {
+  return new Promise(resolve=>setTimeout(resolve, ms));
+}
 function stockPromise(obj){
   return new Promise( (resolve, reject) => {
     setTimeout(()=>{
@@ -176,30 +179,42 @@ async function stockExdividend(stockno){
   return result
 }
 async function stockNetWorth(stockno){
-  console.log('跑淨值')
+  console.log(`stockNetWorth,跑淨值`)
+  //沒值
+  if(!stockno){console.log(`stockNetWorth,${stockno},沒有值`);return false;}
   //淨值
-  const result = '';
-  const jsonUrl = 'https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433'
-  return await stockPromise({url: jsonUrl,method: "GET"})
+  const options  = {
+    url: `https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  }
+  return await stockPromise(options)
   .then(body=>JSON.parse(body))
   .then(data=>data.a1)
   .then(a1s=>{
+    let json = '';
+    // console.log(`a1s,${JSON.stringify(a1s)}`)
     for(a1 of a1s){
+      // console.log(`a1,${JSON.stringify(a1)}`)
       const msgs = a1.msgArray
       if(msgs){
+        // console.log(`msgs,${JSON.stringify(msgs)}`)
         for(msg of msgs){
-          // console.log(msg.a,stockno)
+          // console.log(`msg,${JSON.stringify(msg)}`)
           if(msg.a==stockno){
-            result = `${msg.f} / ${msg.g}%` 
+            json = `${Number(msg.f).toFixed(2)} / ${Number(msg.g).toFixed(2)}%` 
           }
         }
       }
     }
-    return result;
+    console.log(`stockNetWorth,json${JSON.stringify(json)}`)
+    return json;
   })
   .catch(error=>{
-    console.log(`抓取${stockno}淨值錯誤,${error}`)
-    return false;
+    console.log(`stockNetWorth,淨值錯誤,${error}`)
+    return '0';
   })
 }
 async function stockYieldX(stockno,stockdata,yielddata){
@@ -316,6 +331,9 @@ async function stockYieldX(stockno,stockdata,yielddata){
   }
 }
 async function stockYield(stockno,yielddata){
+  //延遲1秒
+  await sleep(1000);
+
   // console.log(`stockYield,殖利率`)
   yielddata = yielddata?JSON.parse(yielddata):yielddata
   const dt = getNowTimeObj();
@@ -355,11 +373,16 @@ async function stockYield(stockno,yielddata){
         return Number(o1['nowYear'])-Number(o2['nowYear']);
       })
 
+      if(!json.length){
+        console.log(`stockYield,抓取資料失敗`)
+        return false;
+      }
+
       console.log(`stockYield,抓取資料:${JSON.stringify(json)}`)
       return JSON.stringify(json);
     })
     .catch((error)=>{
-      console.log(`抓取${stockno}殖利率錯誤,${error}`)
+      console.log(`stockYield,抓取${stockno}殖利率錯誤,${error}`)
       return false;
     })
   }
@@ -370,16 +393,17 @@ async function stockYield(stockno,yielddata){
     console.log(`stockYield,有值,前年${before_year}和資料年${yielddata.slice(-1)[0]['nowYear']}不同抓取股利`)
     return await yield(before_year);
   }else{
-    console.log(`stockYield,有值跳出`)
+    console.log(`stockYield,有值,前年${before_year}和資料年${yielddata.slice(-1)[0]['nowYear']}一樣跳出`)
     return false;
   }
 }
 function stockYieldPrice(yielddata,stockdata){
-  console.log('stockYieldPrice,股利便宜昂貴價')
+  console.log(`stockYieldPrice,股利便宜昂貴價`)
   //判斷沒值
-  if(!yielddata){console.log('stockYieldPrice,沒有股利資料')}
-  if(!stockdata){console.log('stockYieldPrice,沒有股票資料')}
-  if(!yielddata || !stockdata){
+  // console.log(`stockYieldPrice,${yielddata.length},${stockdata.length}`)
+  if(!yielddata.length){console.log(`stockYieldPrice,沒有股利資料`)}
+  if(!stockdata.length){console.log(`stockYieldPrice,沒有股票資料`)}
+  if(!yielddata.length || !stockdata.length){
     const json = [];
     const dt = getNowTimeObj();
     const year = dt['year']; //今年
@@ -782,7 +806,7 @@ async function stockdataFn_d(stockno,stockdata){
 }
 async function stockdataFn_w(stockdata){
   console.log('stockdataFn_w,(周)')
-  if(!stockdata.length){
+  if(!stockdata){
     console.log('stockdataFn_w,沒有資料跳出')
     return false;
   }
@@ -810,25 +834,19 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
   const result = {}
 
   //stockdata
-  let stockdataValue = await stockdataFn_d(stockno,stockdata)
+  const stockdataValue = await stockdataFn_d(stockno,stockdata)
   stockdataValue?result.stockdata = JSON.stringify(stockdataValue):''
-  stockdataValue?result.stockdata_w = JSON.stringify( await stockdataFn_w(stockdataValue)):''
+  stockdataValue?result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue)):''
   stockdata = stockdataValue?stockdataValue:JSON.parse(stockdata) //
   
   //yield 殖利率
   const yield = await stockYield(stockno,yielddata,stockdata)
   yield?result.yielddata = yield:'';
-  // yield.length?result.yieldPrice = stockYieldPrice(yield,stockdata):''
-  // result.yielddata = yield['yearArray'] //殖利率資料
-  // result.cheapPrice = yield['cheapPrice'] //便宜 
-  // result.fairPrice = yield['fairPrice'] //合理
-  // result.expensivePrice = yield['expensivePrice'] //昂貴
-  // result.nowYield = yield['nowYield'] //殖利率
-  // result.exdividendAverage= yield['exdividendAverage'] //平均股利
+
 
   //netWorth 目前淨值
-  // const networth = await stockNetWorth(stockno) 
-  // networth?result.networth = networth:'';
+  const networth = await stockNetWorth(stockno) 
+  networth?result.networth = networth:'';
 
 
 

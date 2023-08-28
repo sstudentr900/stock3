@@ -1,6 +1,6 @@
 const express = require('express');
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('./plugin/db')
-const { stockPayMoreYear, stockYieldPrice,stockPayTodayYearMonth,stockCagr,stockStart,getNowTimeObj } = require("./plugin/stock");
+const { stockPayMoreYear, stockYieldPrice,stockPayTodayYearMonth,stockCagr,stockStart,getNowTimeObj,stockNetWorth } = require("./plugin/stock");
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -40,7 +40,7 @@ app.get('/table', function (req, res) {
 //查詢股票報酬
 app.get('/remuneration', async function (req, res) {
   console.log(`---------查詢股票---------`)
-  const rows = await dbQuery( 'SELECT id,sort,stockname,stockno,stockdata,yielddata,updated_at from stock ORDER BY sort ASC' )
+  const rows = await dbQuery( 'SELECT id,sort,networth,stockname,stockno,stockdata,yielddata,updated_at from stock ORDER BY sort ASC' )
   const nowTimeObj = getNowTimeObj()
   const nowDate = nowTimeObj['date']
   for (const row of rows) {
@@ -62,9 +62,10 @@ app.get('/remuneration', async function (req, res) {
       // console.log(`updataValue更新資料,${JSON.stringify(updataValue)}`)
       await dbUpdata('stock',updataValue,row['id'])
       //更新row
-      jsons && jsons['stockdata']?row['stockdata'] = jsons['stockdata']:console.log(`jsons['stockdata']沒有資料`)
+      jsons && jsons['stockdata']?row['stockdata'] = jsons['stockdata']:console.log(`jsons['stockdata']沒有資料使用row['stockdata']`)
       jsons && jsons['yielddata']?row['yielddata'] = jsons['yielddata']:console.log(`jsons['yielddata']沒有資料`)
-      jsons?row['dataDate'] = nowDate:''
+      jsons && jsons['networth']?row['networth'] = jsons['networth']:console.log(`jsons['networth']沒有資料`)
+      // jsons?row['dataDate'] = nowDate:''
     }
     //stockdata 
     row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
@@ -84,6 +85,8 @@ app.get('/remuneration', async function (req, res) {
     row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
     row['fairPrice'] = yieldObj.fairPrice;//合理
     row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+    //目前淨值
+    // row['networth'] = row['networth'];
   
 
     //移除不需要的值
