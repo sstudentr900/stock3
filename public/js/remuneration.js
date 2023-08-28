@@ -86,6 +86,9 @@ function creatStrockHtml(data){
   const stockPayMonth =data['stockPayMonth'].map(element => {
     return `<li class="${element.month}"><p class="${isActive(element.avenge)}">${element.avenge}</p></li>`
   }).join('');
+  const stockYield =data['stockYield'].map(element => {
+    return `<li class="${element.nowYear}"><p class="${isActive(element.yield)}">${element.yield}</p></li>`
+  }).join('');
   const html = `<ul class="table_content table_content_${data["id"]}" draggable="true">  
     <li class="name">
       <div class="text">
@@ -101,6 +104,13 @@ function creatStrockHtml(data){
     ${stockPayYear}
     <li><p>${data['stockCagr']}</p></li>
     ${stockPayMonth}
+    ${stockYield}
+    <li><p>${data['average']}</p></li>
+    <li><p>${data['averageYield']}</p></li>
+    <li><p>${data['nowYield']}</p></li>
+    <li><p>${data['cheapPrice']}</p></li>
+    <li><p>${data['fairPrice']}</p></li>
+    <li><p>${data['expensivePrice']}</p></li>
   </ul>`
   document.querySelector('.customTable').insertAdjacentHTML('beforeend',html)
   return `.table_content_${data["id"]}`;
@@ -148,6 +158,8 @@ function deletStrock(obj){
   }
 }
 (async function(){
+  //創建html
   pageJson.forEach(d=>creatStrockHtml(d))
+  //拖移
   document.querySelectorAll('.table_content').forEach(o=>dragStrock(o))
 }())

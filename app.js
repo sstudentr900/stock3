@@ -1,6 +1,6 @@
 const express = require('express');
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('./plugin/db')
-const { stockPayMoreYear,stockPayTodayYearMonth,stockCagr,stockStart,getNowTimeObj } = require("./plugin/stock");
+const { stockPayMoreYear, stockYieldPrice,stockPayTodayYearMonth,stockCagr,stockStart,getNowTimeObj } = require("./plugin/stock");
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -40,7 +40,7 @@ app.get('/table', function (req, res) {
 //查詢股票報酬
 app.get('/remuneration', async function (req, res) {
   console.log(`---------查詢股票---------`)
-  const rows = await dbQuery( 'SELECT id,sort,stockname,stockno,stockdata,updated_at from stock ORDER BY sort ASC' )
+  const rows = await dbQuery( 'SELECT id,sort,stockname,stockno,stockdata,yielddata,updated_at from stock ORDER BY sort ASC' )
   const nowTimeObj = getNowTimeObj()
   const nowDate = nowTimeObj['date']
   for (const row of rows) {
@@ -49,28 +49,47 @@ app.get('/remuneration', async function (req, res) {
     //不更新時間
     row['dataDate'] = dataDate
     //資料日期和今天日期不一樣更新
-    console.log(`資料日期${dataDate}和今天日期${nowDate}`)
+    console.log(`updated_at日期${dataDate},今天日期${nowDate}`)
     if(dataDate!=nowDate && dataDate<nowDate || !row['stockdata']){
+      // console.log(`updated_at和今天日期不一樣且小於今天或是stockdata沒資料`)
+      console.log(`updated_at和今天日期不一樣且小於今天`)
       //跑股票
       const jsons = await stockStart(row)
+      // console.log(`jsons值,${JSON.stringify(jsons)}`)
       //更新資料或時間
       const updataValue =  jsons?jsons:{'updated_at':nowTimeObj['datetime']}
+      // console.log(`updataValue更新資料,${JSON.stringify(updataValue)}`)
       await dbUpdata('stock',updataValue,row['id'])
       //更新row
-      jsons?row['stockdata'] = jsons['stockdata']:''
+      jsons && jsons['stockdata']?row['stockdata'] = jsons['stockdata']:console.log(`jsons['stockdata']沒有資料`)
+      jsons && jsons['yielddata']?row['yielddata'] = jsons['yielddata']:console.log(`jsons['yielddata']沒有資料`)
       jsons?row['dataDate'] = nowDate:''
     }
-    const stockdata = JSON.parse(row['stockdata'])
+    //stockdata 
+    row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
     //今年每月報酬
-    row['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
+    row['stockPayMonth'] = stockPayTodayYearMonth(row['stockdata']);
     //最近8年每年報酬
-    row['stockPayYear'] = stockPayMoreYear(stockdata,8)
+    row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],8);
     //年化報酬率
-    row['stockCagr'] = stockCagr(row['stockPayYear'])
+    row['stockCagr'] = stockCagr(row['stockPayYear']);
+    //殖利率
+    let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
+    yieldObj = stockYieldPrice(yieldObj,row['stockdata']);
+    row['stockYield'] = yieldObj.stockYield;//每年殖利率
+    row['average'] = yieldObj.average;//平均股利
+    row['averageYield'] =yieldObj.averageYield;//平均殖利率
+    row['nowYield'] = yieldObj.nowYield;//目前殖利率
+    row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
+    row['fairPrice'] = yieldObj.fairPrice;//合理
+    row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+  
 
     //移除不需要的值
     delete row.stockdata
+    delete row.yielddata
     delete row.updated_at
+    console.log(`row,${JSON.stringify(row)}`)
   }
   // res.send(rows)
   res.render('remuneration',{

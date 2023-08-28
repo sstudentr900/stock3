@@ -26,12 +26,21 @@
             <ul class="table_title">
               <li class="name"><p>名稱</p></li>
               <% data[0]['stockPayYear'].forEach(function(y) { %>
-                <li class="<%= y.year %>"><p><%= y.year %>年</p></li>
+                <li class="<%= y.year %>"><p><%= y.year %>年報酬</p></li>
               <% }); %>
-              <li>年化</li>
+              <li>年化報酬</li>
               <% data[0]['stockPayMonth'].forEach(function(m) { %>
-                <li class="<%= m.month %>"><p><%= m.month %>月</p></li>
+                <li class="<%= m.month %>"><p><%= m.month %>月報酬</p></li>
               <% }); %>
+              <% data[0]['stockYield'].forEach(function(y) { %>
+                <li class="<%= y.nowYear %>"><p><%= y.nowYear %>年殖利率</p></li>
+              <% }); %>
+              <li>平均股利</li>
+              <li>平均殖利率</li>
+              <li>目前殖利率</li>
+              <li>便宜價</li>
+              <li>合理價</li>
+              <li>昂貴價</li>
             </ul>
           </div>
         </div>
