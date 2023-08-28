@@ -537,9 +537,9 @@ function stockPayMoreYear(stockdata,yearNumber){
   let year = nowTimeObj['year'] - yearNumber;
 
   //沒值
-  if(!!stockdata.length){console.log('stockYieldPrice,沒有年數')}
-  if(!yearNumber){console.log('stockYieldPrice,沒有股利資料')}
-  if(!yielddata || !stockdata.length){
+  if(!stockdata.length){console.log('stockYieldPrice,沒有股利資料')}
+  if(!yearNumber){console.log('stockYieldPrice,沒有年數')}
+  if(!stockdata.length || !yearNumber){
     let year = nowTimeObj['year'] - yearNumber;
     while (year <= nowTimeObj['year']){
       row.push({
@@ -603,39 +603,31 @@ function stockPayTodayYearMonth(stockdata){
   }
   return row;
 }
-function stockCagr(stockdata){
+function stockCagr(stockPayYear){
   console.log(`stockCagr,跑年化報酬率`)
   //年化報酬率(%) = (總報酬率+1)^(1/年數) -1
   // 投資案A. 費時10年，總報酬率200%
   // (200%+1)^(1/10)-1 = 3^(0.1)-1 = (1.116–1)*100 = 11.6%
   // 3^(0.1)==3**(0.1) 指數運算子 js寫法
-
-  //沒值
-  if(!stockdata.length){
-    console.log('stockCagr,沒有資料')
-    return '0';
-  }
-
-  //有值
+  
   //year
-  const date = stockdata.filter(({avenge})=>{
+  const date = stockPayYear.filter(({avenge})=>{
     return avenge.includes('%');
   })
-  // console.log(date.length)
-  // console.log(date)
   //total
   const total = date.reduce((accumulator, currentValue, currentIndex, array)=>{
     const avengeValue = currentValue.avenge.split('%')[0]*1;
     return accumulator + avengeValue;
   },0).toFixed(2) 
-  // console.log(total)
-  // console.log(total/100)
-  // console.log(total/100+1)
-  // console.log(1/date.length)
   //結果
-  const result = (((total/100+1)**(1/date.length)-1)*100).toFixed(2)
-  // console.log(result)
-  return result;
+  // console.log(`total,${Boolean(total)},date,${Boolean(date.length)}`)
+  if(total && date.length>0){
+    // console.log(`626${(((total/100+1)**(1/date.length)-1)*100).toFixed(2)}`)
+    return (((total/100+1)**(1/date.length)-1)*100).toFixed(2);
+  }else {
+    // console.log(`0`)
+    return '0';
+  }
 }
 function stockYearPrice(stockdata){
   console.log('跑一段時間的高低點')

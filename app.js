@@ -50,7 +50,8 @@ app.get('/remuneration', async function (req, res) {
     row['dataDate'] = dataDate
     //資料日期和今天日期不一樣更新
     console.log(`updated_at日期${dataDate},今天日期${nowDate}`)
-    if(dataDate!=nowDate && dataDate<nowDate || !row['stockdata']){
+    if(dataDate!=nowDate && dataDate<nowDate){
+      // if(dataDate!=nowDate && dataDate<nowDate || !row['stockdata']){
       // console.log(`updated_at和今天日期不一樣且小於今天或是stockdata沒資料`)
       console.log(`updated_at和今天日期不一樣且小於今天`)
       //跑股票
