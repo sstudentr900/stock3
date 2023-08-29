@@ -1,6 +1,15 @@
 const express = require('express');
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('./plugin/db')
-const { stockPayMoreYear, stockYieldPrice,stockPayTodayYearMonth,stockCagr,stockStart,getNowTimeObj,stockNetWorth } = require("./plugin/stock");
+const { 
+  stockPayMoreYear,
+  stockYieldPrice,
+  stockPayMoreMonth,
+  stockCagr,stockStart,
+  getNowTimeObj,
+  stockHighLowPriceMoreYear,
+  stockdataFn_w,
+  stockKdFn
+} = require("./plugin/stock");
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -23,7 +32,6 @@ app.listen(port,()=>{console.log(`port ${port}`)});
 
 
 //使用express----------------------------------------- 
-
 //middleware把關後才會進入主要的程式碼 ，可以寫一些安全性的程式邏輯
 // app.use((req, res, next) => {
 //   console.log("這是 middleware");
@@ -70,7 +78,7 @@ app.get('/remuneration', async function (req, res) {
     //stockdata 
     row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
     //今年每月報酬
-    row['stockPayMonth'] = stockPayTodayYearMonth(row['stockdata']);
+    row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
     //最近8年每年報酬
     row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],8);
     //年化報酬率
@@ -85,8 +93,10 @@ app.get('/remuneration', async function (req, res) {
     row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
     row['fairPrice'] = yieldObj.fairPrice;//合理
     row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-    //目前淨值
-    // row['networth'] = row['networth'];
+    //4年高低點
+    row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
+    //周kd
+    row['wkd_d'] = stockKdFn(stockdataFn_w(row['stockdata']))['last_d'];
   
 
     //移除不需要的值
@@ -124,32 +134,52 @@ app.post('/remuneration',async function (req, res) {
       console.log('找不到資料')
       res.json({result:'false',message:'找不到資料'})
       return false;
-    }else{
-      // console.log(jsons)
-      const data = {}
-      //stockdata 轉換 parse
-      const stockdata = JSON.parse(jsons['stockdata'])
-      console.log(`抓取數量:${stockdata.length}`)
-      //今年每月報酬
-      data['stockPayMonth'] = stockPayTodayYearMonth(stockdata)
-      //最近8年每年報酬
-      data['stockPayYear'] = await stockPayMoreYear(stockdata,8)
-      //年化報酬率
-      data['stockCagr'] = stockCagr(data['stockPayYear'])
-      //儲存資料
-      const rows = await dbInsert('stock',params)
-      const insertId = rows.insertId
-      jsons['sort'] = insertId
-      await dbUpdata('stock',jsons,insertId)
-      //id
-      data['id'] = insertId
-
-      //移除不需要的值
-      delete data.stockdata
-      delete data.updated_at
-
-      res.json({result:'true',data: data })
     }
+    // console.log(jsons)
+    const data = {}
+    //stockdata 轉換 parse
+    // console.log(JSON.stringify(jsons))
+    const stockdata = jsons['stockdata']?JSON.parse(jsons['stockdata']):''
+    // console.log(`抓取數量:${stockdata.length}`)
+    //今年月報酬
+    data['stockPayMonth'] = stockPayMoreMonth(stockdata)
+    //8年報酬
+    data['stockPayYear'] = stockPayMoreYear(stockdata,8)
+    //年化報酬率
+    data['stockCagr'] = stockCagr(data['stockPayYear'])
+    //殖利率
+    const yielddata = jsons['yielddata']?JSON.parse(jsons['yielddata']):'';
+    const yieldObj = stockYieldPrice(yielddata,stockdata);
+    data['stockYield'] = yieldObj.stockYield;//每年殖利率
+    data['average'] = yieldObj.average;//平均股利
+    data['averageYield'] =yieldObj.averageYield;//平均殖利率
+    data['nowYield'] = yieldObj.nowYield;//目前殖利率
+    data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
+    data['fairPrice'] = yieldObj.fairPrice;//合理
+    data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+    //4年高低點
+    data['highLowPrice'] = stockHighLowPriceMoreYear(stockdata,4);
+    //周kd
+    data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
+    //目前淨值
+    data['networth'] = jsons['networth']
+
+    //儲存資料
+    // console.log(`儲存資料,jsons,${JSON.stringify(jsons)}`)
+    const rows = await dbInsert('stock',params)
+    const insertId = rows.insertId
+    jsons['sort'] = insertId
+    jsons['networth'] = data['networth']
+    await dbUpdata('stock',jsons,insertId)
+
+    //id
+    data['id'] = insertId
+
+    //移除不需要的值
+    delete data.stockdata
+    delete data.updated_at
+
+    res.json({result:'true',data: data })
   }
 })
 //刪除股票報酬
@@ -175,7 +205,7 @@ app.post('/remuneration/sort',async function (req, res) {
   console.log(`---------排序股票報酬---------`)
   const params = req.body
   for (const param of params) {
-    console.log(param['sort'],param['id'])
+    // console.log(param['sort'],param['id'])
     await dbUpdata('stock',{'sort':param['sort']},param['id'])
   }
   res.json({result:'true',message: '股票排序成功'})

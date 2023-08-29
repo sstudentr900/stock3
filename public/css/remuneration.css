@@ -8,7 +8,8 @@
   overflow: auto;
 }
 .remuneration .customTable ul{
-  flex: 0 0 140px;
+  flex: 0 0 150px;
+  height: calc(50px * 34 + 75px);
 }
 .remuneration .customTable ul.table_title{
   position: sticky;

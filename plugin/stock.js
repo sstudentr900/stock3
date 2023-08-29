@@ -60,6 +60,9 @@ function getNowTimeObj(obj){
 function sleep(ms) {
   return new Promise(resolve=>setTimeout(resolve, ms));
 }
+function stockAvenge(startPrice,endPrice){
+  return (((endPrice-startPrice)/startPrice)*100).toFixed(2)+'%'
+}
 function stockPromise(obj){
   return new Promise( (resolve, reject) => {
     setTimeout(()=>{
@@ -331,6 +334,9 @@ async function stockYieldX(stockno,stockdata,yielddata){
   }
 }
 async function stockYield(stockno,yielddata){
+  //沒值
+  if(!stockno){console.log(`stockYield,stockno沒有值`);return false;}
+
   //延遲1秒
   await sleep(1000);
 
@@ -387,7 +393,7 @@ async function stockYield(stockno,yielddata){
     })
   }
   if( !yielddata ){
-    console.log(`stockYield,沒有值`)
+    console.log(`stockYield,資料庫沒有值`)
     return await yield(before_year);
   }else if(yielddata && yielddata.slice(-1)[0]['nowYear']<before_year){
     console.log(`stockYield,有值,前年${before_year}和資料年${yielddata.slice(-1)[0]['nowYear']}不同抓取股利`)
@@ -520,9 +526,6 @@ function stockYieldPrice(yielddata,stockdata){
     expensivePrice: (average*32).toFixed(2), //昂貴
   }
 }
-function stockAvenge(startPrice,endPrice){
-  return (((endPrice-startPrice)/startPrice)*100).toFixed(2)+'%'
-}
 function stockPay(stockdata,time){
   console.log('跑股票報酬')
   const end = stockdata[stockdata.length-1]['Close']
@@ -554,17 +557,17 @@ function stockPayOneYear(stockdata,year){
     return '0';
   }
 }
-function stockPayMoreYear(stockdata,yearNumber){
-  console.log(`stockPayMoreYear,跑最近${yearNumber}年每年報酬`)
+function stockPayMoreYear(stockdata,number){
+  console.log(`stockPayMoreYear,跑最近${number}年每年報酬`)
   const row = []
   const nowTimeObj = getNowTimeObj()
-  let year = nowTimeObj['year'] - yearNumber;
+  let year = nowTimeObj['year'] - number;
 
   //沒值
   if(!stockdata.length){console.log('stockYieldPrice,沒有股利資料')}
-  if(!yearNumber){console.log('stockYieldPrice,沒有年數')}
-  if(!stockdata.length || !yearNumber){
-    let year = nowTimeObj['year'] - yearNumber;
+  if(!number){console.log('stockYieldPrice,沒有年數')}
+  if(!stockdata.length || !number){
+    let year = nowTimeObj['year'] - number;
     while (year <= nowTimeObj['year']){
       row.push({
         'year': year,
@@ -590,15 +593,15 @@ function stockPayMoreYear(stockdata,yearNumber){
   }
   return row;
 }
-function stockPayTodayYearMonth(stockdata){
-  console.log(`stockPayTodayYearMonth,跑今年每月報酬`)
+function stockPayMoreMonth(stockdata){
+  console.log(`stockPayMoreMonth,跑每月報酬`)
   const nowTimeObj = getNowTimeObj()
   const year = nowTimeObj['year']
   const nowMonth = nowTimeObj['month']
   const row = []
   //沒值
   if(!stockdata.length){
-    console.log('stockPayTodayYearMonth,沒有股票資料')
+    console.log('stockPayMoreMonth,沒有股票資料')
     for(let i=1;i<=nowMonth;i++){
       row.push({
         'month': ('0'+i).slice(-2),
@@ -615,15 +618,17 @@ function stockPayTodayYearMonth(stockdata){
     const date = stockdata.filter(({Date})=>{
       return Date>=`${year}-01-01` && Date<=`${year}-${month}-31`;
     })
+    obj['month'] = month
     if(date.length){
-      obj['month'] = month
       // obj['Date_s'] = date[0]['Date']
       // obj['Date_e'] = date[date.length-1]['Date']
       // obj['Close_s'] = date[0]['Close'].toString()
       // obj['Close_e'] = date[date.length-1]['Close'].toString()
       obj['avenge'] = stockAvenge(date[0]['Close'],date[date.length-1]['Close'])
-      row.push(obj)
+    }else{
+      obj['avenge'] = 0
     }
+    row.push(obj)
   }
   return row;
 }
@@ -649,18 +654,105 @@ function stockCagr(stockPayYear){
     // console.log(`626${(((total/100+1)**(1/date.length)-1)*100).toFixed(2)}`)
     return (((total/100+1)**(1/date.length)-1)*100).toFixed(2);
   }else {
-    // console.log(`0`)
+    console.log(`stockCagr,沒有資料`)
     return '0';
   }
 }
-function stockYearPrice(stockdata){
-  console.log('跑一段時間的高低點')
+function stockHighLowPrice(stockdata,year){
+  // console.log(`stockHighLowPrice,跑${year}年高低點`)
+  //有值
   let maxClose = stockdata.reduce((a,b)=>a.Close>=b.Close?a:b)['Close']
   let minClose = stockdata.reduce((a,b)=>a.Close<=b.Close?a:b)['Close']
   let diffind = (((maxClose-minClose)/maxClose)*100).toFixed(2)+'%'
-  return {'max':maxClose,'min':minClose,'diffind': diffind} 
+  return {'max':Number(maxClose).toFixed(2),'min':Number(minClose).toFixed(2),'diffind': diffind,'year':year} 
 }
-function stockGetkdData(stockdata,day){
+function stockHighLowPriceMoreYear(stockdata,number){
+  if(!stockdata.length){console.log(`stockHighLowPriceMoreYear,沒有股票資料`)}
+  if(!number){console.log(`stockHighLowPriceMoreYear,沒有年資料`)}
+  console.log(`stockHighLowPriceMoreYear,${number}年高低點`)
+  const json = [];
+  const nowTimeObj = getNowTimeObj();
+  let before_year = nowTimeObj['year'] - number;
+  // while (before_year <= nowTimeObj['year']){
+  for(before_year;before_year<nowTimeObj['year']; before_year++){
+    // console.log(`before_year,${before_year}`)
+    if(!stockdata.length || !number){
+      console.log(`stockHighLowPriceMoreYear,沒有值`)
+      json.push({'max':'0','min':'0','diffind': '0','year':before_year}) 
+      continue;
+    }
+    const data = stockdata.filter(item=>item.Date.split('-')[0]==before_year)
+    if(!data.length){
+      console.log(`stockHighLowPriceMoreYear,datalength沒有值`)
+      json.push({'max':'0','min':'0','diffind': '0','year':before_year}) 
+      continue;
+    }
+    // console.log(`data,${JSON.stringify(data)}`)
+    json.push(stockHighLowPrice(data,before_year))
+  }
+  // console.log(`stockHighLowPriceMoreYear,json,${JSON.stringify(json)}`)
+  return json;
+}
+function stockKdData(stockdata,day){
+  let K = 0
+  let D = 0
+  day = day?day:9
+  const kdData = []
+  const kdFn = function(nineDayData){
+    // 最近九天的最低價,最高價
+    let minClose = nineDayData.reduce((pre,cur)=>pre.Close<cur.Close?pre:cur).Close
+    let maxClose = nineDayData.reduce((pre,cur)=>pre.Close>cur.Close?pre:cur).Close
+    // 今日收盤價
+    let todayClose = nineDayData[nineDayData.length-1].Close
+    //RSV = ( 今日收盤價 - 最近九天的最低價 ) / ( 最近九天的最高價 - 最近九天最低價 )
+    let rsv = 100 * (todayClose-minClose) / (maxClose - minClose)
+    //K = 2/3 * ( 昨日K值 ) + 1/3 * ( 今日RSV )
+    K = (2/3) * K + (1/3) * rsv
+    //D = 2/3 * ( 昨日D值 ) + 1/3 * ( 今日K值 )
+    D = (2/3) * D + (1/3) * K
+    return {
+      date: nineDayData[nineDayData.length-1].Date,
+      K: (K).toFixed(2),
+      D: (D).toFixed(2)
+    }
+  }
+  stockdata.forEach((element,index) => {
+    const ind = index+1;
+    if(ind>day){
+      const star = ind-day
+      const end =  ind
+      //取0~9,1~10 資料
+      const nineDayData = stockdata.slice(star,end)
+      // console.log(`取${star}~${end}資料,${JSON.stringify(nineDayData)}`)
+      kdData.push(kdFn(nineDayData))
+    }
+  });
+  return kdData
+}
+function stockKdFn(stockdata){
+  console.log(`stockKdFn,跑KD`)
+  // console.log(`stockKdFn,${stockdata}`)
+  if(!stockdata.length){
+    console.log(`stockKdFn,沒有股票資料`)
+    return {
+      'datas': '0',
+      'last_data': '0',
+      'last_date': '0',
+      'last_d': '0',
+      'last_k': '0',
+    }
+  }
+  //有值
+  const kdDatas = stockKdData(stockdata)
+  return {
+    'datas': kdDatas,
+    'last_data': kdDatas[kdDatas.length-1],
+    'last_date': kdDatas[kdDatas.length-1]['date'],
+    'last_d': kdDatas[kdDatas.length-1]['D'],
+    'last_k': kdDatas[kdDatas.length-1]['K'],
+  }
+}
+function stockGetkdDataX(stockdata,day){
   let K = 0
   let D = 0
   let kdData = []
@@ -694,7 +786,7 @@ function stockGetkdData(stockdata,day){
   });
   return kdData
 }
-function stockKdFn(stockdata,stockno,stockname,method,dataSymbol){
+function stockKdFnX(stockdata,stockno,stockname,method,dataSymbol){
   // console.log(`kdFn get ${stockno} data`)
   let kdDatas = stockGetkdData(stockdata)
   let kdData = kdDatas[kdDatas.length-1]
@@ -804,15 +896,17 @@ async function stockdataFn_d(stockno,stockdata){
     // if(typeof value=='string')return message.push(value);//回傳錯誤請求
   }
 }
-async function stockdataFn_w(stockdata){
+function stockdataFn_w(stockdata){
   console.log('stockdataFn_w,(周)')
-  if(!stockdata){
+  if(!stockdata.length){
     console.log('stockdataFn_w,沒有資料跳出')
     return false;
   }
-  const stockdata_w = stockdata.filter(data=>new Date(data.Date).getDay()==5)
-  // result.stockdata_w = JSON.stringify(stockdata_w)
-  return stockdata_w
+  return stockdata.filter(data=>new Date(data.Date).getDay()==5)
+  // const stockdata_w = stockdata.filter(data=>new Date(data.Date).getDay()==5)
+  // console.log(`stockdataFn_w,資料${JSON.stringify(stockdata_w)}`)
+  // return stockdata_w;
+  
 }
 async function stockNowPrice(stockdata){
   console.log('跑今日收盤價')
@@ -834,13 +928,20 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
   const result = {}
 
   //stockdata
+  stockdata = stockdata?JSON.parse(stockdata):''
   const stockdataValue = await stockdataFn_d(stockno,stockdata)
-  stockdataValue?result.stockdata = JSON.stringify(stockdataValue):''
-  stockdataValue?result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue)):''
-  stockdata = stockdataValue?stockdataValue:JSON.parse(stockdata) //
+  if(stockdataValue){
+    result.stockdata = JSON.stringify(stockdataValue);
+    stockdata = stockdataValue
+  }
+  // if(!stockdata && !stockdataValue){
+  //   return false;
+  // }
+  // stockdataValue?result.stockdata_w = JSON.stringify(await stockdataFn_w(stockdataValue)):''
+  // stockdata = stockdataValue?stockdataValue:JSON.parse(stockdata) //
   
   //yield 殖利率
-  const yield = await stockYield(stockno,yielddata,stockdata)
+  const yield = await stockYield(stockno,yielddata)
   yield?result.yielddata = yield:'';
 
 
@@ -848,6 +949,11 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
   const networth = await stockNetWorth(stockno) 
   networth?result.networth = networth:'';
 
+  //3年高低點
+  // const yearPrice = stockYearPrice(value)
+  // result.yearHightPrice = yearPrice['max']
+  // result.yearLowPrice = yearPrice['min']
+  // result.yearDifference = yearPrice['diffind']
 
 
   //price
@@ -870,11 +976,7 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
   // result.twoYearPrice = stockPay(stockdata,480)
   // result.threeYearPrice = stockPay(stockdata,720)
 
-  //一段時間的高低點
-  // const yearPrice = stockYearPrice(value)
-  // result.yearHightPrice = yearPrice['max']
-  // result.yearLowPrice = yearPrice['min']
-  // result.yearDifference = yearPrice['diffind']
+
 
   //exdividend 除息
   // result.exdividendDay = await stockExdividend(stockno)
@@ -896,17 +998,19 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
 }
 module.exports={
   stockMethod,
+  stockdataFn_w,
   stockGetData,
   stockPay,
-  stockYearPrice,
+  stockHighLowPrice,
   stockNetWorth,
-  stockExdividend,
+  stockHighLowPriceMoreYear,
   stockYield,
   stockYieldPrice,
   stockStart,
   stockPromise,
   getNowTimeObj,
   stockPayMoreYear,
-  stockPayTodayYearMonth,
+  stockPayMoreMonth,
+  stockKdFn,
   stockCagr
 }

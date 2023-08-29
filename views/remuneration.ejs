@@ -38,10 +38,14 @@
               <li>平均股利</li>
               <li>平均殖利率</li>
               <li>目前殖利率</li>
-              <li>目前淨值</li>
-              <li>便宜價</li>
-              <li>合理價</li>
-              <li>昂貴價</li>
+              <li>便宜價(6%)</li>
+              <li>合理價(5%)</li>
+              <li>昂貴價(3%)</li>
+              <li>目前價 / 淨值</li>
+              <% data[0]['highLowPrice'].forEach(function(y) { %>
+                <li class="<%= y.year %>"><p><%= y.year %>年高低點</p></li>
+              <% }); %>
+              <li>周D值</li>
             </ul>
           </div>
         </div>

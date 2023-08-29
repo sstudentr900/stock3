@@ -17,7 +17,7 @@ async function stockGetData(stockno,from,to){
 }
 
 //
-stockGetData('00598','2023-07-24','2023-08-24').then((jsons)=>{
+stockGetData('00888','2023-07-24','2023-08-24').then((jsons)=>{
   console.log('21',jsons)
 }).catch((jsons)=>{
   console.log('23',jsons)
