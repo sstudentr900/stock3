@@ -1,13 +1,17 @@
+const config = require("./config");
 const mysql = require('mysql');
 //mysql
 const pool = mysql.createPool({
   connectionLimit: 10,//連接數
-  host           : 'localhost',
-  user           : 'root',
-  password       : '',
-  database       : 'stockdata',
+  host           :  config.DB_HOST,
+  user           :  config.DB_USER,
+  password       :  config.DB_PASSWORD,
+  database       :  config.DB_DATABASE,
 })
 let dbQuery = function( sql, values ) {
+  // console.log(`dbQuery`)
+  if(!sql){console.log('sql錯誤');return false;}
+  // if(!values){console.log('values錯誤');return false;}
   return new Promise(( resolve, reject ) => {
     pool.getConnection(function(err, connection) {
       if (err) {
@@ -27,13 +31,16 @@ let dbQuery = function( sql, values ) {
   })
 }
 let dbInsert = async function( dataName ,objs ) {
-  console.log(`dbInsert`)
-  if(!Object.values(objs).length){console.log('dbInsert->objs錯誤');return false;}
+  // console.log(`dbInsert`)
+  if(!dataName){console.log('dataName錯誤');return false;}
+  if(!Object.values(objs).length){console.log('objs錯誤');return false;}
   return await dbQuery( `INSERT INTO ${dataName} SET ?`,objs);
 }
 let dbUpdata = async function( dataName, objs ,id ) {
   // console.log(`dbUpdata`)
-  if(!Object.values(objs).length){console.log('dbUpdata->objs錯誤');return false;}
+  if(!dataName){console.log('dataName錯誤');return false;}
+  if(!Object.values(objs).length){console.log('objs錯誤');return false;}
+  if(!id){console.log('id錯誤');return false;}
   const val = []
   const sqlText = []
   Object.entries(objs).forEach((obj) => {
@@ -45,8 +52,9 @@ let dbUpdata = async function( dataName, objs ,id ) {
   return await dbQuery( sql,val );
 }
 let dbDelete = async function( dataName ,id ) {
-  console.log(`dbDelete`)
-  if(!id){console.log('dbDelete->id錯誤');return false;}
+  // console.log(`dbDelete`)
+  if(!dataName){console.log('dataName錯誤');return false;}
+  if(!id){console.log('id錯誤');return false;}
   return await dbQuery( `DELETE from ${dataName} WHERE id = ?`,[id] );
 }
 module.exports = { 

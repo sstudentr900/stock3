@@ -82,6 +82,7 @@
     </ul>
     <hr>
 
+
     <h2>JavaScript 陣列</h2>
     <pre class="prettyprint">
       <xmp></xmp>
@@ -93,6 +94,7 @@
       </li>
     </ul>
     <hr>
+
 
     <h2>JavaScript object values null</h2>
     <pre class="prettyprint">
@@ -141,6 +143,8 @@
     </pre>
     <hr>
 
+
+
     <h2>同時運行Node.js服務器和Apache服務器</h2>
     <h3>1.在Apache->httpd.conf 加入ProxyPass</h3>
     <p>/stock2/會轉成->http://localhost:3000/</p>
@@ -168,6 +172,7 @@
     </ul>
     <hr>
 
+
     <h2>爬蟲 用 request + cheerio</h2>
     <h3>安裝</h3>
     <pre class="prettyprint">
@@ -194,7 +199,7 @@
     <hr>
 
 
-    <h2>yahoo-finance 股票</h2>
+    <h2>yahoo-finance 抓取股票</h2>
     <h3>1.安裝</h3>
     <pre class="prettyprint">
       <xmp>
@@ -208,6 +213,8 @@
       </li>
     </ul>
     <hr>
+
+
     <h2>Express</h2>
     <p>Express前後端網頁框架</p>
     <h3>1.安裝</h3>
@@ -240,13 +247,14 @@
     </ul>
     <hr>
 
+
     <h2>EJS</h2>
     <p>是一個簡易的模板語法</p>
     <h3>安裝</h3>
     <pre class="prettyprint">
       <xmp>
         npm i -D ejs
-      npm i -D ejs-locals
+        npm i -D ejs-locals
       </xmp>
     </pre>
     <h3>引入EJS</h3>
@@ -296,6 +304,77 @@
       </li>
     </ul>
     <hr>
+
+    <h2>cron 排程任務的工具 </h2>
+    <h3>安裝</h3>
+    <pre class="prettyprint">
+      <xmp>
+        npm install cron
+      </xmp>
+    </pre>
+    <h3>官方範例</h3>
+    <pre class="prettyprint">
+      <xmp>
+        var CronJob = require('cron').CronJob;
+        var job = new CronJob('* * * * * *', function() {
+            console.log('You will see this message every second');
+        }, null, true, 'America/Los_Angeles');
+        job.start();
+      </xmp>
+    </pre>
+    <h3>api 架構</h3>
+    <pre class="prettyprint">
+      <xmp>
+        constructor(cronTime, onTick, onComplete, start, timezone, context, runOnInit, unrefTimeout)
+        cronTime [必填] 設定定時任務時間
+        onTick [必填] 定時任務要執行的函式
+        onComplete [選填] 完成定時任務後要執行的函式
+        Start [選填] 是否自動啟動job，默認為false
+        timeZone [選填] - 指定執行的時區
+      </xmp>
+    </pre>
+    <h3>cronTime 語法</h3>
+    <pre class="prettyprint">
+      <xmp>
+        //每秒都執行
+        * * * * * *
+
+        //每分鐘的第 10 秒執行
+        10 * * * * *
+
+        //每天晚上 10點30分10秒時執行
+        10 30 22 * * *
+      </xmp>
+    </pre>
+    <h3>調整 package.json，建立專門跑排程的 scripts</h3>
+    <pre class="prettyprint">
+      <xmp>
+        start : mac 執行單次爬蟲時使用的
+        win_start : windows 執行單次爬蟲時使用的(需要將單引號與雙引號反過來，因為 windows 只會將單引號內的資訊印除來而不會去執行)
+        cron : mac、windows 排程執行爬蟲時使用的
+        
+        "scripts": {
+          "start": "node  -e 'require(\"./index\").crawler()'",
+          "win_start": "node  -e \"require('./index').crawler()\"",
+          "cron":"node tools/cron.js"
+        }
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://ithelp.ithome.com.tw/articles/10295841"> 設定排程任務的工具 - node-cron</a>
+      </li>
+      <li>
+        <a href="https://ithelp.ithome.com.tw/articles/10249462">排程 - Cron套件超詳解，讓爬蟲自己動起來</a>
+      </li>
+      <li>
+        <a href="https://www.zeitverschiebung.net/en/">時區代碼參考網站</a>
+      </li>
+    </ul>
+    <hr>
+
+
     <h2>mysql</h2>
     <h3>sql datetime to node.js</h3>
     <p>sql時間轉換</p>
@@ -319,6 +398,8 @@
       </li>
     </ul>
     <hr>
+
+
     <h2>Node.js-Express+MySQL</h2>
     <h4>參考</h4>
     <ul>

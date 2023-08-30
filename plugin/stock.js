@@ -126,7 +126,7 @@ async function stockGetData(stockno,from,to){
   }).then(jsons=>{
     // console.log(`jsons資料: ${JSON.stringify(jsons)}`)
     if(!jsons.length){
-      console.log(`stockGetData沒有資料跳出`)
+      console.log(`stockGetData,沒有資料跳出`)
       return false
     }
 
@@ -140,12 +140,12 @@ async function stockGetData(stockno,from,to){
         let close = Number(json['close']).toFixed(2)
         array.push({
           'Date': date,
-          // 'Open':json['open'],
-          // 'Hight':json['high'],
-          // 'Low':json['low'],
+          'Open':json['open'],
+          'Hight':json['high'],
+          'Low':json['low'],
           'Close': close,
           // 'symbol': json['symbol']
-          // 'Volume':json['volume']
+          'Volume':json['volume']
         })
       }
     })
@@ -181,8 +181,8 @@ async function stockExdividend(stockno){
   }
   return result
 }
-async function stockNetWorth(stockno){
-  console.log(`stockNetWorth,跑淨值`)
+async function stockNetWorth(stockno,networth){
+  // console.log(`stockNetWorth,跑淨值`)
   //沒值
   if(!stockno){console.log(`stockNetWorth,${stockno},沒有值`);return false;}
   //淨值
@@ -212,12 +212,16 @@ async function stockNetWorth(stockno){
         }
       }
     }
-    console.log(`stockNetWorth,json${JSON.stringify(json)}`)
-    return json;
+    if(json==networth){
+      console.log(`stockNetWorth,值一樣不需更新`);return false;
+    }else{
+      console.log(`stockNetWorth,json${JSON.stringify(json)}`)
+      return json;
+    }
   })
   .catch(error=>{
     console.log(`stockNetWorth,淨值錯誤,${error}`)
-    return '0';
+    return false;
   })
 }
 async function stockYieldX(stockno,stockdata,yielddata){
@@ -677,13 +681,13 @@ function stockHighLowPriceMoreYear(stockdata,number){
   for(before_year;before_year<nowTimeObj['year']; before_year++){
     // console.log(`before_year,${before_year}`)
     if(!stockdata.length || !number){
-      console.log(`stockHighLowPriceMoreYear,沒有值`)
+      console.log(`stockHighLowPriceMoreYear,datalength,沒有值`)
       json.push({'max':'0','min':'0','diffind': '0','year':before_year}) 
       continue;
     }
     const data = stockdata.filter(item=>item.Date.split('-')[0]==before_year)
     if(!data.length){
-      console.log(`stockHighLowPriceMoreYear,datalength沒有值`)
+      console.log(`stockHighLowPriceMoreYear,data,沒有值`)
       json.push({'max':'0','min':'0','diffind': '0','year':before_year}) 
       continue;
     }
@@ -826,10 +830,10 @@ async function stockdataFn_d(stockno,stockdata){
   const timObj = getNowTimeObj()
   const nowDate = timObj['date']
   if(stockdata){
-    stockdata = JSON.parse(stockdata)
+    // stockdata = JSON.parse(stockdata)
     let dataDate = stockdata[stockdata.length-1]['Date']
     //資料日期和今天日期不一樣且資料日期不能大於今天日期
-    console.log(`stockdataFn_d,有資料,stockdata日期${dataDate},今天日期${nowDate}`)
+    // console.log(`stockdataFn_d,資料庫有值,資料日期${dataDate},今天日期${nowDate}`)
     //抓取日期要加1
     dataDate = getNowTimeObj({'date':dataDate,'day':1})['date']
     if(dataDate!=nowDate && dataDate<nowDate){
@@ -863,8 +867,11 @@ async function stockdataFn_d(stockno,stockdata){
         console.log('stockdataFn_d,抓取不到資料跳出')
         return false;
       }
+    }else if(dataDate==nowDate){
+      console.log(`stockdataFn_d,抓取範圍,${dataDate}~${nowDate} 一樣跳出`)
+      return false;
     }else{
-      console.log(`stockdataFn_d有資料,資料日期和今天日期一樣或資料日期不能小於今天日期跳出`)
+      console.log(`stockdataFn_d,資料日期:${dataDate},不能小於今天日期:${nowDate} 跳出`)
       return false;
     }
     // else
@@ -883,7 +890,7 @@ async function stockdataFn_d(stockno,stockdata){
   if(!stockdata){
     // let starDay = `${year-5}-${month}-${day}`
     const starDate = `2015-01-01`
-    console.log(`stockdataFn_d沒有資料,抓取範圍${starDate}~${nowDate}`)
+    console.log(`stockdataFn_d,資料庫沒有值,抓取範圍${starDate}~${nowDate}`)
     stockdata = await stockGetData(stockno,starDate,nowDate)
     if(stockdata){
       console.log('stockdataFn_d,抓取資料數量:',stockdata.length)
@@ -922,7 +929,7 @@ async function stockNowPrice(stockdata){
   // }
 
 }
-async function stockStart({stockno,stockdata,yielddata,stockname,method}){
+async function stockStart({stockno,stockdata,yielddata,networth,stockname,method}){
   // console.log(`stockStart`)
   //result
   const result = {}
@@ -946,8 +953,9 @@ async function stockStart({stockno,stockdata,yielddata,stockname,method}){
 
 
   //netWorth 目前淨值
-  const networth = await stockNetWorth(stockno) 
-  networth?result.networth = networth:'';
+  const networthValue = await stockNetWorth(stockno,networth) 
+  networthValue?result.networth = networthValue:'';
+
 
   //3年高低點
   // const yearPrice = stockYearPrice(value)
