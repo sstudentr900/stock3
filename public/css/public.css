@@ -167,22 +167,48 @@ input:focus{
     max-width: 576px;
   }
 } 
+/*publicPage*/
 .publicPage{
   background: #1f2127;
 }
+/*publicContent*/
 .publicContent{
-  padding: 100px 0;
+  padding: 100px 0 0;
 }
+/*publicBox*/
 .publicBox{
   width: 100%;
   padding: 24px;
   background-color: #252730;
   border-radius: 15px;
 }
+.publicBox+.publicBox{
+  margin-top: 24px;
+}
+/*publictitle*/
 .publictitle{
   color: #D8D9E3;
   font-size: 18px;
   margin-bottom: 24px;
+}
+/*publicRow*/
+.publicRowFlex{
+  display: flex;
+  gap: 30px;
+  width: 100%;
+}
+/*publicCol*/
+.publicCol-8{
+  width: 80%;
+}
+.publicCol-7{
+  width: 70%;
+}
+.publicCol-3{
+  width: 30%;
+}
+.publicCol-2{
+  width: 20%;
 }
 
 /* .publicTable{

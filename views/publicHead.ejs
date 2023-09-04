@@ -2,8 +2,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Document</title>
 <link rel="stylesheet" href="css/public.css">
+<% if(active=='remuneration'){ %>
+  <link rel="stylesheet" href="css/<%= active %>.css">
+<% } %>
+<% if(active=='home'){ %>
+  <link rel="stylesheet" href="css/<%= active %>.css">
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js'></script>
+<% } %>
 <script>
   const pageJson = JSON.parse('<%- JSON.stringify(data) %>')
 </script>
 <script src="js/public.js"></script>
+
 

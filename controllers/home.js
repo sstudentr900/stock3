@@ -1,67 +1,76 @@
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('../plugin/db')
-const { stockCrawler } = require("../plugin/stockCrawler");
 const { 
   stockPayMoreYear,
   stockYieldPrice,
   stockPayMoreMonth,
-  stockCagr,
+  stockCagr,stockStart,
   getNowTimeObj,
   stockHighLowPriceMoreYear,
   stockdataFn_w,
   stockKdFn
-} = require("../plugin/stockFn");
-
-async function search(req, res) {
-  console.log(`---------查詢股票---------`)
-  const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at from stock ORDER BY sort ASC' )
+} = require("../plugin/stock");
+async function serch(req, res) {
+  let rows = await dbQuery( 'SELECT * from market' )
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
-    console.log(`--stockno:${row['stockno']}--`)
-    //更新時間
+    //時間
     row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
-    //stockdata 
-    row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
-    //今年每月報酬
-    row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
-    //最近8年每年報酬
-    row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],8);
-    //年化報酬率
-    row['stockCagr'] = stockCagr(row['stockPayYear']);
-    //淨值
-    if(row['networthdata']){
-      let networthdata = JSON.parse(row['networthdata']);
-      networthdata = networthdata[networthdata.length-1]
-      // console.log(`networthdata,${networthdata}`)
-      row['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
-    }
-    //殖利率
-    let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
-    yieldObj = stockYieldPrice(yieldObj,row['stockdata']);
-    row['stockYield'] = yieldObj.stockYield;//每年殖利率
-    row['average'] = yieldObj.average;//平均股利
-    row['averageYield'] =yieldObj.averageYield;//平均殖利率
-    row['nowYield'] = yieldObj.nowYield;//目前殖利率
-    row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-    row['fairPrice'] = yieldObj.fairPrice;//合理
-    row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-    //4年高低點
-    row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
-    //周kd
-    row['wkd_d'] = stockKdFn(stockdataFn_w(row['stockdata']))['last_d'];
-  
+    //融資卷和3大法人買賣超
+    row['threecargo'] = JSON.parse(row['threecargo']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    //3大法人期貨買賣超
+    row['threefutures'] = JSON.parse(row['threefutures']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    //大盤上下跌家數
+    row['updownnumber'] = JSON.parse(row['updownnumber']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    //上市類股漲跌
+    row['listed'] = JSON.parse(row['listed']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    //除息股票
+    row['exdividend'] = JSON.parse(row['exdividend']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    //大股東增減
+    row['holder'] = JSON.parse(row['holder']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    //羊群增減
+    row['retail'] = JSON.parse(row['retail']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    //加權指數
+    const threecargo = JSON.parse(row['threecargo']).slice(-365)
+    row['weighted_option'] = ''
+    //景氣對策信號
+    const prosperity = JSON.parse(row['prosperity']).slice(-12)
+    // const prosperity_date = prosperity.map(({date})=>`${date.split('-')[1]}-${date.split('-')[2]}`)
+    row['prosperity_option'] = {
+      xAxis: {
+        type: 'category',
+        name: '年/月',
+        data: prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          data: prosperity.map(({point})=>point),
+          type: 'line',
+          symbolSize: 20,
+          smooth: true,
+          label: {
+            show: true,
+            position: 'bottom',
+            textStyle: {
+              fontSize: 12
+            }
+          },
+        }
+      ]
+    };
     //移除不需要的值
-    delete row.stockdata
-    delete row.yielddata
+    delete row.id
+    delete row.prosperity
     delete row.updated_at
-    console.log(`row,${JSON.stringify(row)}`)
   }
-  // res.send(rows)
-  res.render('remuneration',{
-    'active': 'remuneration',
-    'data': rows,
+  res.render('home',{
+    'active': 'home',
+    'data': rows[0],
   })
 }
-async function add(req, res) {
+async function stockAdd(req, res) {
   console.log(`---------增加股票---------`)
   const params = req.body
   if(!params.stockname || !params.stockno){
@@ -78,7 +87,7 @@ async function add(req, res) {
     return false;
   }else{
     console.log(`stockno:${stockno}`)
-    const jsons = await stockCrawler({'stockno':stockno})
+    const jsons = await stockStart({'stockno':stockno})
     if(!jsons){
       console.log('找不到資料')
       res.json({result:'false',message:'找不到資料'})
@@ -111,19 +120,18 @@ async function add(req, res) {
     //周kd
     data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
     //目前淨值
-    data['networthdata'] = jsons['networthdata']
+    data['networth'] = jsons['networth']
 
     //儲存資料
     // console.log(`儲存資料,jsons,${JSON.stringify(jsons)}`)
-    // const rows = await dbInsert('stock',params)
-    // const insertId = rows.insertId
-    // jsons['sort'] = insertId
-    // jsons['networth'] = data['networth']
-    // await dbUpdata('stock',jsons,insertId)
+    const rows = await dbInsert('stock',params)
+    const insertId = rows.insertId
+    jsons['sort'] = insertId
+    jsons['networth'] = data['networth']
+    await dbUpdata('stock',jsons,insertId)
 
     //id
-    // data['id'] = insertId
-    data['id'] = jsons['insertId']
+    data['id'] = insertId
 
     //移除不需要的值
     delete data.stockdata
@@ -132,7 +140,7 @@ async function add(req, res) {
     res.json({result:'true',data: data })
   }
 }
-async function delet(req, res) {
+async function stockDelet(req, res) {
   console.log(`---------刪除股票-----------`)
   const params = req.params
   const id = params.id
@@ -149,7 +157,7 @@ async function delet(req, res) {
     res.json({result:'false',message:'刪除股票失敗'})
   }
 }
-async function sort(req, res) {
+async function stockSort(req, res) {
   console.log(`---------排序股票報酬---------`)
   const params = req.body
   for (const param of params) {
@@ -160,8 +168,5 @@ async function sort(req, res) {
 }
 
 module.exports = { 
-  search,
-  add,
-  delet,
-  sort
+  serch
 }

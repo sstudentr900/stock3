@@ -1,5 +1,6 @@
 const express = require('express');
 const remuneration = require('./controllers/remuneration');
+const home = require('./controllers/home');
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -10,6 +11,7 @@ app.use(express.json())
 
 //css 引入
 app.use(express.static('public'))
+
 
 //ejs
 app.set('views', './views'); // 讀取 EJS 檔案位置
@@ -27,18 +29,15 @@ app.listen(port,()=>{console.log(`port ${port}`)});
 // });
 
 //home
-app.get('/', function(req, res){
-  console.log(`發送文字`)
-  res.send('send home 文字')
-})
+app.get('/', home.serch)
 //查詢股票報酬
-app.get('/remuneration', remuneration.stockAll)
+app.get('/remuneration', remuneration.search)
 //增加股票報酬
-app.post('/remuneration',remuneration.stockAdd)
+app.post('/remuneration',remuneration.add)
 //刪除股票報酬
-app.delete('/remuneration/:id',remuneration.stockDelet)
+app.delete('/remuneration/:id',remuneration.delet)
 //排序股票報酬
-app.post('/remuneration/sort',remuneration.stockSort)
+app.post('/remuneration/sort',remuneration.sort)
 
 //發送文字
 app.get('/test', function(req, res){
@@ -55,10 +54,10 @@ app.get('/table', function (req, res) {
 //   notDefined(); // 執行一個沒有定義的函式跳去500
 // })
 // 404
-app.use((req, res, next) => {
-  res.status(404).send("404 Oops! 找不到網頁！");
-});
+// app.use((req, res, next) => {
+//   res.status(404).send("404 Oops! 找不到網頁！");
+// });
 // 500
-app.use((err, req, res, next) => {
-  res.status(500).send("500 程式錯誤，請聯繫 IT 人員協助！");
-});
+// app.use((err, req, res, next) => {
+//   res.status(500).send("500 程式錯誤，請聯繫 IT 人員協助！");
+// });

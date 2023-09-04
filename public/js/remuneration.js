@@ -114,7 +114,7 @@ function creatStrockHtml(data){
     <li><p>${data['cheapPrice']}</p></li>
     <li><p>${data['fairPrice']}</p></li>
     <li><p>${data['expensivePrice']}</p></li>
-    <li><p>${data['networth']}</p></li>
+    <li><p>${data['networthdata']}</p></li>
     ${highLowPrice}
     <li><p>${data['wkd_d']}</p></li>
   </ul>`
