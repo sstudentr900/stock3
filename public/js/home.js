@@ -4,7 +4,145 @@ window.onload=async function(){
   // prosperity.setOption(pageJson['prosperity_option']);
   // const weighted = echarts.init(document.querySelector('.weighted .customTable'),'dark');
   // weighted.setOption(pageJson['weighted_option']);
-
+  //加權指數
+  // $.getJSON('https://data.jianshukeji.com/stock/history/000001', function (data) {
+  //   if(data.code !== 1) {
+  //     alert('读取股票数据失败！');
+  //     return false;
+  //   }
+    Highcharts.setOptions({
+        lang: {
+            rangeSelectorZoom: ''
+        }
+    });
+    data = pageJson['data'];
+    // console.log(data)
+    var ohlc = [],
+      volume = [],
+      dataLength = data.length,
+      // set the allowed units for data grouping
+      groupingUnits = [[
+          'week',                         // unit name
+          [1]                             // allowed multiples
+      ], [
+          'month',
+          [1, 2, 3, 4, 6]
+      ]],
+      i = 0;
+    for (i; i < dataLength; i += 1) {
+      ohlc.push([
+        Date.parse(data[i][0]), // the date
+        Number(data[i][1]), // open
+        Number(data[i][2]), // high
+        Number(data[i][3]), // low
+        Number(data[i][4]),// close
+      ]);
+      volume.push([
+        Date.parse(data[i][0]), // the date
+        Number(data[i][5].split(',').join('')),// the volume
+      ]);
+    }
+    console.log(volume)
+    // create the chart
+    Highcharts.stockChart('weighted_chart', {
+      chart: {
+        backgroundColor: 'none',
+      },
+      // rangeSelector: {
+      //     selected: 1,
+      //     inputDateFormat: '%Y-%m-%d'
+      // },
+      title: {
+          text: null
+      },
+      credits:{
+        enabled: false // 禁用版权信息
+      },
+      xAxis: {
+        dateTimeLabelFormats: {
+          millisecond: '%H:%M:%S.%L',
+          second: '%H:%M:%S',
+          minute: '%H:%M',
+          hour: '%H:%M',
+          day: '%m-%d',
+          week: '%m-%d',
+          month: '%y-%m',
+          year: '%Y'
+        },
+        labels: {
+          style: {
+            color: '#7d7b8a'
+          }
+        },
+      },
+      tooltip: {
+        split: false,
+        shared: true,
+      },
+      yAxis: [{
+        labels: {
+          align: 'right',
+          x: -3,
+          style: {
+            color: '#7d7b8a'
+          }
+        },
+        title: {
+            // text: '股价'
+            text: null,
+        },
+        height: '65%',
+        resize: {
+            enabled: true
+        },
+        gridLineColor: '#333', //網格線
+        lineWidth: 2
+      }, {
+        labels: {
+          align: 'right',
+          x: -3,
+          style: {
+            color: '#7d7b8a'
+          }
+        },
+        title: {
+            // text: '成交量'
+            text: null,
+        },
+        top: '65%',
+        height: '35%',
+        offset: 0,
+        gridLineColor: '#333', //網格線
+        lineWidth: 2
+      }],
+      series: [{
+        type: 'candlestick',
+        name: '平安银行',
+        color: 'green',
+        lineColor: 'green',
+        upColor: 'red',
+        upLineColor: 'red',
+        tooltip: {
+        },
+        navigatorOptions: {
+          color: Highcharts.getOptions().colors[0]
+        },
+        data: ohlc,
+        dataGrouping: {
+          units: groupingUnits
+        },
+        id: 'sz'
+      },{
+        type: 'column',
+        data: volume,
+        yAxis: 1,
+        dataGrouping: {
+          units: groupingUnits
+        }
+      }]
+    });
+  // });
+  //景氣燈號
   Highcharts.chart('prosperity_chart', {
     chart: {
       zoomType: 'xy',
