@@ -26,7 +26,7 @@
 .home .customTable ul li p.green{
   color: #198754;
 }
-.home .customMian ul li{
+.home .customMian .customTable ul li{
   flex: 1 1;
 }
 .home .customMian .customTable li{
@@ -48,3 +48,22 @@
   height: 400px;
   width: 100%;
 }
+.home .prosperity .item{
+  display: flex;
+}
+.home .prosperity .item li{
+  font-size: 13px;
+  color: #7d7b8a;
+}
+.home .prosperity .item li+li{
+  margin-left: 10px;
+
+}
+.home .prosperity .prosperity_chart{
+  width: 100%;
+  height:400px;
+}
+/* logo */
+/* .home .highcharts-credits{
+  display: none;
+} */

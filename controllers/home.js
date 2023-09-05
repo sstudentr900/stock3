@@ -1,22 +1,18 @@
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('../plugin/db')
 const { 
-  stockPayMoreYear,
-  stockYieldPrice,
-  stockPayMoreMonth,
-  stockCagr,stockStart,
-  getNowTimeObj,
-  stockHighLowPriceMoreYear,
-  stockdataFn_w,
-  stockKdFn
-} = require("../plugin/stock");
+  getNowTimeObj
+} = require("../plugin/stockFn");
 async function serch(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
+     //加權指數
+    const threecargo = JSON.parse(row['threecargo'])
+    row['dataDate'] = threecargo
     //時間
     row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
     //融資卷和3大法人買賣超
-    row['threecargo'] = JSON.parse(row['threecargo']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    row['threecargofinancing'] = threecargo.slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //3大法人期貨買賣超
     row['threefutures'] = JSON.parse(row['threefutures']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //大盤上下跌家數
@@ -29,38 +25,19 @@ async function serch(req, res) {
     row['holder'] = JSON.parse(row['holder']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
     //羊群增減
     row['retail'] = JSON.parse(row['retail']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
-    //加權指數
-    const threecargo = JSON.parse(row['threecargo']).slice(-365)
-    row['weighted_option'] = ''
     //景氣對策信號
     const prosperity = JSON.parse(row['prosperity']).slice(-12)
-    // const prosperity_date = prosperity.map(({date})=>`${date.split('-')[1]}-${date.split('-')[2]}`)
-    row['prosperity_option'] = {
-      xAxis: {
-        type: 'category',
-        name: '年/月',
-        data: prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
-      },
-      yAxis: {
-        type: 'value',
-      },
-      series: [
-        {
-          data: prosperity.map(({point})=>point),
-          type: 'line',
-          symbolSize: 20,
-          smooth: true,
-          label: {
-            show: true,
-            position: 'bottom',
-            textStyle: {
-              fontSize: 12
-            }
-          },
-        }
-      ]
-    };
+    row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
+    row['prosperity_data'] = prosperity.map(({point})=>point)
+    //加權指數
+    row['prosperity_market'] = prosperity.map(({date})=>{
+      const obj = threecargo.find(obj=>{
+        return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
+      })
+      return obj?Number(obj.close):0
+    })
     //移除不需要的值
+    delete row.threecargo
     delete row.id
     delete row.prosperity
     delete row.updated_at

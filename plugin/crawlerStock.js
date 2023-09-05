@@ -1,6 +1,6 @@
 exports.crawlerStock = crawlerStock;//讓其他程式在引入時可以使用這個函式
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('./db')
-const { stockCrawler,stockCrawler_market } = require("./stockCrawler");
+const { sleep,stockCrawler,stockCrawler_market } = require("./stockCrawler");
 //爬蟲股票
 async function crawlerStock(){
  //個股

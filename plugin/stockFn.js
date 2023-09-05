@@ -100,13 +100,13 @@ function stockYieldPrice(yielddata,stockdata){
     json = json.map(item=>{
       // console.log(`map,${JSON.stringify(item)},${item.nowYear},${item.dividend},${item.yield}`)
       return{
-        'nowYear': item.nowYear,
+        'nowYear': item.date,
         'dividend': item.dividend,
         'yield': `${item.yield}%`,
       }
     })
     // console.log(`json,${JSON.stringify(json)}`)
-    if(yieldLength<=5){
+    if(yieldLength<5){
       const dt = getNowTimeObj();
       const year = dt['year']; //今年
       const before_year = ((year*1)-1); //前年

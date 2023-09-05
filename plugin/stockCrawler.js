@@ -846,8 +846,8 @@ async function stockGetData({stockno,dataDate,nowDate}){
 
     // console.log(`jsons資料: ${JSON.stringify(jsons)}`)
     if(!jsons.length){
-      console.log(`stockGetData,沒有資料跑stockGetData2`)
-      jsons = await stockGetData2({dataDate,stockno,nowDate})
+      // console.log(`stockGetData,沒有資料跑stockGetData2`)
+      // jsons = await stockGetData2({dataDate,stockno,nowDate})
       if(!jsons.length){
         console.log(`stockGetData,沒有資料跳出`)
         return false
@@ -1042,22 +1042,27 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   const result = {}
 
   console.log(`抓取${stockno}資料`)
+  await sleep(10000);
   const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':stockno})
   stockdataValue?result.stockdata = stockdataValue:'';
 
-  // console.log(`殖利率`)
+  // console.log(`抓取${stockno}殖利率`)
+  // await sleep(10000);
   // const yield = await stockYield({stockno,yielddata})
   // yield?result.yielddata = yield:'';
 
-  // console.log(`淨值`)
-  // const networthValue = await stockIsGetValue({'fnName': stockNetWorth,'stockdata':networthdata,'stockno':stockno})
-  // networthValue?result.networthdata = networthValue:'';
+  console.log(`抓取${stockno}淨值`)
+  await sleep(10000);
+  const networthValue = await stockIsGetValue({'fnName': stockNetWorth,'stockdata':networthdata,'stockno':stockno})
+  networthValue?result.networthdata = networthValue:'';
 
-  // console.log(`法人買賣超和融資融劵`)
+  // console.log(`抓取${stockno}法人買賣超和融資融劵`)
+  // await sleep(10000);
   // const threecargoValue = await stockIsGetValue({'fnName': stockGetStockThreeCargo,'stockdata':threecargo,'stockno':stockno})
   // threecargoValue?result.threecargo = threecargoValue:'';
 
-  // console.log(`股東持股分級週統計圖`)
+  // console.log(`抓取${stockno}股東持股分級週統計圖`)
+  // await sleep(10000);
   // const holderValue = await stockIsGetValue({'fnName': stockGetStockHolder,'stockdata':holder,'stockno':stockno})
   // holderValue?result.holder = holderValue:'';
 
@@ -1087,35 +1092,43 @@ async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed
   const result = {}
 
   console.log(`3大法人買賣超`)
+  await sleep(10000);
   const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
   threeCargo?result.threecargo = threeCargo:'';
 
   console.log(`3大法人期貨`)
+  await sleep(10000);
   const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
   threeFutures?result.threefutures = threeFutures:'';
 
   console.log(`抓取上市類股漲跌`)
+  await sleep(10000);
   const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
   listedUpDown?result.listed = listedUpDown:'';
   // console.log(listedUpDown)
 
   console.log(`抓取除息股票`)
+  await sleep(10000);
   const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
   exdividendData?result.exdividend = exdividendData:'';
 
   console.log(`抓取上下跌家數`)
+  await sleep(10000);
   const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
   upDownNumber?result.updownnumber = upDownNumber:'';
 
   console.log(`股東增減`)
+  await sleep(10000);
   const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
   shareholder?result.holder = shareholder:'';
 
   console.log(`羊群增減`)
+  await sleep(10000);
   const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
   stockRetail?result.retail = stockRetail:'';
 
   console.log(`景氣對策信號`)
+  await sleep(10000);
   const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,stockdata:prosperity})
   prosperityData?result.prosperity = prosperityData:'';
 
@@ -1143,5 +1156,5 @@ async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed
 }
 module.exports={
   stockCrawler_market,
-  stockCrawler
+  stockCrawler,
 }

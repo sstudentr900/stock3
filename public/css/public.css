@@ -149,7 +149,14 @@ textarea:focus,
 input:focus{
     outline: none;
 }
+
 /*共用--------------------------------------------------------------------*/
+.publicTextGreen{
+  color: #198754!important;
+}
+.publicTextRed{
+  color: #F95F53!important;
+}
 /*publicWidth*/
 .publicWidth{
   max-width: 1280px;

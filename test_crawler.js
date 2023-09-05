@@ -7,7 +7,6 @@ async function crawlerStock(){
   const rows = await dbQuery( 'SELECT * from stock' )
   if(!rows){console.log(`crawlerStock失敗跳出`)}
   for (const row of rows) {
-    await sleep(4000);
     //跑股票
     // console.log(`----crawlerStock更新${row['stockno']}----`)
     // const jsons = await stockCrawler(row)
@@ -16,10 +15,10 @@ async function crawlerStock(){
   }
 
   //market 大盤
-  const rows2 = await dbQuery( 'SELECT * from market where id=1' )
-  if(!rows2){console.log(`crawlerStock_market失敗跳出`)}
-  // console.log(`rows2,${JSON.stringify(rows2[0])}`)
-  await stockCrawler_market(rows2[0])
+  // const rows2 = await dbQuery( 'SELECT * from market where id=1' )
+  // if(!rows2){console.log(`crawlerStock_market失敗跳出`)}
+  // // console.log(`rows2,${JSON.stringify(rows2[0])}`)
+  // await stockCrawler_market(rows2[0])
 }
 crawlerStock()
 

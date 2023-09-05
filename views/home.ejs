@@ -57,7 +57,7 @@
                   <li><p>融資</p></li>
                   <li><p>融劵</p></li>
                 </ul>
-                <% data['threecargo'].forEach(function(o) { %>
+                <% data['threecargofinancing'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li><p><%= o.date %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.foreign))<0){%>green<%}%>"><%= o.foreign %></p></li>
@@ -130,10 +130,14 @@
               <div class="publictitle">
                 <div class="title">
                   <h4>景氣對策信號</h4>
+                  <ul class="item">
+                    <li>低迷 16-9分</li>
+                    <li>穩定 31-23分</li>
+                    <li class="publicTextRed">熱絡 45-38分</li>
+                  </ul>
                 </div>
               </div>
-              <div class="customTable">
-              </div>
+              <div id="prosperity_chart"></div>
             </div>
           </div>
           <div class="publicCol-3 customNav">

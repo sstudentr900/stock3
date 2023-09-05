@@ -12,9 +12,16 @@
 <div class="publicFooter">
   <small>Copyright © 2023. All rights reserved.</small>
 </div>
+<script src="js/public.js"></script>
+<script>
+  const pageJson = JSON.parse('<%- JSON.stringify(data) %>')
+</script>
 <% if(active=='remuneration'){ %>
   <script src="./js/<%= active %>.js"></script>
 <% } %>
 <% if(active=='home'){ %>
+  <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js'></script> -->
+  <!-- <script src="http://code.hcharts.cn/highstock/10.0.0/highstock.js"></script> -->
+  <script src="https://code.hcharts.cn/highcharts.js"></script>
   <script src="./js/<%= active %>.js"></script>
 <% } %>
