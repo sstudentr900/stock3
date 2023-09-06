@@ -48,10 +48,26 @@ window.onload=async function(){
       chart: {
         backgroundColor: 'none',
       },
-      // rangeSelector: {
-      //     selected: 1,
-      //     inputDateFormat: '%Y-%m-%d'
-      // },
+      scrollbar: {
+        // barBorderRadius: 0,
+        // barBorderWidth: 1,
+        // buttonsEnabled: true,
+        // height: 12,
+        // margin: 0,
+        // rifleColor: '#333',
+        // trackBackgroundColor: '#f2f2f2',
+        // trackBorderRadius: 0
+        showFull: false,
+        enabled: false,//關閉航海家
+      },
+      rangeSelector: {
+        // selected: 0.3,
+        // inputDateFormat: '%Y-%m-%d',
+        enabled: false,//時間範圍
+      },
+      navigator: {
+        enabled: false,//關閉航海家
+      },
       title: {
           text: null
       },
@@ -81,59 +97,60 @@ window.onload=async function(){
       },
       yAxis: [{
         labels: {
-          align: 'right',
-          x: -3,
+          align: 'left',
+          // x: -3,
           style: {
             color: '#7d7b8a'
           }
         },
         title: {
-            // text: '股价'
-            text: null,
+          // text: '股价'
+          text: null,
         },
         height: '65%',
         resize: {
-            enabled: true
+          enabled: true
         },
         gridLineColor: '#333', //網格線
-        lineWidth: 2
+        lineWidth: 1
       }, {
         labels: {
-          align: 'right',
-          x: -3,
+          align: 'left',
+          // x: -3,
           style: {
             color: '#7d7b8a'
           }
         },
         title: {
-            // text: '成交量'
-            text: null,
+          // text: '成交量'
+          text: null,
         },
         top: '65%',
         height: '35%',
         offset: 0,
         gridLineColor: '#333', //網格線
-        lineWidth: 2
+        lineWidth: 1
       }],
       series: [{
         type: 'candlestick',
-        name: '平安银行',
+        name: '加權指數',
         color: 'green',
         lineColor: 'green',
         upColor: 'red',
         upLineColor: 'red',
         tooltip: {
         },
-        navigatorOptions: {
-          color: Highcharts.getOptions().colors[0]
-        },
+        // navigatorOptions: {
+        //   color: Highcharts.getOptions().colors[0]
+        // },
         data: ohlc,
         dataGrouping: {
           units: groupingUnits
         },
-        id: 'sz'
+        // id: 'sz'
       },{
         type: 'column',
+        name: '成交量',
         data: volume,
         yAxis: 1,
         dataGrouping: {
