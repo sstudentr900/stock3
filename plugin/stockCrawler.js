@@ -350,7 +350,7 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
       return false;
     }else{
       console.log(`stockIsGetValue,有值,抓取範圍${dataDate}以上`)
-      const datas = await fnName({nowDate,dataDate,stockno})
+      const datas = await fnName({nowDate,dataDate,stockno,stockdata})
       // console.log(`stockIsGetValue,有值,${JSON.stringify(datas)}`)
       if(!datas || !datas.length){
         console.log(`stockIsGetValue,有值,抓取不到資料跳出`)
@@ -462,7 +462,7 @@ async function stockGetListedUpDown({dataDate}){
     return false
   })
 }
-async function stockGetExdividend({dataDate}){
+async function stockGetExdividend({stockdata}){
   console.log(`stockGetExdividendData,goodinfo抓取除息股票`)
   await sleep(10000)
   const options  = {
@@ -478,16 +478,18 @@ async function stockGetExdividend({dataDate}){
     const $ = cheerio.load(body);
     const json=[]
     const exdividend = $("div.b1.r10.box_shadow table[style='width:100%;font-size:11pt'] tr");
+    const ex_date = stockdata?stockdata[stockdata.length-1]['ex_date']:'1911-01-01'
     for (let i = 1; i < exdividend.length; i++) {
       const obj = {}
       const td = exdividend.eq(i).find('td');
       if(td.length==4){
         // console.log(td.text())
+        const dates = td.eq(1).text().trim().split('/')
+        obj['ex_date'] = `${dates[0]}-${dates[1]}-${dates[2]}`;//日期
+        // console.log(`stockGetUpDownNumber,${ex_date},${obj['ex_date']},${ex_date>=obj['ex_date']}`)
+        if(ex_date && ex_date>=obj['ex_date']){continue;}
         obj['date'] = getNowTimeObj()['date']
-        // console.log(`stockGetUpDownNumber,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
-        if(dataDate && dataDate>=obj['date']){continue;}
         obj['name'] = td.eq(0).text().trim()//名稱
-        obj['ex_date'] = td.eq(1).text().trim();//日期
         obj['exdividend'] = `${td.eq(2).text().trim()} ${td.eq(3).text().trim()}`;//股利
         json.push(obj)
       }
@@ -546,7 +548,7 @@ async function stockGetUpDownNumber({dataDate}){
   })
 }
 async function stockGetShareholder({dataDate}){
-  console.log(`stockGetShareholder,抓取股東增減`)
+  console.log(`stockGetShareholder,agdstoc,抓取股東增減`)
   const options  = {
     url: `https://agdstock.club/flock-p`,
     method: 'GET',
@@ -585,7 +587,7 @@ async function stockGetShareholder({dataDate}){
   })
 }
 async function stockGetRetail({dataDate}){
-  console.log(`stockGetShareholder,抓取羊群增減`)
+  console.log(`stockGetRetail,agdstoc,抓取羊群增減`)
   const options  = {
     url: `https://agdstock.club/flock-p`,
     method: 'GET',
@@ -1094,38 +1096,37 @@ async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed
   //result
   const result = {}
 
-  console.log(`3大法人買賣超`)
-  const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
-  threeCargo?result.threecargo = threeCargo:'';
+  // console.log(`3大法人買賣超`)
+  // const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
+  // threeCargo?result.threecargo = threeCargo:'';
 
-  console.log(`3大法人期貨`)
-  const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
-  threeFutures?result.threefutures = threeFutures:'';
+  // console.log(`3大法人期貨`)
+  // const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
+  // threeFutures?result.threefutures = threeFutures:'';
 
-  console.log(`抓取上市類股漲跌`)
-  const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
-  listedUpDown?result.listed = listedUpDown:'';
-  // console.log(listedUpDown)
+  // console.log(`抓取上市類股漲跌`)
+  // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
+  // listedUpDown?result.listed = listedUpDown:'';
 
-  console.log(`抓取除息股票`)
-  const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
-  exdividendData?result.exdividend = exdividendData:'';
+  // console.log(`抓取除息股票`)
+  // const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
+  // exdividendData?result.exdividend = exdividendData:'';
 
-  console.log(`抓取上下跌家數`)
-  const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
-  upDownNumber?result.updownnumber = upDownNumber:'';
+  // console.log(`抓取上下跌家數`)
+  // const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
+  // upDownNumber?result.updownnumber = upDownNumber:'';
 
-  console.log(`股東增減`)
-  const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
-  shareholder?result.holder = shareholder:'';
+  // console.log(`股東增減`)
+  // const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
+  // shareholder?result.holder = shareholder:'';
 
-  console.log(`羊群增減`)
-  const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
-  stockRetail?result.retail = stockRetail:'';
+  // console.log(`羊群增減`)
+  // const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
+  // stockRetail?result.retail = stockRetail:'';
 
-  console.log(`景氣對策信號`)
-  const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,stockdata:prosperity})
-  prosperityData?result.prosperity = prosperityData:'';
+  // console.log(`景氣對策信號`)
+  // const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,stockdata:prosperity})
+  // prosperityData?result.prosperity = prosperityData:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){

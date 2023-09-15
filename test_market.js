@@ -48,6 +48,7 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
   const timObj = getNowTimeObj()
   const nowDate = timObj['date']
   if(stockdata){
+    // stockdata = JSON.stringify(stockdata)
     // console.log(`stockIsGetValue,stockdata,${stockdata}`)
   // if(Array.isArray(stockdata)&&stockdata.length){
     stockdata = JSON.parse(stockdata)
@@ -110,8 +111,9 @@ async function stockGetThreeCargo(dataDate){
       const dates = td.eq(0).text().split('/')
       obj['date'] = `${year}-${dates[0]}-${dates[1]}`
       // if(dataDate && !(dataDate<=obj['date'])){continue;}
-      console.log(`stockGetThreeCargo,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
-      if(dataDate && dataDate>=obj['date']){continue;}
+      // console.log(`stockGetThreeCargo,${JSON.stringify(dataDate)},${dataDate['dataDate']},${obj['date']},${dataDate['dataDate']>=obj['date']}`)
+
+      if(dataDate['dataDate'] && dataDate['dataDate']>=obj['date']){continue;}
       obj['open'] = td.eq(1).text();//指數
       obj['high'] = td.eq(2).text();//指數
       obj['low'] = td.eq(3).text();//指數
@@ -195,7 +197,7 @@ async function stockGetExdividend(dataDate){
       if(td.length==4){
         // console.log(td.text())
         obj['date'] = getNowTimeObj()['date']
-        // console.log(`stockGetUpDownNumber,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
+        console.log(`stockGetUpDownNumber,${JSON.stringify(dataDate)},${obj['date']},${dataDate>=obj['date']}`)
         if(dataDate && dataDate>=obj['date']){continue;}
         obj['name'] = td.eq(0).text().trim()//名稱
         obj['ex_date'] = td.eq(1).text().trim();//日期
@@ -580,7 +582,7 @@ async function aa(){
     }
   ]
   //3大法人買賣超
-  // const threeCargo = await await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':[{ date: '2023-08-01'}]})
+  // const threeCargo = await await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':JSON.stringify([{"date":"2023-09-13"}])})
   // console.log(threeCargo)
   //3大法人期貨
   // const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':''})
@@ -589,8 +591,8 @@ async function aa(){
   // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':[{ date: '2023-08-01'}]})
   // console.log(listedUpDown)
   //抓取除息股票
-  // const exdividend = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':[{ date: '2023-09-03'}]})
-  // console.log(exdividend)
+  const exdividend = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':JSON.stringify([{ date: '2023-09-03'}])})
+  console.log(exdividend)
   //抓取上下跌家數
   // const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':[{ date: '2023-08-01'}]})
   // console.log(upDownNumber)
@@ -610,7 +612,7 @@ async function aa(){
   // const StockThreeCargo = await stockIsGetValue({'fnName': stockGetStockThreeCargo,stockno:'00888','stockdata':JSON.stringify([{ date: '2023-08-01'}])})
   // console.log(StockThreeCargo)
   //抓取股東持股分級週統計圖
-  const stockHolder = await stockIsGetValue({'fnName': stockGetStockHolder,stockno:'00888','stockdata':''})
-  console.log(stockHolder)
+  // const stockHolder = await stockIsGetValue({'fnName': stockGetStockHolder,stockno:'00888','stockdata':''})
+  // console.log(stockHolder)
 }
 aa()
