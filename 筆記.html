@@ -34,16 +34,15 @@
         console.log(lastElement); //16
         console.timeEnd('array length property');
 
-        console.time('array slice method');
+        console.time('array slice method 回傳是array');
         let lastElement1 = arry.slice(-1);
         console.log(lastElement1); //[16]
         console.timeEnd('array slice method');
 
-        console.time('array pop method');
+        console.time('array pop method 會改變數組的長度');
         let lastElement2 = arry.pop();
         console.log(lastElement2); //16
         console.timeEnd('array pop method');
-
 
         //Output:
         //array length property: 13.798ms
@@ -59,9 +58,29 @@
     </ul>
     <hr>
 
-  
+    <h2>JavaScript空白分割字串</h2>
+    <pre class="prettyprint">
+      <xmp>
+        let s = "this        is  a book";
+        let ss = s.split(/\s+/);  // "\\s+" 是正則表示式，代表至少一個或多個空白。
+        console.log(ss);          // ["this", "is", "a", "book"]
+        
+        
+        若只要用換行符號分割字串，則使用split(/\n/")。
+        let s = "台北 文山\n新竹 竹南\n高雄 左營";
+        let ss = s.split(/\n/);
+        console.log(ss); // ["台北 文山", "新竹 竹南", "高雄 左營"]
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://matthung0807.blogspot.com/2019/12/javascript-split-by-blank.html">空白分割字串</a>
+      </li>
+    </ul>
+    <hr>
 
-    <h2>JavaScript 陣列</h2>
+    <h2>JavaScript 字符串是否是数字</h2>
     <pre class="prettyprint">
       <xmp>
         function f(a){
@@ -83,7 +102,7 @@
     <hr>
 
 
-    <h2>JavaScript 陣列</h2>
+    <h2>JavaScript 陣列函數</h2>
     <pre class="prettyprint">
       <xmp></xmp>
     </pre>

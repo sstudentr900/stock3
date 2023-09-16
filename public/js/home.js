@@ -69,7 +69,7 @@ window.onload=async function(){
         enabled: false,//關閉航海家
       },
       title: {
-          text: null
+        text: null
       },
       credits:{
         enabled: false // 禁用版权信息

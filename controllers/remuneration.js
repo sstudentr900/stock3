@@ -64,8 +64,10 @@ async function search(req, res) {
 async function add(req, res) {
   console.log(`---------增加股票---------`)
   const params = req.body
-  if(!params.stockname || !params.stockno){
-    console.log(`來源資料錯誤:${params.stockname}-${params.stockno}-${JSON.stringify(params)}`)
+  // if(!params.stockname || !params.stockno){
+  if(!params.stockno){
+    // console.log(`來源資料錯誤:${params.stockname}-${params.stockno}-${JSON.stringify(params)}`)
+    console.log(`來源資料錯誤:${params.stockno}-${JSON.stringify(params)}`)
     res.json({result:'false',message:'來源資料錯誤'})
     return false;
   }
@@ -78,6 +80,7 @@ async function add(req, res) {
     return false;
   }else{
     console.log(`stockno:${stockno}`)
+    //抓取資料
     const jsons = await stockCrawler({'stockno':stockno})
     if(!jsons){
       console.log('找不到資料')
@@ -90,6 +93,10 @@ async function add(req, res) {
     // console.log(JSON.stringify(jsons))
     const stockdata = jsons['stockdata']?JSON.parse(jsons['stockdata']):''
     // console.log(`抓取數量:${stockdata.length}`)
+    //股名
+    data['stockname'] = jsons['stockName']
+    //股號
+    data['stockno'] = stockno
     //今年月報酬
     data['stockPayMonth'] = stockPayMoreMonth(stockdata)
     //8年報酬
@@ -111,18 +118,15 @@ async function add(req, res) {
     //周kd
     data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
     //目前淨值
-    data['networthdata'] = jsons['networthdata']
-
-    //儲存資料
-    // console.log(`儲存資料,jsons,${JSON.stringify(jsons)}`)
-    // const rows = await dbInsert('stock',params)
-    // const insertId = rows.insertId
-    // jsons['sort'] = insertId
-    // jsons['networth'] = data['networth']
-    // await dbUpdata('stock',jsons,insertId)
-
+    if(jsons['networthdata']){
+      let networthdata = JSON.parse(jsons['networthdata']);
+      networthdata = networthdata[networthdata.length-1]
+      // console.log(`networthdata,${networthdata}`)
+      data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
+    }else{
+      data['networthdata'] = 0;
+    }
     //id
-    // data['id'] = insertId
     data['id'] = jsons['insertId']
 
     //移除不需要的值

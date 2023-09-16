@@ -198,6 +198,10 @@ input:focus{
   font-size: 18px;
   margin-bottom: 24px;
 }
+.publictitle .time{
+  font-size: 13px;
+  color: #7d7b8a;
+}
 /*publicRow*/
 .publicRowFlex{
   display: flex;

@@ -1,4 +1,4 @@
-let dragStrockTarget;
+var dragStrockTarget;
 function dragStrock(item){
   function dragstart(evt) {
     // console.log('dragstart-拖拉節點-1')
@@ -125,24 +125,31 @@ function addStrock(){
   // console.log('addStrock')
   const stockno = window.prompt('您好!請輸入股號', '0050');
   if (stockno) {
-    const stockname = window.prompt('請輸入股名', '元大台灣50');
-    if (stockname) {
-      getJSON({
-        'url': './remuneration',
-        'method': 'POST',
-        'body': {
-          'stockno': stockno,
-          'stockname': stockname
-        }
-      }).then(function (json) {
-        if(json.result=='false'){alert(json.message);return false;}
-        json.data.stockno = stockno
-        json.data.stockname = stockname
-        const nowObj = creatStrockHtml(json.data)
-        dragStrock(document.querySelector(nowObj))
-        alert(`新增${stockname}(${stockno})成功`)
-      });
-    } 
+    //load
+    const add = document.querySelector('.control .add')
+    add.onclick = null
+    add.classList.add('active')
+    getJSON({
+      'url': './remuneration',
+      'method': 'POST',
+      'body': {
+        'stockno': stockno,
+        // 'stockname': stockname
+      }
+    }).then(function (json) {
+      //load
+      add.onclick = addStrock
+      add.classList.remove('active')
+      if(json.result=='false'){alert(json.message);return false;}
+      // json.data.stockno = stockno
+      // json.data.stockname = stockname
+      const nowObj = creatStrockHtml(json.data)
+      dragStrock(document.querySelector(nowObj))
+      alert(`新增${stockno}成功`)
+    });
+    // const stockname = window.prompt('請輸入股名', '元大台灣50');
+    // if (stockname) {
+    // } 
   } 
 }
 function deletStrockfetch(obj,id){
