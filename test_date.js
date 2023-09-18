@@ -1,32 +1,39 @@
-function getNowTimeObj(obj){
-  const objDate = obj?.date
-  const objDay = obj?.day
-  const objYear= obj?.year
-  const dt = objDate?new Date(objDate):new Date();
-  objDay?dt.setDate(dt.getDate()+objDay):'';//加減日
-  objYear?dt.setDate(dt.getFullYear()+objYear):'';//加減日
-  // const year = Number(dt.getFullYear());//取幾年-2022
-  // let month = Number(dt.getMonth())+1;//取幾月-8
-  // month = month>9?month:'0'+month//08
-  const year = dt.getFullYear()+'';
-  const month = ('0'+(dt.getMonth()+1)).slice(-2);
-  const day = ('0'+dt.getDate()).slice(-2);
-  const date = `${year}-${month}-${day}`;
-  const hours = ('0'+(dt.getHours())).slice(-2);
-  const min = ('0'+(dt.getMinutes())).slice(-2);
-  const sec = ('0'+(dt.getSeconds())).slice(-2);
-  const time = `${hours}:${min}:${sec}`;
-  const datetime = `${date} ${time}`;
-  return {
-    "year": year,
-    "month" :month,
-    "day": day,
-    "date": date,
-    "hours": hours,
-    "min": min,
-    "sec": sec,
-    "time": time,
-    "datetime": datetime
-  }
-}
-console.log(getNowTimeObj({'date':'2023-08-26','year':-2}))
+// function getNowTimeObj(obj){
+//   const objDate = obj?.date
+//   const objDay = obj?.day
+//   const objYear= obj?.year
+//   const dt = objDate?new Date(objDate):new Date();
+//   objDay?dt.setDate(dt.getDate()+objDay):'';//加減日
+//   objYear?dt.setDate(dt.getFullYear()+objYear):'';//加減日
+//   // const year = Number(dt.getFullYear());//取幾年-2022
+//   // let month = Number(dt.getMonth())+1;//取幾月-8
+//   // month = month>9?month:'0'+month//08
+//   const year = dt.getFullYear()+'';
+//   const month = ('0'+(dt.getMonth()+1)).slice(-2);
+//   const day = ('0'+dt.getDate()).slice(-2);
+//   const date = `${year}-${month}-${day}`;
+//   const hours = ('0'+(dt.getHours())).slice(-2);
+//   const min = ('0'+(dt.getMinutes())).slice(-2);
+//   const sec = ('0'+(dt.getSeconds())).slice(-2);
+//   const time = `${hours}:${min}:${sec}`;
+//   const datetime = `${date} ${time}`;
+//   return {
+//     "year": year,
+//     "month" :month,
+//     "day": day,
+//     "date": date,
+//     "hours": hours,
+//     "min": min,
+//     "sec": sec,
+//     "time": time,
+//     "datetime": datetime
+//   }
+// }
+// console.log(getNowTimeObj({'date':'2023-08-26','year':-2}))
+
+//2020-01-01~2022-12-01
+const json = JSON.parse('[{"date":"2022-09-19","dollars":"31.35"},{"date":"2022-09-20","dollars":"31.345"},{"date":"2022-09-21","dollars":"31.44"},{"date":"2022-09-22","dollars":"31.616"},{"date":"2022-09-23","dollars":"31.665"},{"date":"2022-09-26","dollars":"31.818"},{"date":"2022-09-27","dollars":"31.78"},{"date":"2022-09-28","dollars":"31.871"},{"date":"2022-09-29","dollars":"31.847"},{"date":"2022-09-30","dollars":"31.743"},{"date":"2022-10-03","dollars":"31.868"},{"date":"2022-10-04","dollars":"31.748"},{"date":"2022-10-05","dollars":"31.568"},{"date":"2022-10-06","dollars":"31.53"},{"date":"2022-10-07","dollars":"31.668"},{"date":"2022-10-11","dollars":"31.867"},{"date":"2022-10-12","dollars":"31.839"},{"date":"2022-10-13","dollars":"31.889"},{"date":"2022-10-14","dollars":"31.884"},{"date":"2022-10-17","dollars":"31.997"},{"date":"2022-10-18","dollars":"31.994"},{"date":"2022-10-19","dollars":"32.022"},{"date":"2022-10-20","dollars":"32.107"},{"date":"2022-10-21","dollars":"32.188"},{"date":"2022-10-24","dollars":"32.226"},{"date":"2022-10-25","dollars":"32.319"},{"date":"2022-10-26","dollars":"32.215"},{"date":"2022-10-27","dollars":"32.108"},{"date":"2022-10-28","dollars":"32.148"},{"date":"2022-10-31","dollars":"32.21"},{"date":"2022-11-01","dollars":"32.179"},{"date":"2022-11-02","dollars":"32.17"},{"date":"2022-11-03","dollars":"32.245"},{"date":"2022-11-04","dollars":"32.185"},{"date":"2022-11-07","dollars":"32.082"},{"date":"2022-11-08","dollars":"32.062"},{"date":"2022-11-09","dollars":"31.903"},{"date":"2022-11-10","dollars":"31.905"},{"date":"2022-11-11","dollars":"31.41"},{"date":"2022-11-14","dollars":"31.116"},{"date":"2022-11-15","dollars":"31.105"},{"date":"2022-11-16","dollars":"31.115"},{"date":"2022-11-17","dollars":"31.158"},{"date":"2022-11-18","dollars":"31.17"},{"date":"2022-11-21","dollars":"31.21"},{"date":"2022-11-22","dollars":"31.213"},{"date":"2022-11-23","dollars":"31.218"},{"date":"2022-11-24","dollars":"31.027"},{"date":"2022-11-25","dollars":"30.905"},{"date":"2022-11-28","dollars":"31.012"},{"date":"2022-11-29","dollars":"30.952"},{"date":"2022-11-30","dollars":"30.902"},{"date":"2022-12-01","dollars":"30.633"},{"date":"2022-12-02","dollars":"30.605"},{"date":"2022-12-05","dollars":"30.455"},{"date":"2022-12-06","dollars":"30.638"},{"date":"2022-12-07","dollars":"30.662"},{"date":"2022-12-08","dollars":"30.685"},{"date":"2022-12-09","dollars":"30.622"},{"date":"2022-12-12","dollars":"30.714"},{"date":"2022-12-13","dollars":"30.724"},{"date":"2022-12-14","dollars":"30.582"},{"date":"2022-12-15","dollars":"30.625"},{"date":"2022-12-16","dollars":"30.71"},{"date":"2022-12-19","dollars":"30.74"},{"date":"2022-12-20","dollars":"30.72"},{"date":"2022-12-21","dollars":"30.709"},{"date":"2022-12-22","dollars":"30.68"},{"date":"2022-12-23","dollars":"30.712"},{"date":"2022-12-26","dollars":"30.708"},{"date":"2022-12-27","dollars":"30.691"},{"date":"2022-12-28","dollars":"30.715"},{"date":"2022-12-29","dollars":"30.732"},{"date":"2022-12-30","dollars":"30.708"},{"date":"2023-01-03","dollars":"30.698"},{"date":"2023-01-04","dollars":"30.714"},{"date":"2023-01-05","dollars":"30.71"},{"date":"2023-01-06","dollars":"30.712"},{"date":"2023-01-09","dollars":"30.52"},{"date":"2023-01-10","dollars":"30.463"},{"date":"2023-01-11","dollars":"30.435"},{"date":"2023-01-12","dollars":"30.458"},{"date":"2023-01-13","dollars":"30.387"},{"date":"2023-01-16","dollars":"30.268"},{"date":"2023-01-17","dollars":"30.315"},{"date":"2023-01-30","dollars":"30.137"},{"date":"2023-01-31","dollars":"30.052"},{"date":"2023-02-01","dollars":"29.965"},{"date":"2023-02-02","dollars":"29.7"},{"date":"2023-02-03","dollars":"29.72"},{"date":"2023-02-06","dollars":"29.984"},{"date":"2023-02-07","dollars":"30.043"},{"date":"2023-02-08","dollars":"30.06"},{"date":"2023-02-09","dollars":"30.068"},{"date":"2023-02-10","dollars":"30.136"},{"date":"2023-02-13","dollars":"30.238"},{"date":"2023-02-14","dollars":"30.215"},{"date":"2023-02-15","dollars":"30.308"},{"date":"2023-02-16","dollars":"30.28"},{"date":"2023-02-17","dollars":"30.404"},{"date":"2023-02-20","dollars":"30.371"},{"date":"2023-02-21","dollars":"30.415"},{"date":"2023-02-22","dollars":"30.504"},{"date":"2023-02-23","dollars":"30.405"},{"date":"2023-02-24","dollars":"30.48"},{"date":"2023-03-01","dollars":"30.588"},{"date":"2023-03-02","dollars":"30.63"},{"date":"2023-03-03","dollars":"30.627"},{"date":"2023-03-06","dollars":"30.576"},{"date":"2023-03-07","dollars":"30.594"},{"date":"2023-03-08","dollars":"30.79"},{"date":"2023-03-09","dollars":"30.81"},{"date":"2023-03-10","dollars":"30.848"},{"date":"2023-03-13","dollars":"30.651"},{"date":"2023-03-14","dollars":"30.62"},{"date":"2023-03-15","dollars":"30.592"},{"date":"2023-03-16","dollars":"30.631"},{"date":"2023-03-17","dollars":"30.554"},{"date":"2023-03-20","dollars":"30.593"},{"date":"2023-03-21","dollars":"30.563"},{"date":"2023-03-22","dollars":"30.526"},{"date":"2023-03-23","dollars":"30.372"},{"date":"2023-03-24","dollars":"30.353"},{"date":"2023-03-27","dollars":"30.372"},{"date":"2023-03-28","dollars":"30.385"},{"date":"2023-03-29","dollars":"30.455"},{"date":"2023-03-30","dollars":"30.461"},{"date":"2023-03-31","dollars":"30.454"},{"date":"2023-04-06","dollars":"30.528"},{"date":"2023-04-07","dollars":"30.446"},{"date":"2023-04-10","dollars":"30.452"},{"date":"2023-04-11","dollars":"30.475"},{"date":"2023-04-12","dollars":"30.505"},{"date":"2023-04-13","dollars":"30.496"},{"date":"2023-04-14","dollars":"30.465"},{"date":"2023-04-17","dollars":"30.494"},{"date":"2023-04-18","dollars":"30.527"},{"date":"2023-04-19","dollars":"30.562"},{"date":"2023-04-20","dollars":"30.612"},{"date":"2023-04-21","dollars":"30.622"},{"date":"2023-04-24","dollars":"30.645"},{"date":"2023-04-25","dollars":"30.68"},{"date":"2023-04-26","dollars":"30.725"},{"date":"2023-04-27","dollars":"30.71"},{"date":"2023-04-28","dollars":"30.74"},{"date":"2023-05-02","dollars":"30.782"},{"date":"2023-05-03","dollars":"30.746"},{"date":"2023-05-04","dollars":"30.666"},{"date":"2023-05-05","dollars":"30.641"},{"date":"2023-05-08","dollars":"30.673"},{"date":"2023-05-09","dollars":"30.702"},{"date":"2023-05-10","dollars":"30.729"},{"date":"2023-05-11","dollars":"30.738"},{"date":"2023-05-12","dollars":"30.758"},{"date":"2023-05-15","dollars":"30.813"},{"date":"2023-05-16","dollars":"30.805"},{"date":"2023-05-17","dollars":"30.817"},{"date":"2023-05-18","dollars":"30.766"},{"date":"2023-05-19","dollars":"30.682"},{"date":"2023-05-22","dollars":"30.677"},{"date":"2023-05-23","dollars":"30.748"},{"date":"2023-05-24","dollars":"30.794"},{"date":"2023-05-25","dollars":"30.79"},{"date":"2023-05-26","dollars":"30.748"},{"date":"2023-05-29","dollars":"30.652"},{"date":"2023-05-30","dollars":"30.66"},{"date":"2023-05-31","dollars":"30.766"},{"date":"2023-06-01","dollars":"30.74"},{"date":"2023-06-02","dollars":"30.655"},{"date":"2023-06-05","dollars":"30.695"},{"date":"2023-06-06","dollars":"30.728"},{"date":"2023-06-07","dollars":"30.712"},{"date":"2023-06-08","dollars":"30.76"},{"date":"2023-06-09","dollars":"30.725"},{"date":"2023-06-12","dollars":"30.754"},{"date":"2023-06-13","dollars":"30.716"},{"date":"2023-06-14","dollars":"30.72"},{"date":"2023-06-15","dollars":"30.724"},{"date":"2023-06-16","dollars":"30.708"},{"date":"2023-06-19","dollars":"30.796"},{"date":"2023-06-20","dollars":"30.89"},{"date":"2023-06-21","dollars":"30.92"},{"date":"2023-06-26","dollars":"31.017"},{"date":"2023-06-27","dollars":"31.03"},{"date":"2023-06-28","dollars":"31.072"},{"date":"2023-06-29","dollars":"31.078"},{"date":"2023-06-30","dollars":"31.135"},{"date":"2023-07-03","dollars":"31.131"},{"date":"2023-07-04","dollars":"31.116"},{"date":"2023-07-05","dollars":"31.152"},{"date":"2023-07-06","dollars":"31.22"},{"date":"2023-07-07","dollars":"31.33"},{"date":"2023-07-10","dollars":"31.385"},{"date":"2023-07-11","dollars":"31.32"},{"date":"2023-07-12","dollars":"31.238"},{"date":"2023-07-13","dollars":"31.086"},{"date":"2023-07-14","dollars":"30.893"},{"date":"2023-07-17","dollars":"31.052"},{"date":"2023-07-18","dollars":"30.996"},{"date":"2023-07-19","dollars":"31.063"},{"date":"2023-07-20","dollars":"31.077"},{"date":"2023-07-21","dollars":"31.24"},{"date":"2023-07-24","dollars":"31.352"},{"date":"2023-07-25","dollars":"31.306"},{"date":"2023-07-26","dollars":"31.252"},{"date":"2023-07-27","dollars":"31.238"},{"date":"2023-07-28","dollars":"31.39"},{"date":"2023-07-31","dollars":"31.43"},{"date":"2023-08-01","dollars":"31.518"},{"date":"2023-08-02","dollars":"31.625"},{"date":"2023-08-04","dollars":"31.691"},{"date":"2023-08-07","dollars":"31.67"},{"date":"2023-08-08","dollars":"31.81"},{"date":"2023-08-09","dollars":"31.75"},{"date":"2023-08-10","dollars":"31.762"},{"date":"2023-08-11","dollars":"31.798"},{"date":"2023-08-14","dollars":"31.924"},{"date":"2023-08-15","dollars":"31.935"},{"date":"2023-08-16","dollars":"31.895"},{"date":"2023-08-17","dollars":"31.974"},{"date":"2023-08-18","dollars":"31.942"},{"date":"2023-08-21","dollars":"31.965"},{"date":"2023-08-22","dollars":"31.938"},{"date":"2023-08-23","dollars":"31.926"},{"date":"2023-08-24","dollars":"31.795"},{"date":"2023-08-25","dollars":"31.85"},{"date":"2023-08-28","dollars":"31.874"},{"date":"2023-08-29","dollars":"31.884"},{"date":"2023-08-30","dollars":"31.856"},{"date":"2023-08-31","dollars":"31.854"},{"date":"2023-09-01","dollars":"31.861"},{"date":"2023-09-04","dollars":"31.88"},{"date":"2023-09-05","dollars":"31.895"},{"date":"2023-09-06","dollars":"31.967"},{"date":"2023-09-07","dollars":"31.995"},{"date":"2023-09-08","dollars":"32.008"},{"date":"2023-09-11","dollars":"31.98"},{"date":"2023-09-12","dollars":"32.032"},{"date":"2023-09-13","dollars":"31.968"},{"date":"2023-09-14","dollars":"31.91"},{"date":"2023-09-15","dollars":"31.928"},{"date":"2023-09-18","dollars":"31.978"}]')
+const year = 2020;
+
+
+console.log(57,getMonthly({year,json}))

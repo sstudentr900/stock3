@@ -1,20 +1,19 @@
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('../plugin/db')
 const { 
-  getNowTimeObj
+  getNowTimeObj,
+  getMonthly
 } = require("../plugin/stockFn");
 async function serch(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
      //加權指數
-    const threecargo = JSON.parse(row['threecargo'])
-    row['data'] = threecargo.map(item=>{
-      return [item.date,item.open,item.high,item.low,item.close,item.Volume]
-    })
+    const data = JSON.parse(row['twii'])
+    row['data'] = data.map(item=>[item.date,item.open,item.hight,item.low,item.close,item.volume])
     //時間
     row['date'] = getNowTimeObj({'date':row['updated_at']})['date']
-    //融資卷和3大法人買賣超
-    row['threecargofinancing'] = threecargo.slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    //3大法人買賣超融資卷
+    row['threecargofinancing'] = JSON.parse(row['threecargo']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //3大法人期貨買賣超
     row['threefutures'] = JSON.parse(row['threefutures']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //大盤上下跌家數
@@ -52,7 +51,7 @@ async function serch(req, res) {
       row['prosperity_data'] = prosperity.map(({point})=>point)
       //景氣對策信號_加權指數
       row['prosperity_market'] = prosperity.map(({date})=>{
-        const obj = threecargo.find(obj=>{
+        const obj = data.find(obj=>{
           return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
         })
         return obj?Number(obj.close):0
@@ -60,26 +59,27 @@ async function serch(req, res) {
     }
     //美金
     if(row['dollars']){
-      const dollars = JSON.parse(row['dollars']).slice(-360)
+      const dollars = getMonthly({ year:'2020',json:JSON.parse(row['dollars']) })
       //日期
-      row['dollars_date'] = dollars.map(({date})=>date)
+      row['dollars_date'] = dollars.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
       //美金資料
       row['dollars_data'] = dollars.map(({dollars})=>Number(dollars))
       //美金_加權指數
       row['dollars_market'] = dollars.map(({date})=>{
-        const obj = threecargo.find(obj=>date==obj.date)
+        const obj = data.find(obj=>date==obj.date)
         return obj?Number(obj.close):0
       })
     }
 
     //移除不需要的值和值沒有轉JSON.parse
+    delete row.twii
     delete row.threecargo
     delete row.id
     delete row.prosperity
     delete row.updated_at
     delete row.dollars
   }
-  console.log(rows[0])
+  // console.log(rows[0])
   res.render('home',{
     'active': 'home',
     'data': rows[0],

@@ -391,8 +391,7 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
   return JSON.stringify(stockdata);
 }
 async function stockGetThreeCargo({dataDate}){
-  console.log(`stockGetThreeCargo,goodinfo抓取3大法人買賣超,指數高低點成交量,融資融卷`)
-  console.log(`stockGetThreeCargo,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE`)
+  console.log(`stockGetThreeCargo,抓取3大法人買賣超融資融卷,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE`)
   await sleep(12000)
   const json = []
   const dt = getNowTimeObj();
@@ -417,11 +416,11 @@ async function stockGetThreeCargo({dataDate}){
       // if(dataDate && !(dataDate<=obj['date'])){continue;}
       // console.log(`stockGetThreeCargo,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate && dataDate>=obj['date']){continue;}
-      obj['open'] = td.eq(1).text();//指數
-      obj['high'] = td.eq(2).text();//指數
-      obj['low'] = td.eq(3).text();//指數
-      obj['close'] = td.eq(4).text();//指數收盤
-      obj['Volume'] = td.eq(8).text();//指數
+      // obj['open'] = td.eq(1).text();//指數
+      // obj['high'] = td.eq(2).text();//指數
+      // obj['low'] = td.eq(3).text();//指數
+      // obj['close'] = td.eq(4).text();//指數收盤
+      // obj['Volume'] = td.eq(8).text();//指數
       obj['foreign'] = td.eq(10).text();//外資
       obj['letter'] = td.eq(11).text();//投信
       obj['proprietor'] = td.eq(12).text();//自營商
@@ -915,7 +914,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
   }
   console.log(`stockGetData,yahoo,抓取時間,${dataDate},${nowDate}`)
   return await yahooFinance.historical({
-    symbol: `${stockno}.TW`,
+    symbol: `${stockno}`,
     from: dataDate,
     to: nowDate,
     period: 'd'
@@ -1132,7 +1131,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   result.stockno = stockno;
 
   console.log(`抓取${stockno}資料`)
-  const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':stockno})
+  const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':`${stockno}.TW`})
   stockdataValue?result.stockdata = stockdataValue:'';
 
   console.log(`抓取${stockno}殖利率`)
@@ -1182,12 +1181,12 @@ async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,l
   const result = {}
 
   console.log(`抓取加權資料`)
-  const twiiValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':twii})
+  const twiiValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':twii,'stockno':'^TWII'})
   twiiValue?result.twii = twiiValue:'';
 
-  // console.log(`3大法人買賣超`)
-  // const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
-  // threeCargo?result.threecargo = threeCargo:'';
+  console.log(`3大法人買賣超`)
+  const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
+  threeCargo?result.threecargo = threeCargo:'';
 
   // console.log(`3大法人期貨`)
   // const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
@@ -1217,9 +1216,9 @@ async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,l
   // const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,'stockdata':prosperity})
   // prosperityData?result.prosperity = prosperityData:'';
 
-  // console.log(`美金`)
-  // const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
-  // dollarsData?result.dollars = dollarsData:'';
+  console.log(`美金`)
+  const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
+  dollarsData?result.dollars = dollarsData:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){

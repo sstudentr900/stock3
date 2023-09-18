@@ -1,7 +1,8 @@
 const yahooFinance = require('yahoo-finance');
 async function stockGetData(stockno,from,to){
   return await yahooFinance.historical({
-    symbol: `${stockno}.TW`,
+    // symbol: `${stockno}.TW`,
+    symbol: `${stockno}`,
     from: from,
     to: to,
     period: 'd'
@@ -17,7 +18,7 @@ async function stockGetData(stockno,from,to){
 }
 
 //
-stockGetData('00731','2023-09-16','2023-09-16').then((jsons)=>{
+stockGetData('^TWII','2023-08-16','2023-09-16').then((jsons)=>{
   console.log('21',jsons)
 }).catch((jsons)=>{
   console.log('23',jsons)

@@ -29,6 +29,30 @@ function getNowTimeObj(obj){
     "datetime": datetime
   }
 }
+function getMonthly({year,json}){
+  //2020-01-01~2020-02-01~2020-03-01
+  const arr = []
+  const array = []
+  const yearNumber = (new Date().getFullYear()-Number(year))+1
+  Array.from(Array(yearNumber)).forEach((y, y_i) => {
+    Array.from(Array(12)).forEach((m, m_i) => {
+      arr.push(`${Number(year)+y_i}-${('0'+(m_i+1)).slice(-2)}-01`)
+    })
+  })
+  arr.forEach(function(o){
+    const oDtae = o.split('-')
+    const value = json.find(function(item){
+      const itemDtae = item.date.split('-')
+      if(itemDtae[0]+'-'+itemDtae[1]==oDtae[0]+'-'+oDtae[1] && item.date>=o){
+        return item
+      }
+    })
+    if(value){
+      array.push(value);
+    }
+  })
+  return array;
+}
 function stockAvenge(startPrice,endPrice){
   return (((endPrice-startPrice)/startPrice)*100).toFixed(2)+'%'
 }
@@ -474,5 +498,6 @@ module.exports={
   stockPayMoreYear,
   stockPayMoreMonth,
   stockKdFn,
-  stockCagr
+  stockCagr,
+  getMonthly
 }
