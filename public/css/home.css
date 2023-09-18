@@ -1,3 +1,4 @@
+
 .home .customTable{
   max-height: 420px;
   overflow: auto;
@@ -43,6 +44,18 @@
 }
 .home .customNav ul.table_content li{
   padding: 6px 8px;
+}
+/* .home .publictitle .title{
+  display: flex;
+  align-items: end;
+} */
+.home .publictitle .title .time{
+  font-size: 13px;
+  color: #7d7b8a;
+  /* margin-left: 10px; */
+}
+.home .prosperity .publictitle .title{
+  display: block;
 }
 .home .prosperity .customTable{
   height: 400px;

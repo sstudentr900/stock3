@@ -6,10 +6,10 @@ async function stockGetData(stockno,from,to){
     to: to,
     period: 'd'
     // period: 'd'  // 'd' (daily), 'w' (weekly), 'm' (monthly), 'v' (dividends only)
-  }).then(reason=>{
-    console.log('ok',reason)
+  }).then(jsons=>{
+    // console.log('ok',jsons)
     // console.log(`jsons資料: ${JSON.stringify(jsons)}`)
-    return JSON.stringify(reason)
+    return JSON.stringify(jsons)
   }).catch(reason=>{
     console.log('error',reason)
     return false
@@ -17,7 +17,7 @@ async function stockGetData(stockno,from,to){
 }
 
 //
-stockGetData('00888','2023-07-24','2023-08-24').then((jsons)=>{
+stockGetData('00731','2023-09-16','2023-09-16').then((jsons)=>{
   console.log('21',jsons)
 }).catch((jsons)=>{
   console.log('23',jsons)

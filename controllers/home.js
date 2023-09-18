@@ -4,6 +4,7 @@ const {
 } = require("../plugin/stockFn");
 async function serch(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
+ 
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
      //加權指數
@@ -22,11 +23,27 @@ async function serch(req, res) {
     //上市類股漲跌
     row['listed'] = JSON.parse(row['listed']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
     //除息股票
-    row['exdividend'] = JSON.parse(row['exdividend']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    row['exdividend'] = JSON.parse(row['exdividend']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
+      // console.log(item.ex_date,nowDate,item.ex_date>=nowDate)
+      const nowDate = getNowTimeObj()['date']
+      if(item.ex_date>=nowDate){
+        return item;
+      }
+    })
     //大股東增減
-    row['holder'] = JSON.parse(row['holder']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    row['holder'] = JSON.parse(row['holder']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
+      const nowDate = getNowTimeObj({day:'-3'})['date']
+      if(item.date>=nowDate){
+        return item;
+      }
+    })
     //羊群增減
-    row['retail'] = JSON.parse(row['retail']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    row['retail'] = JSON.parse(row['retail']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
+      const nowDate = getNowTimeObj({day:'-3'})['date']
+      if(item.date>=nowDate){
+        return item;
+      }
+    })
     //景氣對策信號
     const prosperity = JSON.parse(row['prosperity']).slice(-12)
     row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)

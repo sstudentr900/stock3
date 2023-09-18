@@ -2,12 +2,14 @@ function getNowTimeObj(obj){
   const objDate = obj?.date
   const objDay = obj?.day
   const objYear= obj?.year
+
   const dt = objDate?new Date(objDate):new Date();
-  objDay?dt.setDate(dt.getDate()+objDay):'';//加減日
-  objYear?dt.setDate(dt.getFullYear()+objYear):'';//加減日
+  objDay?dt.setDate(dt.getDate()+Number(objDay)):'';//加減日
+  objYear?dt.setDate(dt.getFullYear()+Number(objYear)):'';//加減日
   // const year = Number(dt.getFullYear());//取幾年-2022
   // let month = Number(dt.getMonth())+1;//取幾月-8
   // month = month>9?month:'0'+month//08
+  // console.log(5,dt.getDate(),Number(objDay))
   const year = dt.getFullYear()+'';
   const month = ('0'+(dt.getMonth()+1)).slice(-2);
   const day = ('0'+dt.getDate()).slice(-2);
