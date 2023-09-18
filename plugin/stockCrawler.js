@@ -19,6 +19,22 @@ function stockPromise(obj){
     },0)
   })
 }
+function waitForElement({selector, timeout = 10000}) {
+  console.log(`等待${selector},加載`)
+  return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const intervalId = setInterval(() => {
+          const element = $(selector);
+          if (element.length > 0) {
+              clearInterval(intervalId);
+              resolve();
+          } else if (Date.now() - start > timeout) {
+              clearInterval(intervalId);
+              reject(new Error('等待超时'));
+          }
+      }, 1000); // 每秒检查一次
+  });
+}
 async function stockGetDataX(stockno,monthLength=3){
   const getTimes = function(monthLength){
     const dt = new Date();
@@ -370,6 +386,7 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
     console.log(`stockIsGetValue,沒有值,抓取不到資料跳出`)
     return false;
   } 
+  // console.log(`stockIsGetValue,沒有值,抓取資料數量:${JSON.stringify(stockdata)}`)
   console.log(`stockIsGetValue,沒有值,抓取資料數量:${stockdata.length}`)
   return JSON.stringify(stockdata);
 }
@@ -720,6 +737,57 @@ async function stockGetProsperity({dataDate}){
     return false
   })
 }
+async function stockDollars({dataDate}){
+  console.log(`stockDollars,抓取美金,https://www.taifex.com.tw/cht/3/dailyFXRate`)
+  const nowDates = getNowTimeObj()['date']
+  let queryEndDate = nowDates.split('-')
+  queryEndDate = `${queryEndDate[0]}/${queryEndDate[1]}/${queryEndDate[2]}`;
+  let queryStartDate = getNowTimeObj({'date':nowDates,'year':'-1'})['date'].split('-');
+  queryStartDate = `${queryStartDate[0]}/${queryStartDate[1]}/${queryStartDate[2]}`;
+  if(dataDate){
+    const dataDates = dataDate.split('-')
+    queryStartDate = `${dataDates[0]}/${dataDates[1]}/${dataDates[2]}`
+  }
+  const options  = {
+    url: `https://www.taifex.com.tw/cht/3/dailyFXRate`,
+    method: 'POST',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+    },
+    form: {
+      'queryStartDate': queryStartDate,
+      'queryEndDate': queryEndDate
+    },
+  }
+  return await stockPromise(options)
+  .then(async (body)=>{
+    const $ = cheerio.load(body);
+    const json=[]
+    const trs = $("#printhere table.table_c tr");
+    for (let i = 1; i < trs.length; i++) {
+      const obj = {}
+      const td = trs.eq(i).find('td');
+      if(!td){continue;}
+      let date = td.eq(0).text().split('/');//日期
+      obj['date'] = `${date[0]}-${date[1]}-${date[2]}` //112/06/30=>2023-06-30
+      if(dataDate && dataDate>=obj['date']){continue;}
+      obj['dollars'] = td.eq(1).text().trim();//美金
+      json.push(obj)
+    }
+    if(!json.length){console.log(`stockDollars 沒有值`);return false;}
+    //排小到大
+    // json.sort((o1,o2)=>{
+    //   o1 = o1['date'].split('-').join('')
+    //   o2 = o2['date'].split('-').join('')
+    //   return o1-o2;
+    // })
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stockDollars,錯誤,${error}`)
+    return false;
+  })
+}
 async function stockYield({stockno,yielddata}){
   //沒值
   // if(!stockno){console.log(`stockYield,stockno沒有值`);return false;}
@@ -795,7 +863,7 @@ async function stockYield({stockno,yielddata}){
 }
 async function stockGetData2({dataDate,stockno,nowDate}){
   // await sleep(2000);
-  console.log(`stockGetData2,goodinfo抓取個股`)
+  console.log(`stockGetData2,抓取個股,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
   await sleep(12000)
   const year = nowDate.split('-')[0]
   const options  = {
@@ -951,51 +1019,6 @@ async function stockNetWorth({stockno,nowDate}){
     return false;
   })
 }
-// async function stockNameFn({stockno}){
-//   if(!stockno){console.log(`stockNameFn,${stockno},沒有值`);return false;}
-//   console.log(`stockNameFn,twse抓股名`)
-//   const json = []
-//   const options  = {
-//     url: `https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433`,
-//     method: 'GET',
-//     headers:{
-//       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
-//     }
-//   }
-//   return await stockPromise(options)
-//   .then(body=>JSON.parse(body))
-//   .then(data=>data.a1)
-//   .then(a1s=>{
-//     // console.log(`a1s,${JSON.stringify(a1s)}`)
-//     for(a1 of a1s){
-//       // console.log(`a1,${JSON.stringify(a1)}`)
-//       const msgs = a1.msgArray
-//       if(msgs){
-//         // console.log(`msgs,${JSON.stringify(msgs)}`)
-//         for(msg of msgs){
-//           // console.log(`msg,${JSON.stringify(msg)}`)
-//           if(msg.a==stockno){
-//             const obj = {}
-//             obj['date'] = nowDate;//日期
-//             obj['price'] = Number(msg.f).toFixed(2);//價格
-//             obj['networth'] = `${Number(msg.g).toFixed(2)}%`;//淨值
-//             json.push(obj)
-//             // json = `${Number(msg.f).toFixed(2)} / ${Number(msg.g).toFixed(2)}%` 
-//           }
-//         }
-//       }
-//     }
-//     if(!json.length){
-//       console.log(`stockNameFn,抓取不到資料跳出`)
-//       return false;
-//     }
-//     return json
-//   })
-//   .catch((error)=>{
-//     console.log(`stockNameFn,股名錯誤,${error}`)
-//     return false;
-//   })
-// }
 async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno,nowDate}){
   // await sleep(2000);
   console.log(`stockGetStockThreeCargo,goodinfo抓取個股法人買賣超和融資融劵`)
@@ -1153,42 +1176,50 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
   console.log(`stockCrawler,結束`)
 }
-async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity}){
+async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars}){
   console.log(`stockCrawler_market開始`)
   //result
   const result = {}
 
-  console.log(`3大法人買賣超`)
-  const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
-  threeCargo?result.threecargo = threeCargo:'';
+  console.log(`抓取加權資料`)
+  const twiiValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':twii})
+  twiiValue?result.twii = twiiValue:'';
 
-  console.log(`3大法人期貨`)
-  const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
-  threeFutures?result.threefutures = threeFutures:'';
+  // console.log(`3大法人買賣超`)
+  // const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
+  // threeCargo?result.threecargo = threeCargo:'';
 
-  console.log(`抓取上市類股漲跌`)
-  const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
-  listedUpDown?result.listed = listedUpDown:'';
+  // console.log(`3大法人期貨`)
+  // const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
+  // threeFutures?result.threefutures = threeFutures:'';
 
-  console.log(`抓取除息股票`)
-  const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
-  exdividendData?result.exdividend = exdividendData:'';
+  // console.log(`抓取上市類股漲跌`)
+  // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
+  // listedUpDown?result.listed = listedUpDown:'';
 
-  console.log(`抓取上下跌家數`)
-  const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
-  upDownNumber?result.updownnumber = upDownNumber:'';
+  // console.log(`抓取除息股票`)
+  // const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
+  // exdividendData?result.exdividend = exdividendData:'';
 
-  console.log(`股東增減`)
-  const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
-  shareholder?result.holder = shareholder:'';
+  // console.log(`抓取上下跌家數`)
+  // const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
+  // upDownNumber?result.updownnumber = upDownNumber:'';
 
-  console.log(`羊群增減`)
-  const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
-  stockRetail?result.retail = stockRetail:'';
+  // console.log(`股東增減`)
+  // const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
+  // shareholder?result.holder = shareholder:'';
 
-  console.log(`景氣對策信號`)
-  const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,stockdata:prosperity})
-  prosperityData?result.prosperity = prosperityData:'';
+  // console.log(`羊群增減`)
+  // const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
+  // stockRetail?result.retail = stockRetail:'';
+
+  // console.log(`景氣對策信號`)
+  // const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,'stockdata':prosperity})
+  // prosperityData?result.prosperity = prosperityData:'';
+
+  // console.log(`美金`)
+  // const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
+  // dollarsData?result.dollars = dollarsData:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){
@@ -1204,8 +1235,6 @@ async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed
     }else{
       console.log(`stockCrawler_market,新增`)
       await dbInsert('market',result)
-      // const rows = await dbInsert('market',result)
-      // result['insertId'] = rows.insertId
     }
   }
 

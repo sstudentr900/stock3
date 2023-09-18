@@ -4,7 +4,6 @@ const {
 } = require("../plugin/stockFn");
 async function serch(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
- 
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
      //加權指數
@@ -45,25 +44,42 @@ async function serch(req, res) {
       }
     })
     //景氣對策信號
-    const prosperity = JSON.parse(row['prosperity']).slice(-12)
-    row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
-    row['prosperity_data'] = prosperity.map(({point})=>point)
-    //景氣對策信號_加權指數
-    row['prosperity_market'] = prosperity.map(({date})=>{
-      const obj = threecargo.find(obj=>{
-        return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
+    if(row['prosperity']){
+      const prosperity = JSON.parse(row['prosperity']).slice(-12)
+      //日期
+      row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
+      //景氣對策信號
+      row['prosperity_data'] = prosperity.map(({point})=>point)
+      //景氣對策信號_加權指數
+      row['prosperity_market'] = prosperity.map(({date})=>{
+        const obj = threecargo.find(obj=>{
+          return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
+        })
+        return obj?Number(obj.close):0
       })
-      return obj?Number(obj.close):0
-    })
+    }
+    //美金
+    if(row['dollars']){
+      const dollars = JSON.parse(row['dollars']).slice(-360)
+      //日期
+      row['dollars_date'] = dollars.map(({date})=>date)
+      //美金資料
+      row['dollars_data'] = dollars.map(({dollars})=>Number(dollars))
+      //美金_加權指數
+      row['dollars_market'] = dollars.map(({date})=>{
+        const obj = threecargo.find(obj=>date==obj.date)
+        return obj?Number(obj.close):0
+      })
+    }
 
-    
-
-    //移除不需要的值
+    //移除不需要的值和值沒有轉JSON.parse
     delete row.threecargo
     delete row.id
     delete row.prosperity
     delete row.updated_at
+    delete row.dollars
   }
+  console.log(rows[0])
   res.render('home',{
     'active': 'home',
     'data': rows[0],
