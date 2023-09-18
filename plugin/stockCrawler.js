@@ -1096,37 +1096,37 @@ async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed
   //result
   const result = {}
 
-  // console.log(`3大法人買賣超`)
-  // const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
-  // threeCargo?result.threecargo = threeCargo:'';
+  console.log(`3大法人買賣超`)
+  const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
+  threeCargo?result.threecargo = threeCargo:'';
 
-  // console.log(`3大法人期貨`)
-  // const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
-  // threeFutures?result.threefutures = threeFutures:'';
+  console.log(`3大法人期貨`)
+  const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
+  threeFutures?result.threefutures = threeFutures:'';
 
-  // console.log(`抓取上市類股漲跌`)
-  // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
-  // listedUpDown?result.listed = listedUpDown:'';
+  console.log(`抓取上市類股漲跌`)
+  const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
+  listedUpDown?result.listed = listedUpDown:'';
 
-  // console.log(`抓取除息股票`)
-  // const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
-  // exdividendData?result.exdividend = exdividendData:'';
+  console.log(`抓取除息股票`)
+  const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
+  exdividendData?result.exdividend = exdividendData:'';
 
-  // console.log(`抓取上下跌家數`)
-  // const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
-  // upDownNumber?result.updownnumber = upDownNumber:'';
+  console.log(`抓取上下跌家數`)
+  const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
+  upDownNumber?result.updownnumber = upDownNumber:'';
 
-  // console.log(`股東增減`)
-  // const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
-  // shareholder?result.holder = shareholder:'';
+  console.log(`股東增減`)
+  const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
+  shareholder?result.holder = shareholder:'';
 
-  // console.log(`羊群增減`)
-  // const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
-  // stockRetail?result.retail = stockRetail:'';
+  console.log(`羊群增減`)
+  const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
+  stockRetail?result.retail = stockRetail:'';
 
-  // console.log(`景氣對策信號`)
-  // const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,stockdata:prosperity})
-  // prosperityData?result.prosperity = prosperityData:'';
+  console.log(`景氣對策信號`)
+  const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,stockdata:prosperity})
+  prosperityData?result.prosperity = prosperityData:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){
@@ -1134,17 +1134,17 @@ async function stockCrawler_market({id,threecargo,threefutures,exdividend,listed
     // return false;
   }else{
     //存資料庫
-    console.log(`stockCrawler_market,更新`)
-    await dbUpdata('market',result,id)
-    // if(id){
-    //   console.log(`stockCrawler_market,更新`)
-    //   await dbUpdata('market',result,id)
-    // }else{
-    //   console.log(`stockCrawler_market,新增`)
-    //   await dbInsert('market',result)
-    //   // const rows = await dbInsert('market',result)
-    //   // result['insertId'] = rows.insertId
-    // }
+    // console.log(`stockCrawler_market,更新`)
+    // await dbUpdata('market',result,id)
+    if(id){
+      console.log(`stockCrawler_market,更新`)
+      await dbUpdata('market',result,id)
+    }else{
+      console.log(`stockCrawler_market,新增`)
+      await dbInsert('market',result)
+      // const rows = await dbInsert('market',result)
+      // result['insertId'] = rows.insertId
+    }
   }
 
   console.log(`stockCrawler_market,結束`)
