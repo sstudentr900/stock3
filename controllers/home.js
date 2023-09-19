@@ -5,6 +5,7 @@ const {
 } = require("../plugin/stockFn");
 async function search(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
+
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
      //加權指數
@@ -13,25 +14,41 @@ async function search(req, res) {
     //時間
     row['date'] = getNowTimeObj({'date':row['updated_at']})['date']
     //上市三大法人排名
-    row['ranking'] = JSON.parse(row['ranking']).slice(-18).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    if(row['ranking']){
+      row['ranking'] = JSON.parse(row['ranking']).slice(-18).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    }
     //3大法人買賣超融資卷
-    row['threecargofinancing'] = JSON.parse(row['threecargo']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    if(row['prosperity']){
+      row['threecargofinancing'] = JSON.parse(row['threecargo']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    }
     //3大法人期貨買賣超
-    row['threefutures'] = JSON.parse(row['threefutures']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    if(row['threefutures']){
+      row['threefutures'] = JSON.parse(row['threefutures']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    }
     //大盤上下跌家數
-    row['updownnumber'] = JSON.parse(row['updownnumber']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    if(row['updownnumber']){
+      row['updownnumber'] = JSON.parse(row['updownnumber']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
+    }
     //上市類股漲跌
-    row['listed'] = JSON.parse(row['listed']).slice(-54).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    if(row['listed']){
+      row['listed'] = JSON.parse(row['listed']).slice(-54).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    }
     //除息股票
-    row['exdividend'] = JSON.parse(row['exdividend']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
-      if(item.ex_date>=getNowTimeObj()['date']){
-        return item;
-      }
-    })
+    if(row['exdividend']){
+      row['exdividend'] = JSON.parse(row['exdividend']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
+        if(item.ex_date>=getNowTimeObj()['date']){
+          return item;
+        }
+      })
+    }
     //大股東增減
-    row['holder'] = JSON.parse(row['holder']).slice(-20).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    if(row['holder']){
+      row['holder'] = JSON.parse(row['holder']).slice(-20).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    }
     //羊群增減
-    row['retail'] = JSON.parse(row['retail']).slice(-20).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    if(row['retail']){
+      row['retail'] = JSON.parse(row['retail']).slice(-20).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    }
     //景氣對策信號
     if(row['prosperity']){
       const prosperity = JSON.parse(row['prosperity']).slice(-12)
@@ -62,14 +79,14 @@ async function search(req, res) {
     }
 
     //移除不需要的值和值沒有轉JSON.parse
-    delete row.twii
+    delete row.ranking
     delete row.threecargo
-    delete row.id
     delete row.prosperity
-    delete row.updated_at
     delete row.dollars
+    delete row.twii
+    delete row.id
+    delete row.updated_at
   }
-  console.log(rows[0]['ranking'])
   // console.log(rows[0])
   res.render('home',{
     'active': 'home',

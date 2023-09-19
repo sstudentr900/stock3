@@ -25,7 +25,7 @@
               <div class="publictitle">
                 <div class="title">
                   <h4>上市類股漲跌</h4>
-                  <p class="time">更新時間 : <%= data['threecargofinancing'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['threecargofinancing']?data['threecargofinancing'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -34,20 +34,20 @@
                   <li><p>價位</p></li>
                   <li><p>漲跌</p></li>
                 </ul>
-                <% data['listed'].forEach(function(o) { %>
+                <% if(data['listed']){data['listed'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p><%= o.name %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.price))<0){%>green<%}%>"><%= o.price %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.undulation))<0){%>green<%}%>"><%= o.undulation %></p></li>
                 </ul>
-                <% }); %>
+                <% });} %>
               </div>
             </div>
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
                   <h4>三大法人買賣超</h4>
-                  <p class="time">更新時間 : <%= data['threecargofinancing'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['threecargofinancing']?data['threecargofinancing'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -60,7 +60,7 @@
                   <li><p>融資</p></li>
                   <li><p>融劵</p></li>
                 </ul>
-                <% data['threecargofinancing'].forEach(function(o) { %>
+                <% if(data['threecargofinancing']){ data['threecargofinancing'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li><p><%= o.date %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.foreign))<0){%>green<%}%>"><%= o.foreign %></p></li>
@@ -70,14 +70,14 @@
                   <li><p><%= o.financing %></p></li>
                   <li><p><%= o.lending %></p></li>
                 </ul>
-                <% }); %>
+                <% });} %>
               </div>
             </div>
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
                   <h4>期貨買賣超</h4>
-                  <p class="time">更新時間 : <%= data['threefutures'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['threefutures']?data['threefutures'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -89,7 +89,7 @@
                   <li><p>投信</p></li>
                   <li><p>自營商</p></li>
                 </ul>
-                <% data['threefutures'].forEach(function(o) { %>
+                <% if(data['threefutures']){ data['threefutures'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li><p><%= o.date %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.topfive))<0){%>green<%}%>"><%= o.topfive %></p></li>
@@ -98,14 +98,14 @@
                   <li><p class="<% if(Math.sign(parseInt(o.letter))<0){%>green<%}%>"><%= o.letter %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.proprietor))<0){%>green<%}%>"><%= o.proprietor %></p></li>
                 </ul>
-                <% }); %>
+                <% });} %>
               </div>
             </div>
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
                   <h4>大盤上下跌家數</h4>
-                  <p class="time">更新時間 : <%= data['updownnumber'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['updownnumber']?data['updownnumber'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -118,7 +118,7 @@
                   <li><p>權值下跌</p></li>
                   <li><p>註解</p></li>
                 </ul>
-                <% data['updownnumber'].forEach(function(o) { %>
+                <% if(data['updownnumber']){ data['updownnumber'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li><p><%= o.date %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.uphome))<0){%>green<%}%>"><%= o.uphome %></p></li>
@@ -128,7 +128,7 @@
                   <li><p class="<% if(Math.sign(parseInt(o.downweighted))<0){%>green<%}%>"><%= o.downweighted %></p></li>
                   <li><p><%= o.annotation %></p></li>
                 </ul>
-                <% }); %>
+                <% });} %>
               </div>
             </div>
             <div class="publicBox prosperity">
@@ -148,11 +148,6 @@
               <div class="publictitle">
                 <div class="title">
                   <h4>美元匯率</h4>
-                  <!-- <ul class="item">
-                    <li>低迷 16-9分</li>
-                    <li>穩定 31-23分</li>
-                    <li class="publicTextRed">熱絡 45-38分</li>
-                  </ul> -->
                 </div>
               </div>
               <div id="dollars_chart"></div>
@@ -163,7 +158,7 @@
               <div class="publictitle">
                 <div class="title">
                   <h4>即將除息股票</h4>
-                  <p class="time">更新時間 : <%= data['exdividend'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['exdividend']?data['exdividend'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -171,19 +166,19 @@
                   <li><p>名稱</p></li>
                   <li><p>除息日期</p></li>
                 </ul>
-                <% data['exdividend'].forEach(function(o) { %>
+                <% if(data['exdividend']){ data['exdividend'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
                   <li><p><%= o.ex_date %></p></li>
                 </ul>
-                <% }); %>
+                <% });} %>
               </div>
             </div>
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
                   <h4>上市三大法人排名</h4>
-                  <p class="time">更新時間 : <%= data['ranking'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['ranking']?data['ranking'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -191,19 +186,19 @@
                   <li><p>名稱</p></li>
                   <li><p>增減</p></li>
                 </ul>
-                <% data['ranking'].forEach(function(o) { %>
+                <% if(data['ranking']){ data['ranking'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
                 </ul>
-                <% }); %>
+                <% });}%>
               </div>
             </div>
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
                   <h4>大股東持股增減</h4>
-                  <p class="time">更新時間 : <%= data['holder'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['holder']?data['holder'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -211,19 +206,19 @@
                   <li><p>名稱</p></li>
                   <li><p>增減</p></li>
                 </ul>
-                <% data['holder'].forEach(function(o) { %>
+                <% if(data['holder']){ data['holder'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
                 </ul>
-                <% }); %>
+                <% });}%>
               </div>
             </div>
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
                   <h4>散戶持股增減</h4>
-                  <p class="time">更新時間 : <%= data['retail'][0]['date'] %></p>
+                  <p class="time">更新時間 : <%= data['retail']?data['retail'][0]['date']:'' %></p>
                 </div>
               </div>
               <div class="customTable">
@@ -231,12 +226,12 @@
                   <li><p>名稱</p></li>
                   <li><p>增減</p></li>
                 </ul>
-                <% data['retail'].forEach(function(o) { %>
+                <% if(data['retail']){ data['retail'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
                   <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
                 </ul>
-                <% }); %>
+                <% });} %>
               </div>
             </div>
           </div>

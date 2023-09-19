@@ -26,7 +26,7 @@ async function search(req, res) {
     return false;
   }
   const stockno = params.stockno
-  const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at from stock WHERE stockno = ?',[stockno] )
+  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,holder,updated_at from stock WHERE stockno = ?',[stockno] )
   if(!rows.length){
     console.log(`serch,沒有值,重新抓取`)
     res.render('individual',{
@@ -40,26 +40,25 @@ async function search(req, res) {
     console.log(`serch,有值`)
     for (const row of rows) {
       console.log(`--stockno:${row['stockno']}--`)
+      //法人買賣超和融資融劵		
+      row['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
+      //股東持股分級週統計圖	
+      row['holder'] = row['holder']?JSON.parse(row['holder']):'';
       //更新時間
       row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
       //stockdata 
       row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
       //今年每月報酬
       row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
-      //最近8年每年報酬
-      row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],8);
+      //最近6年每年報酬
+      row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],6);
       //年化報酬率
       row['stockCagr'] = stockCagr(row['stockPayYear']);
       //淨值
-      if(row['networthdata']){
-        let networthdata = JSON.parse(row['networthdata']);
-        networthdata = networthdata[networthdata.length-1]
-        // console.log(`networthdata,${networthdata}`)
-        row['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
-      }
+      row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
       //殖利率
-      let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
-      yieldObj = stockYieldPrice(yieldObj,row['stockdata']);
+      row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
+      const yieldObj = stockYieldPrice(row['yielddata'],row['stockdata']);
       row['stockYield'] = yieldObj.stockYield;//每年殖利率
       row['average'] = yieldObj.average;//平均股利
       row['averageYield'] =yieldObj.averageYield;//平均殖利率
@@ -78,10 +77,11 @@ async function search(req, res) {
       delete row.updated_at
       // console.log(`row,${JSON.stringify(row)}`)
     }
+    // console.log(rows[0])
     // res.send(rows)
     res.render('individual',{
       'active': 'individual',
-      'data': rows,
+      'data': rows[0],
     })
   }
 }

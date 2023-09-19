@@ -12,10 +12,10 @@
 <div class="publicFooter">
   <small>Copyright © 2023. All rights reserved.</small>
 </div>
-<script src="./js/public.js"></script>
 <script>
-    const pageJson = JSON.parse('<%- JSON.stringify(data) %>')
+  const pageJson = JSON.parse('<%- JSON.stringify(data) %>')
 </script>
+<script src="./js/public.js"></script>
 <% if(active=='remuneration'){ %>
   <script src="./js/<%= active %>.js"></script>
 <% } %>

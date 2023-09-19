@@ -2,18 +2,122 @@
 <html lang="en">
 <head>
   <%- include('publicHead') -%>
+  <link rel="stylesheet" href="./css/<%= active %>.css">
 </head>
 <body>
   <div class="publicPage <%= active %>">
     <%- include('publicNav') %>
     <div class="publicContent">
       <div class="publicWidth">
-        <div class="publicBox">
-          <h2>individual</h2>
+        <div class="publicBox lineGraph">
+          <div class="publictitle">
+            <div class="title">
+              <h4>日K線</h4>
+            </div>
+          </div>
+          <div id="lineGraph"></div>
+        </div>
+        <div class="publicRowFlex">
+          <div class="publicCol-7 customMian">
+            <div class="publicBox threecargo">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>三大法人和融資融劵</h4>
+                  <p class="time">更新時間 : <%= data['threecargo']?data['threecargo'][0]['date']:'' %></p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li class='date'><p>日期</p></li>
+                  <li><p>外資</p></li>
+                  <li><p>投信</p></li>
+                  <li><p>自營</p></li>
+                  <li><p>合計</p></li>
+                  <li><p>外資持股</p></li>
+                  <li><p>融資餘額</p></li>
+                  <li><p>融劵餘額</p></li>
+                </ul>
+                <% if(data['threecargo']){data['threecargo'].forEach(function(o) { %>
+                <ul class="table_content" data-date="<%= o.date %>">
+                  <li class='date'><p><%= o.date %></p></li>
+                  <li><p><%= o.foreign %></p></li>
+                  <li><p><%= o.letter %></p></li>
+                  <li><p><%= o.proprietor %></p></li>
+                  <li><p><%= o.totle %></p></li>
+                  <li><p><%= o.foreignhold %></p></li>
+                  <li><p><%= o.financing %></p></li>
+                  <li><p><%= o.lending %></p></li>
+                </ul>
+                <% });} %>
+                <ul class='remark'>
+                  <ol>融資、融券一般被認為是散戶指標，因大戶法人較無資金需求，且使用借券而非融券，因此可有此觀察散戶的動向。</ol>
+                  <ol>對於大型股而言股價高檔融資創新高，表示散戶大量進場，市場過熱，反之股價低檔，融券創新高表示股價快要落底。</ol>
+                  <ol>而中小型股主力可能使用融資、融券操作，股價低檔時融資暴增，可能是主力介入吸收籌碼，反之高檔時融券暴增，可能是主力正在出貨</ol>
+                </ul>
+              </div>
+            </div>
+            <div class="publicBox holder">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>股東持股分級週統計圖</h4>
+                  <p class="time">更新時間 : <%= data['holder']?data['holder'][0]['date']:'' %></p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li class='date'><p>日期</p></li>
+                  <li><p>>10張</p></li>
+                  <li><p>>50張</p></li>
+                  <li><p>>100張</p></li>
+                  <li><p>>200張</p></li>
+                  <li><p>>400張</p></li>
+                  <li><p>>800張</p></li>
+                  <li><p>>1000張</p></li>
+                </ul>
+                <% if(data['holder']){ data['holder'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li class='date'><p><%= o.date %></p></li>
+                  <li><p><%= o.big10 %></p></li>
+                  <li><p><%= o.big50 %></p></li>
+                  <li><p><%= o.big100 %></p></li>
+                  <li><p><%= o.big200 %></p></li>
+                  <li><p><%= o.big400 %></p></li>
+                  <li><p><%= o.big800 %></p></li>
+                  <li><p><%= o.big1000 %></p></li>
+                </ul>
+                <% });} %>
+              </div>
+            </div>
+            <div class="publicBox yielddata">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>殖利率</h4>
+                  <p class="time">更新時間 : <%= data['yielddata']?data['yielddata'][0]['date']:'' %></p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>日期</p></li>
+                  <li><p>股利</p></li>
+                  <li><p>殖利率</p></li>
+                </ul>
+                <% if(data['yielddata']){ data['yielddata'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li><p><%= o.date %></p></li>
+                  <li><p><%= o.dividend %></p></li>
+                  <li><p><%= o.yield %></p></li>
+                </ul>
+                <% });} %>
+              </div>
+            </div>
+          </div>
+          <div class="publicCol-3 customNav">
+          </div>
         </div>
       </div>
     </div>
     <%- include('publicFooter') %>
+    <script src="./js/<%= active %>.js"></script>
   </div>
 </body>
 </html>
