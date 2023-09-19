@@ -445,7 +445,7 @@ async function stockGetThreeCargo({dataDate}){
   })
 }
 async function stockGetListedUpDown({dataDate}){
-  console.log(`stockGetListedUpDown,goodinfo抓取上市類股漲跌`)
+  console.log(`stockGetListedUpDown,抓取上市類股漲跌,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
   await sleep(12000)
   const options  = {
     url: `https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`,
@@ -480,7 +480,7 @@ async function stockGetListedUpDown({dataDate}){
   })
 }
 async function stockGetExdividend({stockdata}){
-  console.log(`stockGetExdividendData,goodinfo抓取除息股票`)
+  console.log(`stockGetExdividendData,抓取除息股票,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
   await sleep(12000)
   const options  = {
     url: `https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`,
@@ -519,7 +519,7 @@ async function stockGetExdividend({stockdata}){
   })
 }
 async function stockGetUpDownNumber({dataDate}){
-  console.log(`stockUpDownNumber,上下跌家數大盤上下漲`)
+  console.log(`stockUpDownNumber,上下跌家數大盤上下漲,https://agdstock.club/udc-p`)
   // const dt = getNowTimeObj();
   // const year = dt['year']; //抓取前年
   const options  = {
@@ -619,7 +619,7 @@ async function stockRanking({dataDate}){
     //上市三大法人排名
     const card = $(".col-12.col-lg-4 .row>.col-12").eq(2).find('.card>.card-body.top-line');
     const date = card.find('.row>.col-5.box-title.text-right').text().trim();
-    if(date>=dataDate){console.log(`stockRanking,抓取上市三大法人排名,日期依樣${date},${dataDate}`);return false;}
+    if(date>=dataDate){console.log(`stockRanking,抓取上市三大法人排名,日期依樣${date},${dataDate}跳出`);return false;}
     const trs = card.find('.row+.box-sub-title+.table-responsive-md tr');
     const trs2 = card.find('.row+.box-sub-title+.table-responsive-md+.box-sub-title+.table-responsive-md tr');
     const json = [
@@ -651,7 +651,7 @@ async function stockRanking({dataDate}){
   })
 }
 async function stockGetRetail({dataDate}){
-  console.log(`stockGetRetail,agdstoc,抓取羊群增減`)
+  console.log(`stockGetRetail,抓取羊群增減,https://agdstock.club/flock-p`)
   const options  = {
     url: `https://agdstock.club/flock-p`,
     method: 'GET',
@@ -742,7 +742,7 @@ async function stockGetThreeFutures({dataDate}){
   })
 }
 async function stockGetProsperity({dataDate}){
-  console.log(`stockProsperity,景氣對策信號`)
+  console.log(`stockProsperity,景氣對策信號,https://index.ndc.gov.tw/n/json/data/eco/indicators`)
   // console.log(`stockGetProsperity,抓取景氣對策信號`)
   // const json = []
   // const dt = getNowTimeObj();

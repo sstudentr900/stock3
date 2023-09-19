@@ -25,11 +25,12 @@
   }
   .publicNav .nav ul{
     display: flex;
+    align-items: center;
   }
   .publicNav .nav a{
     color: #7d7b8a;
-    font-size: 14px;
-    font-weight: 300;
+    font-size: 15px;
+    font-weight: 400;
     padding: 0 16px;
   }
   .publicNav .nav a:hover{
@@ -37,6 +38,39 @@
   }
   .publicNav .nav a.active{
     color: #fff;
+  }
+  .publicNav .serch{
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  .publicNav .serch input{
+    max-width: 140px;
+    padding: 8px;  
+    border-radius: 3px;
+    border: none;
+    margin-left: 10px;
+  }
+  .publicNav .serch input::-webkit-outer-spin-button,
+  .publicNav .serch input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .publicNav .serch input[type=number] {
+    -moz-appearance: textfield;
+  }
+  .publicNav .serch a{
+    position: absolute;
+    right: 5px;
+    top: 6px;
+    padding: 0;
+    height: auto;
+    width: 18px;
+    cursor: pointer;
+  }
+  .publicNav .serch a svg{
+    width: 100%;
+    height: auto;
   }
 </style>
 <div class="publicNav">
@@ -59,12 +93,35 @@
     <div class="nav">
       <ul>
         <li>
-          <a href="remuneration" class="<%if(active=='remuneration'){%>active<%}%>">股票報酬</a>
+          <a href="./" class="<%if(active=='home'){%>active<%}%>">首頁</a>
         </li>
         <li>
-          <a href="backtest" class="<%if(active=='backtest'){%>active<%}%>">股票回測</a>
+          <a href="./remuneration" class="<%if(active=='remuneration'){%>active<%}%>">股票報酬</a>
+        </li>
+        <li>
+          <a href="./backtest" class="<%if(active=='backtest'){%>active<%}%>">股票回測</a>
+        </li>
+        <!-- <li>
+          <a href="individual" class="<%if(active=='individual'){%>active<%}%>">個股查詢</a>
+        </li> -->
+        <li class="serch">
+          <input type="text" placeholder="股票代號">
+          <a class="<%if(active=='individual'){%>active<%}%>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z"/></svg></a>
         </li>
       </ul>
     </div>
   </div>
 </div>
+<script>
+  const publicNavSerch = document.querySelector('.publicNav .serch')
+  const publicNavSerchInput = publicNavSerch.querySelector('input')
+  const publicNavSerchLink = publicNavSerch.querySelector('a')
+  publicNavSerchLink.addEventListener('click',function(){
+    const value = publicNavSerchInput.value
+    if(!value){
+      alert('請輸入股號')
+      return false;
+    }
+    window.location = `./individual/${value}`;
+  })
+</script>

@@ -1,6 +1,7 @@
 const express = require('express');
 const remuneration = require('./controllers/remuneration');
 const home = require('./controllers/home');
+const individual = require('./controllers/individual');
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -11,7 +12,6 @@ app.use(express.json())
 
 //css 引入
 app.use(express.static('public'))
-
 
 //ejs
 app.set('views', './views'); // 讀取 EJS 檔案位置
@@ -29,7 +29,9 @@ app.listen(port,()=>{console.log(`port ${port}`)});
 // });
 
 //home
-app.get('/', home.serch)
+app.get('/', home.search)
+//查詢個股
+app.get('/individual/:stockno', individual.search)
 //查詢股票報酬
 app.get('/remuneration', remuneration.search)
 //增加股票報酬
@@ -40,15 +42,15 @@ app.delete('/remuneration/:id',remuneration.delet)
 app.post('/remuneration/sort',remuneration.sort)
 
 //發送文字
-app.get('/test', function(req, res){
-  // console.log(`發送文字`)
-  res.send('send home 文字')
-})
+// app.get('/test', function(req, res){
+//   // console.log(`發送文字`)
+//   res.send('send home 文字')
+// })
 //引入模板
-app.get('/table', function (req, res) {
-  // console.log(`引入模板`)
-  res.render('table')
-})
+// app.get('/table', function (req, res) {
+//   // console.log(`引入模板`)
+//   res.render('table')
+// })
 // //error
 // app.get('/error', function (req, res) {
 //   notDefined(); // 執行一個沒有定義的函式跳去500

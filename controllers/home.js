@@ -3,7 +3,7 @@ const {
   getNowTimeObj,
   getMonthly
 } = require("../plugin/stockFn");
-async function serch(req, res) {
+async function search(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
@@ -174,5 +174,5 @@ async function stockSort(req, res) {
 }
 
 module.exports = { 
-  serch
+  search
 }
