@@ -12,6 +12,8 @@ async function serch(req, res) {
     row['data'] = data.map(item=>[item.date,item.open,item.hight,item.low,item.close,item.volume])
     //時間
     row['date'] = getNowTimeObj({'date':row['updated_at']})['date']
+    //上市三大法人排名
+    row['ranking'] = JSON.parse(row['ranking']).slice(-18).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //3大法人買賣超融資卷
     row['threecargofinancing'] = JSON.parse(row['threecargo']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //3大法人期貨買賣超
@@ -19,29 +21,17 @@ async function serch(req, res) {
     //大盤上下跌家數
     row['updownnumber'] = JSON.parse(row['updownnumber']).slice(-10).sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')))
     //上市類股漲跌
-    row['listed'] = JSON.parse(row['listed']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
+    row['listed'] = JSON.parse(row['listed']).slice(-54).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
     //除息股票
     row['exdividend'] = JSON.parse(row['exdividend']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
-      // console.log(item.ex_date,nowDate,item.ex_date>=nowDate)
-      const nowDate = getNowTimeObj()['date']
-      if(item.ex_date>=nowDate){
+      if(item.ex_date>=getNowTimeObj()['date']){
         return item;
       }
     })
     //大股東增減
-    row['holder'] = JSON.parse(row['holder']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
-      const nowDate = getNowTimeObj({day:'-3'})['date']
-      if(item.date>=nowDate){
-        return item;
-      }
-    })
+    row['holder'] = JSON.parse(row['holder']).slice(-20).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
     //羊群增減
-    row['retail'] = JSON.parse(row['retail']).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))).filter((item,index)=>{
-      const nowDate = getNowTimeObj({day:'-3'})['date']
-      if(item.date>=nowDate){
-        return item;
-      }
-    })
+    row['retail'] = JSON.parse(row['retail']).slice(-20).sort((o1,o2)=>Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join('')))
     //景氣對策信號
     if(row['prosperity']){
       const prosperity = JSON.parse(row['prosperity']).slice(-12)
@@ -79,6 +69,7 @@ async function serch(req, res) {
     delete row.updated_at
     delete row.dollars
   }
+  console.log(rows[0]['ranking'])
   // console.log(rows[0])
   res.render('home',{
     'active': 'home',

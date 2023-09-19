@@ -182,6 +182,26 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
+                  <h4>上市三大法人排名</h4>
+                  <p class="time">更新時間 : <%= data['ranking'][0]['date'] %></p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>名稱</p></li>
+                  <li><p>增減</p></li>
+                </ul>
+                <% data['ranking'].forEach(function(o) { %>
+                <ul class="table_content" data-date="<%= o.date %>">
+                  <li><p class="publicEllipsis1"><%= o.name %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
+                </ul>
+                <% }); %>
+              </div>
+            </div>
+            <div class="publicBox">
+              <div class="publictitle">
+                <div class="title">
                   <h4>大股東持股增減</h4>
                   <p class="time">更新時間 : <%= data['holder'][0]['date'] %></p>
                 </div>
