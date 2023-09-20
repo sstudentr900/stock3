@@ -5,14 +5,7 @@
 .individual .publicRowFlex{
   margin-top: 24px;
 }
-.individual .customTable ul{
-  display: flex;
-  background: #212529;
-}
-.individual .customTable ul li{
-  flex: 1 1;
-}
-.individual .customTable ul li.date{
+.individual .customMian .customTable .date{
   flex: 0 0 130px;
 }
 .individual .customTable ul.remark{
@@ -24,71 +17,7 @@
 .individual .customTable ul.remark ol+ol{
   margin-top: 8px;
 }
-.individual .customTable ul.table_title{
-  border-bottom: 2px solid #808191;
-}
-.individual .customTable ul.table_title li{
-  padding: 12px 6px;
-}
-.individual .customTable ul.table_content{
-  border-bottom: 1px solid #373b3e;
-}
-.individual .customTable ul.table_content li{
-  padding: 6px 6px;
-}
-.individual .customTable ul li p.green{
-  color: #198754;
-}
-
-/* .individual .customMian .customTable ul li{
-  flex: 1 1;
-}
-.individual .customMian .customTable li{
-  text-align: center;
-}
-.individual .customNav ul li:nth-child(1){
-  width: 65%;
-}
-.individual .customNav ul li:nth-child(2){
-  width: 35%;
-}
-.individual .customNav ul.table_title li{
-  padding: 12px 8px;
-}
-.individual .customNav ul.table_content li{
-  padding: 6px 8px;
-} */
-/* .individual .publictitle .title{
-  display: flex;
-  align-items: end;
-} */
-/* .individual .publictitle .title .time{
-  font-size: 13px;
-  color: #7d7b8a;
-} */
-/* .individual .prosperity .publictitle .title{
-  display: block;
-}
-.individual .prosperity .customTable{
+.individual #lineGraph{
+  width: 100%;
   height: 400px;
-  width: 100%;
 }
-.individual .prosperity .item{
-  display: flex;
-}
-.individual .prosperity .item li{
-  font-size: 13px;
-  color: #7d7b8a;
-}
-.individual .prosperity .item li+li{
-  margin-left: 10px;
-
-}
-.individual .prosperity .prosperity_chart{
-  width: 100%;
-  height:400px;
-} */
-/* logo */
-/* .home .highcharts-credits{
-  display: none;
-} */

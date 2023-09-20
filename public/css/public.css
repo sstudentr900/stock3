@@ -176,7 +176,8 @@ input:focus{
 } 
 /*publicPage*/
 .publicPage{
-  background: #1f2127;
+  /* background: #1f2127; */
+  background: #f5feff;
 }
 /*publicContent*/
 .publicContent{
@@ -186,22 +187,68 @@ input:focus{
 .publicBox{
   width: 100%;
   padding: 24px;
-  background-color: #252730;
-  border-radius: 15px;
+  /* background-color: #252730; */
+  box-shadow: 2px 2px 5px #bbbbbb;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.125);
+  border-top: 5px #058296 solid;
+  /* border-radius: 15px; */
+  border-radius: 6px;
 }
 .publicBox+.publicBox{
   margin-top: 24px;
 }
 /*publictitle*/
 .publictitle{
-  color: #D8D9E3;
+  /* color: #D8D9E3; */
+  color: #058296;
   font-size: 18px;
-  margin-bottom: 24px;
+  font-weight: 400;
+  margin-bottom: 12px;
 }
 .publictitle .time{
   font-size: 13px;
   color: #7d7b8a;
 }
+/*customTable*/
+.customTable ul{
+  display: flex;
+  border: 1px solid #dee2e6;
+  border-top: none;
+}
+.customTable ul:first-child{
+  border-top: 1px solid #dee2e6;
+}
+.customTable .table_title{
+  background: #f5feff;
+  border-bottom: 1px solid #dee2e6;
+}
+.customTable .table_title p{
+  color: #212529;
+}
+.customTable .table_title li{
+  padding: 12px;
+}
+.customTable .table_content li{
+  padding: 6px 12px;
+}
+.customTable .table_content p{
+  color: #5e5e5e;
+}
+.customTable .table_content p.green{
+  color: #15b303;
+}
+.customMian .customTable li{
+  flex: 1 1;
+  text-align: center;
+}
+.customNav .customTable li{
+  flex: 1 1;
+}
+.customNav .customTable li:nth-child(2){
+  text-align: right;
+}
+
 /*publicRow*/
 .publicRowFlex{
   display: flex;

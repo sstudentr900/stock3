@@ -392,7 +392,7 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
 }
 async function stockGetThreeCargo({dataDate}){
   console.log(`stockGetThreeCargo,抓取3大法人買賣超融資融卷,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE`)
-  await sleep(12000)
+  await sleep(20000)
   const json = []
   const dt = getNowTimeObj();
   const year = dt['year']; //抓取前年
@@ -446,7 +446,7 @@ async function stockGetThreeCargo({dataDate}){
 }
 async function stockGetListedUpDown({dataDate}){
   console.log(`stockGetListedUpDown,抓取上市類股漲跌,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
-  await sleep(12000)
+  await sleep(20000)
   const options  = {
     url: `https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`,
     method: 'GET',
@@ -481,7 +481,7 @@ async function stockGetListedUpDown({dataDate}){
 }
 async function stockGetExdividend({stockdata}){
   console.log(`stockGetExdividendData,抓取除息股票,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
-  await sleep(12000)
+  await sleep(20000)
   const options  = {
     url: `https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`,
     method: 'GET',
@@ -899,19 +899,19 @@ async function stockYield({stockno,yielddata}){
   }
   if(yielddata && yielddata.slice(-1)[0]['date']<before_year){
     console.log(`stockYield,有值,前年${before_year}和資料年${yielddata.slice(-1)[0]['date']}不同,goodinfo抓取`)
-    await sleep(12000)
+    await sleep(20000)
     return await yield(before_year);
   }
   if( !yielddata ){
     console.log(`stockYield,資料庫沒有值,goodinfo抓取`)
-    // await sleep(12000)
+    // await sleep(20000)
     return await yield(before_year);
   }
 }
 async function stockGetData2({dataDate,stockno,nowDate}){
   // await sleep(2000);
   console.log(`stockGetData2,抓取個股,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
-  await sleep(12000)
+  await sleep(20000)
   const year = nowDate.split('-')[0]
   const options  = {
     url: `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`,
@@ -1069,7 +1069,7 @@ async function stockNetWorth({stockno,nowDate}){
 async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno,nowDate}){
   // await sleep(2000);
   console.log(`stockGetStockThreeCargo,抓取個股法人買賣超和融資融劵,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
-  await sleep(12000)
+  await sleep(20000)
   const year = nowDate.split('-')[0]
   const options  = {
     url: `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`,
@@ -1121,7 +1121,7 @@ async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno,nowDate}){
 async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
   // await sleep(2000);
   console.log(`stockGetStockHolder,抓取股東持股分級週統計圖,https://goodinfo.tw/tw/EquityDistributionClassHis.asp?STOCK_ID=${stockno}`)
-  await sleep(12000)
+  await sleep(20000)
   // const year = nowDate.split('-')[0]
   const options  = {
     url: `https://goodinfo.tw/tw/EquityDistributionClassHis.asp?STOCK_ID=${stockno}`,

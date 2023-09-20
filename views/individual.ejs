@@ -10,11 +10,11 @@
     <div class="publicContent">
       <div class="publicWidth">
         <div class="publicBox lineGraph">
-          <div class="publictitle">
+          <!-- <div class="publictitle">
             <div class="title">
               <h4>日K線</h4>
             </div>
-          </div>
+          </div> -->
           <div id="lineGraph"></div>
         </div>
         <div class="publicRowFlex">
@@ -88,35 +88,138 @@
                 <% });} %>
               </div>
             </div>
-            <div class="publicBox yielddata">
+          </div>
+          <div class="publicCol-3 customNav">
+            <div class="publicBox stockPayYear">
               <div class="publictitle">
                 <div class="title">
-                  <h4>殖利率</h4>
-                  <p class="time">更新時間 : <%= data['yielddata']?data['yielddata'][0]['date']:'' %></p>
+                  <h4>最近5年報酬</h4>
+                  <!-- <p class="time">更新時間 : <%= data['stockPayYear']?data['stockPayYear'][0]['date']:'' %></p> -->
                 </div>
               </div>
               <div class="customTable">
                 <ul class="table_title">
-                  <li><p>日期</p></li>
-                  <li><p>股利</p></li>
-                  <li><p>殖利率</p></li>
+                  <li class='date'><p>日期</p></li>
+                  <li><p>報酬</p></li>
                 </ul>
-                <% if(data['yielddata']){ data['yielddata'].forEach(function(o) { %>
+                <% if(data['stockPayYear']){data['stockPayYear'].forEach(function(o) { %>
                 <ul class="table_content">
-                  <li><p><%= o.date %></p></li>
-                  <li><p><%= o.dividend %></p></li>
-                  <li><p><%= o.yield %></p></li>
+                  <li class='date'><p><%= o.year %>年</p></li>
+                  <li><p><%= o.avenge %></p></li>
+                </ul>
+                <% });} %>
+                <% if(data['stockCagr']){%>
+                  <ul class="table_content">
+                    <li class='date'><p>年化報酬率</p></li>
+                    <li><p><%= data['stockCagr'] %>%</p></li>
+                  </ul>
+                  <%} %>
+              </div>
+            </div>
+            <div class="publicBox networthdata">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>最近淨值</h4>
+                  <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li class='date'><p>日期</p></li>
+                  <li><p>價格 / 淨值</p></li>
+                </ul>
+                <% if(data['networthdata']){data['networthdata'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li class='date'><p><%= o.date %></p></li>
+                  <li><p><%= o.price %> / <%= o.networth %></p></li>
                 </ul>
                 <% });} %>
               </div>
             </div>
-          </div>
-          <div class="publicCol-3 customNav">
+            <div class="publicBox networthdata">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>最近6年高低點</h4>
+                  <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li class='date'><p>日期</p></li>
+                  <li><p>高點 / 低點</p></li>
+                </ul>
+                <% if(data['highLowPrice']){data['highLowPrice'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li class='date'><p><%= o.year %>年</p></li>
+                  <li><p><%= o.max %> / <%= o.min %></p></li>
+                </ul>
+                <% });} %>
+              </div>
+            </div>
+            <div class="publicBox stockYield">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>最近5年殖利率</h4>
+                  <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li class='date'><p>日期</p></li>
+                  <li><p>股利 / 殖利率</p></li>
+                </ul>
+                <% if(data['stockYield']){data['stockYield'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li class='date'><p><%= o.nowYear %>年</p></li>
+                  <li><p><%= o.dividend %> / <%= o.yield %></p></li>
+                </ul>
+                <% });} %>
+                <% if(data['nowYield']){ %>
+                  <ul class="table_content">
+                    <li class='date'><p>目前殖利率</p></li>
+                    <li><p><%= data['nowYield'] %></p></li>
+                  </ul>
+                <% } %>
+              </div>
+            </div>
+            <div class="publicBox stockYieldPrice">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>便宜合理昂貴價</h4>
+                  <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>名稱</p></li>
+                  <li><p>價格</p></li>
+                </ul>
+                <% if(data['cheapPrice']){ %>
+                <ul class="table_content">
+                  <li><p>便宜</p></li>
+                  <li><p><%= data['cheapPrice'] %></p></li>
+                </ul>
+                <% } %>
+                <% if(data['fairPrice']){ %>
+                  <ul class="table_content">
+                    <li><p>合理</p></li>
+                    <li><p><%= data['fairPrice'] %></p></li>
+                  </ul>
+                <% } %>
+                <% if(data['expensivePrice']){ %>
+                  <ul class="table_content">
+                    <li><p>昂貴</p></li>
+                    <li><p><%= data['expensivePrice'] %></p></li>
+                  </ul>
+                <% } %>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <%- include('publicFooter') %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <script src="./js/<%= active %>.js"></script>
   </div>
 </body>

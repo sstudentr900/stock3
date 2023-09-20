@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <%- include('publicHead') -%>
+  <link rel="stylesheet" href="./css/<%= active %>.css">
 </head>
 <body>
   <div class="publicPage <%= active %>">
@@ -11,17 +12,14 @@
         <div class="publicRowFlex">
           <div class="publicCol-7 customMian">
             <div class="publicBox weighted">
-              <div class="publictitle">
+              <!-- <div class="publictitle">
                 <div class="title">
                   <h4>加權指數</h4>
                 </div>
-              </div>
-              <div id="weighted_chart"></div>
-              <!-- <div class="customTable">
-                <p>圖表</p>
               </div> -->
+              <div id="weighted_chart"></div>
             </div>
-            <div class="publicBox">
+            <div class="publicBox updownnumber">
               <div class="publictitle">
                 <div class="title">
                   <h4>上市類股漲跌</h4>
@@ -177,7 +175,7 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
-                  <h4>上市三大法人排名</h4>
+                  <h4>上市法人買賣排名</h4>
                   <p class="time">更新時間 : <%= data['ranking']?data['ranking'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -239,6 +237,16 @@
       </div>
     </div>
     <%- include('publicFooter') %>
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js'></script> -->
+    <!-- <script src="http://code.hcharts.cn/highstock/10.0.0/highstock.js"></script> -->
+    <!-- <script src="https://img.hcharts.cn/jquery/jquery-1.8.3.min.js"></script> -->
+    <!-- <script src="https://code.hcharts.cn/highcharts.js"></script> -->
+    <!-- <script src="https://code.hcharts.cn/highstock/highstock.js"></script> -->
+    <!-- <script src="http://cdn.hcharts.cn/highstock/highstock.js"></script>  -->
+    <!-- <script src="https://code.hcharts.cn/highstock/highstock.js"></script>
+    <script src="https://code.hcharts.cn/plugins/zh_cn.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="./js/<%= active %>.js"></script>
   </div>
 </body>
 </html>

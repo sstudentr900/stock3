@@ -53,6 +53,31 @@ function getMonthly({year,json}){
   })
   return array;
 }
+function getSort({obj,number}){
+  if(obj){
+    return JSON.parse(obj).slice(-1*Number(number))
+    .sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')));
+  }else{
+    return false;
+  }
+  
+}
+function getMa(dayCount, data) {
+  var result = [];
+  for (var i = 0, len = data.length; i < len; i++) {
+    if (i < dayCount) {
+      result.push('-');
+      continue;
+    }
+    var sum = 0;
+    for (var j = 0; j < dayCount; j++) {
+      console.log(i,j,data[i - j],data[i - j]['close'])
+      sum += +data[i - j]['close'];
+    }
+    result.push((sum / dayCount).toFixed(2));
+  }
+  return result;
+}
 function stockAvenge(startPrice,endPrice){
   return (((endPrice-startPrice)/startPrice)*100).toFixed(2)+'%'
 }
@@ -214,13 +239,13 @@ function stockPayMoreYear(stockdata,number){
   console.log(`stockPayMoreYear,跑最近${number}年每年報酬`)
   const row = []
   const nowTimeObj = getNowTimeObj()
-  let year = nowTimeObj['year'] - number;
+  let year = nowTimeObj['year'] - number + 1;
 
   //沒值
   if(!stockdata.length){console.log('stockYieldPrice,沒有股利資料')}
   if(!number){console.log('stockYieldPrice,沒有年數')}
   if(!stockdata.length || !number){
-    let year = nowTimeObj['year'] - number;
+    // let year = nowTimeObj['year'] - number;
     while (year <= nowTimeObj['year']){
       row.push({
         'year': year,
@@ -327,7 +352,7 @@ function stockHighLowPriceMoreYear(stockdata,number){
   const nowTimeObj = getNowTimeObj();
   let before_year = nowTimeObj['year'] - number;
   // while (before_year <= nowTimeObj['year']){
-  for(before_year;before_year<nowTimeObj['year']; before_year++){
+  for(before_year;before_year<=nowTimeObj['year']; before_year++){
     // console.log(`before_year,${before_year}`)
     if(!stockdata.length || !number){
       console.log(`stockHighLowPriceMoreYear,datalength,沒有值`)
@@ -499,5 +524,7 @@ module.exports={
   stockPayMoreMonth,
   stockKdFn,
   stockCagr,
-  getMonthly
+  getMonthly,
+  getSort,
+  getMa
 }

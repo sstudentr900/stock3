@@ -8,7 +8,9 @@ const {
   getNowTimeObj,
   stockHighLowPriceMoreYear,
   stockdataFn_w,
-  stockKdFn
+  stockKdFn,
+  getSort,
+  getMa
 } = require("../plugin/stockFn");
 
 async function search(req, res) {
@@ -41,33 +43,42 @@ async function search(req, res) {
     for (const row of rows) {
       console.log(`--stockno:${row['stockno']}--`)
       //法人買賣超和融資融劵		
-      row['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
+      // row['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
+      row['threecargo'] = getSort({obj:row['threecargo'],number:18})
       //股東持股分級週統計圖	
-      row['holder'] = row['holder']?JSON.parse(row['holder']):'';
+      row['holder'] = getSort({obj:row['holder'],number:18})
       //更新時間
       row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
       //stockdata 
       row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
+      const data = row['stockdata'].slice(-60)
+      row['stock_date'] = data.map(item=>item.date)
+      row['stock_price'] = data.map(item=>[item.open,item.close,item.low,item.hight])
+      row['stock_vol'] = data.map(item=>item.volume)
+      row['stock_ma5'] = getMa(5,data)
+      row['stock_ma10'] = getMa(10,data)
+      row['stock_ma20'] = getMa(20,data)
       //今年每月報酬
-      row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
-      //最近6年每年報酬
-      row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],6);
+      // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
+      //最近5年每年報酬
+      row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],5);
       //年化報酬率
       row['stockCagr'] = stockCagr(row['stockPayYear']);
       //淨值
-      row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
+      // row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
+      row['networthdata'] = getSort({obj:row['networthdata'],number:5})
       //殖利率
       row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
       const yieldObj = stockYieldPrice(row['yielddata'],row['stockdata']);
       row['stockYield'] = yieldObj.stockYield;//每年殖利率
-      row['average'] = yieldObj.average;//平均股利
-      row['averageYield'] =yieldObj.averageYield;//平均殖利率
+      // row['average'] = yieldObj.average;//平均股利
+      // row['averageYield'] =yieldObj.averageYield;//平均殖利率
       row['nowYield'] = yieldObj.nowYield;//目前殖利率
       row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
       row['fairPrice'] = yieldObj.fairPrice;//合理
       row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-      //4年高低點
-      row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
+      //5年高低點
+      row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],5);
       //周kd
       row['wkd_d'] = stockKdFn(stockdataFn_w(row['stockdata']))['last_d'];
     
@@ -77,7 +88,7 @@ async function search(req, res) {
       delete row.updated_at
       // console.log(`row,${JSON.stringify(row)}`)
     }
-    // console.log(rows[0])
+    console.log(rows[0])
     // res.send(rows)
     res.render('individual',{
       'active': 'individual',
