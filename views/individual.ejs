@@ -214,6 +214,46 @@
                 <% } %>
               </div>
             </div>
+            <div class="publicBox industry">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>持股產業</h4>
+                  <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>產業</p></li>
+                  <li><p>比例</p></li>
+                </ul>
+                <% if(data['industry']){data['industry'].forEach(function(o) { %>
+                  <ul class="table_content" data-date="<%= o.date %>">
+                    <li><p><%= o.name %></p></li>
+                    <li><p><%= o.proportion %></p></li>
+                  </ul>
+                <% });} %>
+              </div>
+            </div>
+            <div class="publicBox shareholding">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>持股明細</h4>
+                  <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>產業</p></li>
+                  <li><p>比例</p></li>
+                </ul>
+                <% if(data['shareholding']){data['shareholding'].forEach(function(o) { %>
+                  <ul class="table_content" data-date="<%= o.date %>">
+                    <li><p><%= o.name %></p></li>
+                    <li><p><%= o.proportion %></p></li>
+                  </ul>
+                <% });} %>
+              </div>
+            </div>
           </div>
         </div>
       </div>

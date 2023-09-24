@@ -346,6 +346,53 @@ async function stockdataFn_d(stockno,stockdata){
     // if(typeof value=='string')return message.push(value);//回傳錯誤請求
   }
 }
+async function stockNetWorthX({stockno,nowDate}){
+  if(!stockno){console.log(`stockNetWorth,${stockno},沒有值`);return false;}
+  console.log(`stockNetWorth,goodinfo抓淨值,https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433`)
+  //延遲1秒
+  await sleep(2000);
+  const json = []
+  const options  = {
+    url: `https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  }
+  return await stockPromise(options)
+  .then(body=>JSON.parse(body))
+  .then(data=>data.a1)
+  .then(a1s=>{
+    // console.log(`a1s,${JSON.stringify(a1s)}`)
+    for(a1 of a1s){
+      // console.log(`a1,${JSON.stringify(a1)}`)
+      const msgs = a1.msgArray
+      if(msgs){
+        // console.log(`msgs,${JSON.stringify(msgs)}`)
+        for(msg of msgs){
+          // console.log(`msg,${JSON.stringify(msg)}`)
+          if(msg.a==stockno){
+            const obj = {}
+            obj['date'] = nowDate;//日期
+            obj['price'] = Number(msg.f).toFixed(2);//價格
+            obj['networth'] = `${Number(msg.g).toFixed(2)}%`;//淨值
+            json.push(obj)
+            // json = `${Number(msg.f).toFixed(2)} / ${Number(msg.g).toFixed(2)}%` 
+          }
+        }
+      }
+    }
+    if(!json.length){
+      console.log(`stockNetWorth,抓取不到資料跳出`)
+      return false;
+    }
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stockNetWorth,淨值錯誤,${error}`)
+    return false;
+  })
+}
 async function stockIsGetValue({stockdata,fnName,stockno=''}){
   const timObj = getNowTimeObj()
   const nowDate = timObj['date']
@@ -908,50 +955,109 @@ async function stockYield({stockno,yielddata}){
     return await yield(before_year);
   }
 }
-async function stockNetWorth({stockno,nowDate}){
+async function stockNetWorth({stockno,dataDate}){
   if(!stockno){console.log(`stockNetWorth,${stockno},沒有值`);return false;}
-  console.log(`stockNetWorth,goodinfo抓淨值,https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433`)
+  console.log(`stockNetWorth,抓淨值,https://www.moneydj.com/ETF/X/Basic/Basic0003.xdjhtm?etfid=${stockno}.TW`)
   //延遲1秒
-  await sleep(2000);
-  const json = []
+  // await sleep(2000);
   const options  = {
-    url: `https://mis.twse.com.tw/stock/data/all_etf.txt?1663653801433`,
+    url: `https://www.moneydj.com/ETF/X/Basic/Basic0003.xdjhtm?etfid=${stockno}.TW`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
     }
   }
   return await stockPromise(options)
-  .then(body=>JSON.parse(body))
-  .then(data=>data.a1)
-  .then(a1s=>{
-    // console.log(`a1s,${JSON.stringify(a1s)}`)
-    for(a1 of a1s){
-      // console.log(`a1,${JSON.stringify(a1)}`)
-      const msgs = a1.msgArray
-      if(msgs){
-        // console.log(`msgs,${JSON.stringify(msgs)}`)
-        for(msg of msgs){
-          // console.log(`msg,${JSON.stringify(msg)}`)
-          if(msg.a==stockno){
-            const obj = {}
-            obj['date'] = nowDate;//日期
-            obj['price'] = Number(msg.f).toFixed(2);//價格
-            obj['networth'] = `${Number(msg.g).toFixed(2)}%`;//淨值
-            json.push(obj)
-            // json = `${Number(msg.f).toFixed(2)} / ${Number(msg.g).toFixed(2)}%` 
-          }
-        }
-      }
+  .then(body=>{
+    // console.log(body)
+    const $ = cheerio.load(body);
+    const json = []
+    const trs = $('#Repeater1 tr')
+    for (let i = 1; i < trs.length; i++) {
+      const obj = {}
+      const td = trs.eq(i).find('td');
+      if(!td){continue;}
+      // console.log(td.eq(0).text().trim())
+      obj['date'] = td.eq(0).text().trim().replaceAll('/','-') //112/06/30=>2023-06-30
+      if(dataDate && dataDate>=obj['date']){continue;}
+      obj['networth'] = Number(td.eq(1).text().trim()).toFixed(2)+'';//淨值
+      obj['price'] = Number(td.eq(2).text().trim()).toFixed(2)+'';//價格
+      json.push(obj)
     }
+    const trs1 = $('#Repeater2 tr')
+    for (let i = 1; i < trs1.length; i++) {
+      const obj = {}
+      const td = trs1.eq(i).find('td');
+      if(!td){continue;}
+      obj['date'] = td.eq(0).text().trim().replaceAll('/','-') 
+      if(dataDate && dataDate>=obj['date']){continue;}
+      obj['networth'] = Number(td.eq(1).text().trim()).toFixed(2)+'';//淨值
+      obj['price'] = Number(td.eq(2).text().trim()).toFixed(2)+'';//價格
+      json.push(obj)
+    }
+    // console.log(json)
     if(!json.length){
-      console.log(`stockNetWorth,抓取不到資料跳出`)
+      console.log(`stockNetWorth,抓取不到淨值跳出`)
       return false;
     }
+    //排小到大
+    json.sort((o1,o2)=>{
+      o1 = o1['date'].split('-').join('')
+      o2 = o2['date'].split('-').join('')
+      return o1-o2;
+    })
     return json
   })
   .catch((error)=>{
     console.log(`stockNetWorth,淨值錯誤,${error}`)
+    return false;
+  })
+}
+async function stocksharpe({stockno,nowDate}){
+  if(!stockno){console.log(`stocksharpe,${stockno},沒有值`);return false;}
+  console.log(`stocksharpe,抓夏普值,https://www.moneydj.com/ETF/X/Basic/Basic0010.xdjhtm?etfid=${stockno}.TW`)
+  //延遲1秒
+  // await sleep(2000);
+  const options  = {
+    url: `https://www.moneydj.com/ETF/X/Basic/Basic0010.xdjhtm?etfid=${stockno}.TW`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  }
+  return await stockPromise(options)
+  .then(body=>{
+    // console.log(body)
+    const $ = cheerio.load(body);
+    const json = []
+    const trs = $('#ctl00_ctl00_MainContent_MainContent_stable tr')
+    const array = [stockno,'同投資類型平均','同投資類型排名','同投資區域平均','同投資區域排名','同投資標的平均','同投資標的排名']
+    for (let i = 1; i < trs.length; i++) {
+      const obj = {}
+      const td = trs.eq(i).find('td');
+      if(!td){continue;}
+      obj['date'] = nowDate;//日期
+      obj['name'] = array[i];
+      obj['sharpe'] = td.eq(1).text().trim();//夏普值
+      obj['beta'] = td.eq(2).text().trim();//Beta
+      obj['deviation'] = td.eq(3).text().trim();//標準差
+      json.push(obj)
+    }
+    // console.log(json)
+    if(!json.length){
+      console.log(`stocksharpe,抓取不到夏普值跳出`)
+      return false;
+    }
+    //排小到大
+    // json.sort((o1,o2)=>{
+    //   o1 = o1['date'].split('-').join('')
+    //   o2 = o2['date'].split('-').join('')
+    //   return o1-o2;
+    // })
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stocksharpe,夏普值錯誤,${error}`)
     return false;
   })
 }
@@ -989,8 +1095,8 @@ async function stockGetData2({dataDate,stockno,nowDate}){
     }
     //排小到大
     json.sort((o1,o2)=>{
-      o1 = o1['Date'].split('-').join('')
-      o2 = o2['Date'].split('-').join('')
+      o1 = o1['date'].split('-').join('')
+      o2 = o2['date'].split('-').join('')
       return o1-o2;
     })
     return json
@@ -1007,7 +1113,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
   }else{
     dataDate = '2015-01-01';
   }
-  console.log(`stockGetData,yahoo,抓取時間,${dataDate},${nowDate}`)
+  console.log(`stockGetData,yahooFinance,抓取時間,${dataDate},${nowDate}`)
   return await yahooFinance.historical({
     symbol: `${stockno}`,
     from: dataDate,
@@ -1068,6 +1174,45 @@ async function stockGetData({stockno,dataDate,nowDate}){
     return false
   });
 }
+async function stockindustry({stockno,dataDate}){
+  if(!stockno){console.log(`stockindustry,${stockno},沒有值`);return false;}
+  console.log(`stockindustry,抓產業,https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=${stockno}.TW`)
+  const options  = {
+    url: `https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=${stockno}.TW`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  }
+  return await stockPromise(options)
+  .then(body=>{
+    // console.log(body)
+    const $ = cheerio.load(body);
+    const json = []
+    const trs = $('#ctl00_ctl00_MainContent_MainContent_stable2 tr')
+    const date = $('#ctl00_ctl00_MainContent_MainContent_sdate2').text().trim().split('：')[1].split('/')
+    for (let i = 1; i < trs.length; i++) {
+      const obj = {}
+      const td = trs.eq(i).find('td');
+      if(!td){continue;}
+      obj['date'] = `${date[0]}-${date[1]}-${date[2]}` //112/06/30=>2023-06-30
+      if(dataDate && dataDate>=obj['date']){continue;}
+      obj['name'] = td.eq(1).text().trim();//產業
+      obj['proportion'] = td.eq(3).text().trim();//比例
+      json.push(obj)
+    }
+    // console.log(json)
+    if(!json.length){
+      console.log(`stockindustry,抓取不到資料跳出`)
+      return false;
+    }
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stockindustry,抓取產業錯誤,${error}`)
+    return false;
+  })
+}
 async function stockShareholding({stockno,dataDate}){
   if(!stockno){console.log(`stockShareholding,${stockno},沒有值`);return false;}
   console.log(`stockShareholding,抓持股,https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=${stockno}.TW`)
@@ -1083,19 +1228,16 @@ async function stockShareholding({stockno,dataDate}){
     // console.log(body)
     const $ = cheerio.load(body);
     const json = []
-    const trs1 = $('#ctl00_ctl00_MainContent_MainContent_stable2 tr')
-    const date1 = $('#ctl00_ctl00_MainContent_MainContent_sdate2').text().trim().split('：')[1].split('/')
-    // const json2 = []
-    // const trs2 = $('#ctl00_ctl00_MainContent_MainContent_stable3 tr')
-    // const date2 = $('#ctl00_ctl00_MainContent_MainContent_sdate3').text().trim().split('：')[1].split('/')
+    const trs1 = $('#ctl00_ctl00_MainContent_MainContent_stable3 tr')
+    const date1 = $('#ctl00_ctl00_MainContent_MainContent_sdate3').text().trim().split('：')[1].split('/')
     for (let i = 1; i < trs1.length; i++) {
       const obj = {}
       const td = trs1.eq(i).find('td');
       if(!td){continue;}
       obj['date'] = `${date1[0]}-${date1[1]}-${date1[2]}` //112/06/30=>2023-06-30
       if(dataDate && dataDate>=obj['date']){continue;}
-      obj['name'] = td.eq(1).text().trim();//產業
-      obj['proportion'] = td.eq(3).text().trim();//比例
+      obj['name'] = td.eq(0).text().trim();//產業
+      obj['proportion'] = td.eq(1).text().trim();//比例
       json.push(obj)
     }
     // console.log(json)
@@ -1106,7 +1248,7 @@ async function stockShareholding({stockno,dataDate}){
     return json
   })
   .catch((error)=>{
-    console.log(`stockShareholding,持股錯誤,${error}`)
+    console.log(`stockShareholding,抓取持股錯誤,${error}`)
     return false;
   })
 }
@@ -1215,7 +1357,7 @@ async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
     return false
   })
 }
-async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threecargo,holder,stockname,shareholding}){
+async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threecargo,holder,stockname,shareholding,industry,sharpedata}){
   console.log(`stockCrawler,開始`)
   //result
   const result = {}
@@ -1239,6 +1381,10 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   // const networthValue = await stockIsGetValue({'fnName': stockNetWorth,'stockdata':networthdata,'stockno':stockno})
   // networthValue?result.networthdata = networthValue:'';
 
+  console.log(`抓取${stockno}夏普值`)
+  const sharpeValue = await stockIsGetValue({'fnName': stocksharpe,'stockdata':sharpedata,'stockno':stockno})
+  sharpeValue?result.sharpedata = sharpeValue:'';
+
   // console.log(`抓取${stockno}法人買賣超和融資融劵`)
   // const threecargoValue = await stockIsGetValue({'fnName': stockGetStockThreeCargo,'stockdata':threecargo,'stockno':stockno})
   // threecargoValue?result.threecargo = threecargoValue:'';
@@ -1247,9 +1393,13 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   // const holderValue = await stockIsGetValue({'fnName': stockGetStockHolder,'stockdata':holder,'stockno':stockno})
   // holderValue?result.holder = holderValue:'';
 
-  console.log(`抓取${stockno}持股`)
-  const shareholdingValue = await stockIsGetValue({'fnName': stockShareholding,'stockdata':shareholding,'stockno':stockno})
-  shareholdingValue?result.shareholding = shareholdingValue:'';
+  // console.log(`抓取${stockno}產業`)
+  // const industryValue = await stockIsGetValue({'fnName': stockindustry,'stockdata':industry,'stockno':stockno})
+  // industryValue?result.industry = industryValue:'';
+
+  // console.log(`抓取${stockno}持股`)
+  // const shareholdingValue = await stockIsGetValue({'fnName': stockShareholding,'stockdata':shareholding,'stockno':stockno})
+  // shareholdingValue?result.shareholding = shareholdingValue:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){

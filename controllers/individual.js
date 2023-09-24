@@ -28,7 +28,7 @@ async function search(req, res) {
     return false;
   }
   const stockno = params.stockno
-  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,holder,updated_at from stock WHERE stockno = ?',[stockno] )
+  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,holder,shareholding,industry,stocksharpe,updated_at from stock WHERE stockno = ?',[stockno] )
   if(!rows.length){
     console.log(`serch,沒有值,重新抓取`)
     res.render('individual',{
@@ -77,6 +77,12 @@ async function search(req, res) {
       row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
       row['fairPrice'] = yieldObj.fairPrice;//合理
       row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+      //持股產業
+      row['industry'] = row['industry']?JSON.parse(row['industry']):'';
+      //持股明細
+      row['shareholding'] = row['shareholding']?JSON.parse(row['shareholding']):'';
+      //夏普值
+      row['stocksharpe'] = row['stocksharpe']?JSON.parse(row['stocksharpe']):'';
       //5年高低點
       row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],5);
       //周kd
