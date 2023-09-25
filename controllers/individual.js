@@ -42,11 +42,7 @@ async function search(req, res) {
     console.log(`serch,有值`)
     for (const row of rows) {
       console.log(`--stockno:${row['stockno']}--`)
-      //法人買賣超和融資融劵		
-      // row['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
-      row['threecargo'] = getSort({obj:row['threecargo'],number:18})
-      //股東持股分級週統計圖	
-      row['holder'] = getSort({obj:row['holder'],number:18})
+      
       //更新時間
       row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
       //stockdata 
@@ -58,6 +54,37 @@ async function search(req, res) {
       row['stock_ma5'] = getMa(5,data)
       row['stock_ma10'] = getMa(10,data)
       row['stock_ma20'] = getMa(20,data)
+      //法人買賣超和融資融劵		
+      // row['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
+      const threecargo = JSON.parse(row['threecargo'])
+      row['threecargo'] = getSort({obj:row['threecargo'],number:18})
+      //法人買賣超_日期
+      row['threecargo_date'] = threecargo.map(({date})=>date)
+      //法人買賣超
+      row['threecargo_data'] = threecargo.map(({totle})=>totle)
+      //法人買賣超_加權指數
+      row['threecargo_market'] = threecargo.map(({date})=>{
+        const obj = row['stockdata'].find(obj=>date==obj.date)
+        return obj?Number(obj.close):0
+      })
+      //股東持股分級週統計圖	
+      const holder = JSON.parse(row['holder'])
+      row['holder'] = getSort({obj:row['holder'],number:18})
+      //法人買賣超_日期
+      row['holder_date'] = holder.map(({date})=>date)
+      //法人買賣超
+      row['holder_data'] = holder.map(({big400})=>big400)
+      //法人買賣超_加權指數
+      // row['holder_market'] = holder.map(({date})=>{
+      //   const obj = row['stockdata'].find(obj=>date==obj.date)
+      //   return obj?Number(obj.close):0
+      // })
+      row['holder_market'] = holder.map(({date})=>{
+        const obj = row['stockdata'].find(obj=>{
+          return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
+        })
+        return obj?Number(obj.close):0
+      })
       //今年每月報酬
       // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
       //最近5年每年報酬

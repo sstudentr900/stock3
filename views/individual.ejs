@@ -9,13 +9,13 @@
     <%- include('publicNav') %>
     <div class="publicContent">
       <div class="publicWidth">
-        <div class="publicBox lineGraph">
+        <div class="publicBox line_chart">
           <!-- <div class="publictitle">
             <div class="title">
               <h4>日K線</h4>
             </div>
           </div> -->
-          <div id="lineGraph"></div>
+          <div id="line_chart"></div>
         </div>
         <div class="publicRowFlex">
           <div class="publicCol-7 customMian">
@@ -26,6 +26,7 @@
                   <p class="time">更新時間 : <%= data['threecargo']?data['threecargo'][0]['date']:'' %></p>
                 </div>
               </div>
+              <div id="threecargo_chart"></div>
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>
@@ -63,6 +64,7 @@
                   <p class="time">更新時間 : <%= data['holder']?data['holder'][0]['date']:'' %></p>
                 </div>
               </div>
+              <div id="holder_chart"></div>
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>

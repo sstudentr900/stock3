@@ -1,174 +1,26 @@
 window.onload=async function(){
   console.log(pageJson)
-  // 基于准备好的dom，初始化echarts实例
-  const prosperity_chart = echarts.init(document.getElementById('prosperity_chart'));
-  const dollars_chart = echarts.init(document.getElementById('dollars_chart'));
+  //大盤
   const weighted_chart = echarts.init(document.getElementById('weighted_chart'));
+  //三大買賣
+  const threecargo_chart = echarts.init(document.getElementById('threecargo_chart'));
+  //期貨買賣
+  const threefutures_chart = echarts.init(document.getElementById('threefutures_chart'));
+  //上下跌家數
+  const updownnumber_chart = echarts.init(document.getElementById('updownnumber_chart'));
+  //景氣
+  const prosperity_chart = echarts.init(document.getElementById('prosperity_chart'));
+  //美元
+  const dollars_chart = echarts.init(document.getElementById('dollars_chart'));
   window.addEventListener('resize', function() {
     prosperity_chart.resize();
+    threecargo_chart.resize();
+    threefutures_chart.resize();
+    updownnumber_chart.resize();
     dollars_chart.resize();
     weighted_chart.resize();
   });
   // 指定图表的配置项和数据
-  const prosperity_chart_option = {
-    title: {
-      show: false // 隐藏标题
-    },
-    grid: {
-      left: 50, //畫面編距
-      right: 30,
-      top: 30,
-      bottom: 20
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' }
-    },
-    legend: {
-      show: false // 隐藏图例
-    },
-    xAxis: [
-      {
-        type: 'category',
-        axisTick: {
-          alignWithLabel: true
-        },
-        data: pageJson['prosperity_date']
-      }
-    ],
-    yAxis: [
-      {
-        type: 'value',
-        // name: '景氣燈號',
-        min: 3,
-        position: 'right',
-        splitLine: {
-          lineStyle: {
-            // opacity: 0.2,
-          }
-        },
-      },
-      {
-        type: 'value',
-        // name: '大盤指數',
-        min: 3000,
-        // max: 25,
-        position: 'left',
-        // scale: true //放大
-        splitLine: {
-          show: false, //分線關閉
-        },
-        // axisLabel: {
-        //   formatter: '{value} °C'
-        // }
-      }
-    ],
-    series: [
-      {
-        name: '景氣燈號',
-        type: 'bar',
-        yAxisIndex: 0,
-        data: pageJson['prosperity_data'],
-        itemStyle: {
-          color: '#a3b3b5', // 柱子颜色
-        }
-      },
-      {
-        name: '大盤指數',
-        type: 'line',
-        smooth: true,
-        yAxisIndex: 1,
-        data: pageJson['prosperity_market'],
-        lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
-        },
-        itemStyle: {
-          opacity: 0, //點隱蔽
-        }
-      }
-    ]
-  };
-  const dollars_chart_option = {
-    title: {
-      show: false // 隐藏标题
-    },
-    grid: {
-      left: 50, //畫面編距
-      right: 30,
-      top: 30,
-      bottom: 20
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' }
-    },
-    legend: {
-      show: false // 隐藏图例
-    },
-    xAxis: [
-      {
-        type: 'category',
-        axisTick: {
-          alignWithLabel: true
-        },
-        data: pageJson['dollars_date']
-      }
-    ],
-    yAxis: [
-      {
-        type: 'value',
-        // name: '美金',
-        min: 26,
-        position: 'right',
-        splitLine: {
-          lineStyle: {
-            // opacity: 0.2,
-          }
-        },
-      },
-      {
-        type: 'value',
-        // name: '大盤指數',
-        min: 3000,
-        // max: 25,
-        position: 'left',
-        splitLine: {
-          show: false, //分線關閉
-        },
-      }
-    ],
-    series: [
-      {
-        name: '美金',
-        type: 'bar',
-        yAxisIndex: 0,
-        data: pageJson['dollars_data'],
-        itemStyle: {
-          color: '#a3b3b5', // 柱子颜色
-          // borderColor: 'green', // 柱子边框颜色
-          // borderWidth: 2, // 柱子边框宽度
-          // barBorderRadius: 5, // 柱子边框圆角
-          // shadowBlur: 10, // 阴影模糊度
-          // shadowColor: 'rgba(0, 0, 0, 0.5)' // 阴影颜色
-        }
-      },
-      {
-        name: '大盤指數',
-        type: 'line',
-        smooth: true,
-        yAxisIndex: 1,
-        data: pageJson['dollars_market'],
-        lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
-        },
-        itemStyle: {
-          opacity: 0, //點隱蔽
-        }
-      }
-    ]
-  };
   let color = {
     up: '#c40f0fd3',
     down: '#058296',
@@ -335,8 +187,372 @@ window.onload=async function(){
       data: pageJson['twii_vol']
     }]
   };
+  const threecargo_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 50,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['threecargo_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // min: 26,
+        position: 'right',
+      },
+      {
+        type: 'value',
+        // min: 3000,
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '買賣合計累積',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['threecargo_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['threecargo_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  const threefutures_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 80,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['threefutures_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // min: 26,
+        position: 'right',
+      },
+      {
+        type: 'value',
+        // min: 3000,
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '合計期貨買賣超',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['threefutures_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['threefutures_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  const updownnumber_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 50,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['updownnumber_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // min: 26,
+        position: 'right',
+      },
+      {
+        type: 'value',
+        // min: 3000,
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '合計家數',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['updownnumber_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['updownnumber_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  const prosperity_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 30,
+      top: 30,
+      bottom: 20
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['prosperity_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // name: '景氣燈號',
+        min: 3,
+        position: 'right',
+        splitLine: {
+          lineStyle: {
+            // opacity: 0.2,
+          }
+        },
+      },
+      {
+        type: 'value',
+        // name: '大盤指數',
+        min: 3000,
+        // max: 25,
+        position: 'left',
+        // scale: true //放大
+        splitLine: {
+          show: false, //分線關閉
+        },
+        // axisLabel: {
+        //   formatter: '{value} °C'
+        // }
+      }
+    ],
+    series: [
+      {
+        name: '景氣燈號',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['prosperity_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['prosperity_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  const dollars_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 30,
+      top: 30,
+      bottom: 20
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['dollars_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // name: '美金',
+        min: 26,
+        position: 'right',
+        splitLine: {
+          lineStyle: {
+            // opacity: 0.2,
+          }
+        },
+      },
+      {
+        type: 'value',
+        // name: '大盤指數',
+        min: 3000,
+        // max: 25,
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '美金',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['dollars_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+          // borderColor: 'green', // 柱子边框颜色
+          // borderWidth: 2, // 柱子边框宽度
+          // barBorderRadius: 5, // 柱子边框圆角
+          // shadowBlur: 10, // 阴影模糊度
+          // shadowColor: 'rgba(0, 0, 0, 0.5)' // 阴影颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['dollars_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
   // 使用刚指定的配置项和数据显示图表。
+  weighted_chart.setOption(weighted_chart_option);
+  threecargo_chart.setOption(threecargo_chart_option);
+  threefutures_chart.setOption(threefutures_chart_option);
+  updownnumber_chart.setOption(updownnumber_chart_option);
   prosperity_chart.setOption(prosperity_chart_option);
   dollars_chart.setOption(dollars_chart_option);
-  weighted_chart.setOption(weighted_chart_option);
+
 }

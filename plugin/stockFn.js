@@ -63,12 +63,13 @@ function getSort({obj,number}){
 }
 function getAccumulate({obj}){
   //累加
-  obj = JSON.parse(obj)
+  // obj = JSON.parse(obj)
   let array = [];
   let sum = 0;
-  for(let n of obj['totle']) {
-    sum += n;
-    array.push(sum)
+  // console.log(obj)
+  for(let n of obj) {
+    sum += Number(n);
+    array.push(sum.toFixed(2))
   }
   return array;
 }

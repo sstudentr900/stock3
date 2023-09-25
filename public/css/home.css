@@ -44,6 +44,9 @@
   margin-left: 10px;
 
 }
+.home #threecargo_chart,
+.home #threefutures_chart,
+.home #updownnumber_chart,
 .home #prosperity_chart,
 .home #dollars_chart,
 .home #weighted_chart{

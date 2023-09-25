@@ -41,13 +41,14 @@
                 <% });} %>
               </div>
             </div>
-            <div class="publicBox">
+            <div class="publicBox threecargofinancing">
               <div class="publictitle">
                 <div class="title">
                   <h4>三大法人買賣超</h4>
                   <p class="time">更新時間 : <%= data['threecargofinancing']?data['threecargofinancing'][0]['date']:'' %></p>
                 </div>
               </div>
+              <div id="threecargo_chart"></div>
               <div class="customTable">
                 <ul class="table_title">
                   <li><p>日期</p></li>
@@ -71,13 +72,14 @@
                 <% });} %>
               </div>
             </div>
-            <div class="publicBox">
+            <div class="publicBox threefutures">
               <div class="publictitle">
                 <div class="title">
                   <h4>期貨買賣超</h4>
                   <p class="time">更新時間 : <%= data['threefutures']?data['threefutures'][0]['date']:'' %></p>
                 </div>
               </div>
+              <div id="threefutures_chart"></div>
               <div class="customTable">
                 <ul class="table_title">
                   <li><p>日期</p></li>
@@ -99,13 +101,14 @@
                 <% });} %>
               </div>
             </div>
-            <div class="publicBox">
+            <div class="publicBox updownnumber">
               <div class="publictitle">
                 <div class="title">
                   <h4>大盤上下跌家數</h4>
                   <p class="time">更新時間 : <%= data['updownnumber']?data['updownnumber'][0]['date']:'' %></p>
                 </div>
               </div>
+              <div id="updownnumber_chart"></div>
               <div class="customTable">
                 <ul class="table_title">
                   <li><p>日期</p></li>

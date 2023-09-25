@@ -17,7 +17,9 @@
 .individual .customTable ul.remark ol+ol{
   margin-top: 8px;
 }
-.individual #lineGraph{
+.individual #threecargo_chart,
+.individual #holder_chart,
+.individual #line_chart{
   width: 100%;
   height: 400px;
 }

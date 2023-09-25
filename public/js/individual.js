@@ -1,8 +1,14 @@
 window.onload=async function(){
   console.log(pageJson)
-  const lineGraph = echarts.init(document.getElementById('lineGraph'));
+  const line_chart = echarts.init(document.getElementById('line_chart'));
+  //三大法人和融資融劵
+  const threecargo_chart = echarts.init(document.getElementById('threecargo_chart'));
+  //股東持股分級週統計圖
+  const holder_chart = echarts.init(document.getElementById('holder_chart'));
   window.addEventListener('resize', function() {
-    lineGraph.resize();
+    line_chart.resize();
+    threecargo_chart.resize();
+    holder_chart.resize();
   });
   let color = {
     up: '#c40f0fd3',
@@ -13,7 +19,7 @@ window.onload=async function(){
     ma20: '#ca0199',
     //ma60: '#D94600'
   };
-  const lineGraph_option = {
+  const line_chart_option = {
     animation: true,
     title: {
       text: `${pageJson['stockname']} 日K線`,
@@ -170,5 +176,141 @@ window.onload=async function(){
       data: pageJson['stock_vol']
     }]
   };
-  lineGraph.setOption(lineGraph_option);
+  const threecargo_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 50,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['threecargo_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // min: 26,
+        position: 'right',
+      },
+      {
+        type: 'value',
+        // min: 3000,
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '合計',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['threecargo_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['threecargo_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  const holder_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 50,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['holder_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        // min: 26,
+        position: 'right',
+      },
+      {
+        type: 'value',
+        // min: 3000,
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '400張以下',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['holder_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['holder_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  line_chart.setOption(line_chart_option);
+  threecargo_chart.setOption(threecargo_chart_option);
+  holder_chart.setOption(holder_chart_option);
 }
