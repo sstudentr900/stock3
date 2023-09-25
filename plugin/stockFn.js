@@ -60,7 +60,17 @@ function getSort({obj,number}){
   }else{
     return false;
   }
-  
+}
+function getAccumulate({obj}){
+  //累加
+  obj = JSON.parse(obj)
+  let array = [];
+  let sum = 0;
+  for(let n of obj['totle']) {
+    sum += n;
+    array.push(sum)
+  }
+  return array;
 }
 function getMa(dayCount, data) {
   var result = [];
@@ -526,5 +536,6 @@ module.exports={
   stockCagr,
   getMonthly,
   getSort,
-  getMa
+  getMa,
+  getAccumulate
 }

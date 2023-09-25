@@ -44,7 +44,7 @@
                   <li><p><%= o.letter %></p></li>
                   <li><p><%= o.proprietor %></p></li>
                   <li><p><%= o.totle %></p></li>
-                  <li><p><%= o.foreignhold %></p></li>
+                  <li><p><%= o.foreignhold %>%</p></li>
                   <li><p><%= o.financing %></p></li>
                   <li><p><%= o.lending %></p></li>
                 </ul>
@@ -66,26 +66,53 @@
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>
-                  <li><p>>10張</p></li>
-                  <li><p>>50張</p></li>
-                  <li><p>>100張</p></li>
-                  <li><p>>200張</p></li>
-                  <li><p>>400張</p></li>
-                  <li><p>>800張</p></li>
-                  <li><p>>1000張</p></li>
+                  <li><p>50張以下</p></li>
+                  <li><p>100張以下</p></li>
+                  <li><p>400張以下</p></li>
+                  <li><p>800張以下</p></li>
+                  <li><p>1000張以下</p></li>
+                  <li><p>1000張以上</p></li>
                 </ul>
                 <% if(data['holder']){ data['holder'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li class='date'><p><%= o.date %></p></li>
-                  <li><p><%= o.big10 %></p></li>
                   <li><p><%= o.big50 %></p></li>
                   <li><p><%= o.big100 %></p></li>
-                  <li><p><%= o.big200 %></p></li>
                   <li><p><%= o.big400 %></p></li>
                   <li><p><%= o.big800 %></p></li>
                   <li><p><%= o.big1000 %></p></li>
+                  <li><p><%= o.big1001 %></p></li>
                 </ul>
                 <% });} %>
+              </div>
+            </div>
+            <div class="publicBox sharpedata">
+              <div class="publictitle">
+                <div class="title">
+                  <h4>報酬率比較表</h4>
+                  <p class="time">更新時間 : <%= data['sharpedata']?data['sharpedata'][0]['date']:'' %></p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>名稱</p></li>
+                  <li><p>Sharpe</p></li>
+                  <li><p>Beta</p></li>
+                  <li><p>標準差</p></li>
+                </ul>
+                <% if(data['sharpedata']){ data['sharpedata'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li><p><%= o.name %></p></li>
+                  <li><p><%= o.sharpe %></p></li>
+                  <li><p><%= o.beta %></p></li>
+                  <li><p><%= o.deviation %></p></li>
+                </ul>
+                <% });} %>
+                <ul class='remark'>
+                  <ol>夏普值報酬風險比率，愈大愈好，判定投資組合能否用「愈低的波動」，尋求「愈高的報酬」，例如夏普值為0.8，那此投資組合要創造8%的報酬率，需承受10%的波動風險。</ol>
+                  <ol>Beta值與大盤的連動程度，無絕對好壞，Beta值為1.5，代表大盤漲10%，投資組合會上漲15%；反之，若大盤跌10%，投資組合也會下跌15%。Beta值為0.5，代表大盤漲10%，投資組合會上漲5%；反之，若大盤跌10%，投資組合也會下跌5%。</ol>
+                  <ol>標準差波動程度，愈小愈穩健，愈大基金淨值的波動振幅就會較為劇烈。</ol>
+                </ul>
               </div>
             </div>
           </div>

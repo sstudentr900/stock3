@@ -28,7 +28,7 @@ async function search(req, res) {
     return false;
   }
   const stockno = params.stockno
-  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,holder,shareholding,industry,stocksharpe,updated_at from stock WHERE stockno = ?',[stockno] )
+  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,holder,shareholding,industry,sharpedata,updated_at from stock WHERE stockno = ?',[stockno] )
   if(!rows.length){
     console.log(`serch,沒有值,重新抓取`)
     res.render('individual',{
@@ -66,7 +66,7 @@ async function search(req, res) {
       row['stockCagr'] = stockCagr(row['stockPayYear']);
       //淨值
       // row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
-      row['networthdata'] = getSort({obj:row['networthdata'],number:5})
+      row['networthdata'] = getSort({obj:row['networthdata'],number:6})
       //殖利率
       row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
       const yieldObj = stockYieldPrice(row['yielddata'],row['stockdata']);
@@ -82,7 +82,7 @@ async function search(req, res) {
       //持股明細
       row['shareholding'] = row['shareholding']?JSON.parse(row['shareholding']):'';
       //夏普值
-      row['stocksharpe'] = row['stocksharpe']?JSON.parse(row['stocksharpe']):'';
+      row['sharpedata'] = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7):'';
       //5年高低點
       row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],5);
       //周kd

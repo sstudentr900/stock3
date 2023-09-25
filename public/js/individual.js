@@ -16,7 +16,7 @@ window.onload=async function(){
   const lineGraph_option = {
     animation: true,
     title: {
-      text: '日K線',
+      text: `${pageJson['stockname']} 日K線`,
     },
     legend: {
       top: 3,
