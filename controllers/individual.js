@@ -16,7 +16,7 @@ const {
 async function search(req, res) {
   console.log(`---------查詢股票---------`)
   const params = req.params
-  console.log(params.stockno)
+  // console.log(params.stockno)
   if(!params.stockno){
     console.log(`來源資料錯誤:${params.stockno}-${JSON.stringify(params)}`)
     res.render('individual',{
@@ -39,15 +39,15 @@ async function search(req, res) {
     })
 
   }else{
-    console.log(`serch,有值`)
+    // console.log(`serch,有值`)
     for (const row of rows) {
-      console.log(`--stockno:${row['stockno']}--`)
+      // console.log(`--stockno:${row['stockno']}--`)
       
       //更新時間
       row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
       //stockdata 
       row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
-      const data = row['stockdata'].slice(-60)
+      const data = row['stockdata'].slice(-132)
       row['stock_date'] = data.map(item=>item.date)
       row['stock_price'] = data.map(item=>[item.open,item.close,item.low,item.hight])
       row['stock_vol'] = data.map(item=>item.volume)
@@ -61,10 +61,10 @@ async function search(req, res) {
       //法人買賣超_日期
       row['threecargo_date'] = threecargo.map(({date})=>date)
       //法人買賣超
-      row['threecargo_data'] = threecargo.map(({totle})=>totle)
+      row['threecargo_data'] = threecargo.map(({totle})=>totle.split(',').join(''))
       //法人買賣超_加權指數
       row['threecargo_market'] = threecargo.map(({date})=>{
-        const obj = row['stockdata'].find(obj=>date==obj.date)
+        const obj = row['stockdata'].find(item=>date==item.date)
         return obj?Number(obj.close):0
       })
       //股東持股分級週統計圖	
@@ -73,16 +73,10 @@ async function search(req, res) {
       //法人買賣超_日期
       row['holder_date'] = holder.map(({date})=>date)
       //法人買賣超
-      row['holder_data'] = holder.map(({big400})=>big400)
+      row['holder_data'] = holder.map(({big1001})=>big1001.split(',').join(''))
       //法人買賣超_加權指數
-      // row['holder_market'] = holder.map(({date})=>{
-      //   const obj = row['stockdata'].find(obj=>date==obj.date)
-      //   return obj?Number(obj.close):0
-      // })
       row['holder_market'] = holder.map(({date})=>{
-        const obj = row['stockdata'].find(obj=>{
-          return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
-        })
+        const obj = row['stockdata'].find(item=>item.date == date)
         return obj?Number(obj.close):0
       })
       //今年每月報酬
@@ -121,7 +115,7 @@ async function search(req, res) {
       delete row.updated_at
       // console.log(`row,${JSON.stringify(row)}`)
     }
-    console.log(rows[0])
+    // console.log(rows[0])
     // res.send(rows)
     res.render('individual',{
       'active': 'individual',

@@ -1136,7 +1136,8 @@ async function stockGetData2({dataDate,stockno,nowDate}){
     const $ = cheerio.load(body);
     const json=[]
     const trs = $("#divPriceDetail table#tblPriceDetail tbody tr[align='center']");
-    for (let i = 1; i < trs.length; i++) {
+    // console.log(trs.text())
+    for (let i = 0; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
       const dates = td.eq(0).text().trim().split('/')//日期
@@ -1182,6 +1183,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
     // console.log(`stockGetData,jsons資料: ${JSON.stringify(jsons)}`)
     if(!jsons.length){
       console.log(`stockGetData,yahooFinance沒有資料跑stockGetData2`)
+      stockno = stockno.split('.')[0];
       jsons = await stockGetData2({dataDate,stockno,nowDate})
       if(!jsons.length){
         console.log(`stockGetData2,goodinfo沒有資料跳出`)
@@ -1189,6 +1191,10 @@ async function stockGetData({stockno,dataDate,nowDate}){
       }
       return jsons;
     }
+    // if(!jsons.length){
+    //   console.log(`stockGetData,yahooFinance沒有資料跳出`)
+    //   return false
+    // }
 
     //修改和移除空白 jsons
     const array = [] 
@@ -1213,7 +1219,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
       }
     })
     if(!array.length){
-      console.log(`stockGetData2,array,沒有資料跳出`)
+      console.log(`stockGetData,array,沒有資料跳出`)
       return false
     }
     // console.log(`抓取資料: ${JSON.stringify(array)}`)
@@ -1411,11 +1417,35 @@ async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
     return false
   })
 }
+async function stockGetname({stockno}){
+  console.log(`stockname,抓取股名,https://agdstock.club/stock/${stockno}`)
+  const options  = {
+    url: `https://agdstock.club/stock/${stockno}`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  }
+  return await stockPromise(options)
+  .then(body=>{
+    // console.log(body)
+    const $ = cheerio.load(body);
+    const name = $("h1.page-title").text().split('-')[0].split(' ')[1]
+    if(!name){
+      console.log(`stockname,抓取不到資料跳出`)
+      return false;
+    }
+    return name;
+  })
+  .catch((error)=>{
+    console.log(`stockname,抓取錯誤,${error}`)
+    return false
+  })
+}
 async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threecargo,holder,stockname,shareholding,industry,sharpedata}){
   console.log(`stockCrawler,開始`)
   //result
   const result = {}
-
   result.stockno = stockno;
 
   console.log(`抓取${stockno}資料`)
@@ -1427,8 +1457,9 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   yieldObj && yieldObj['yield']?result.yielddata = yieldObj['yield']:'';
 
   if(!stockname){
-    yieldObj && yieldObj['stockName']?result.stockName = yieldObj['stockName']:'';
-    console.log(`抓取${stockno}股名${result.stockName}`)
+    console.log(`抓取${stockno}股名`)
+    const stocknameValue = await stockGetname({stockno})
+    stocknameValue?result.stockname = stocknameValue:'';
   }
 
   console.log(`抓取${stockno}淨值`)
@@ -1469,7 +1500,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
       const rows = await dbInsert('stock',result)
       const id =  rows.insertId
       await dbUpdata('stock',{sort:id},id)
-      result['insertId'] = id
+      result['id'] = id
       return result;
     }
   }

@@ -2,50 +2,53 @@
   padding-bottom: 0;
 }
 .remuneration .customTable{
-  border: 1px solid #4A4C55;
-  display: flex;
+  border: 1px solid #dee2e6;
   height: calc(100vh - 100px - 77px - 48px - 67px);
   overflow: auto;
 }
-.remuneration .customTable ul{
-  flex: 0 0 150px;
-  height: calc(50px * 34 + 75px);
+.remuneration .customTable ul,
+.remuneration .customTable .table_title{
+  border: none;
+  background: none;
+  border-bottom: none;
 }
 .remuneration .customTable ul.table_title{
   position: sticky;
-  left: 0;
+  top: 0;
   z-index: 1;
 }
 .remuneration .customTable ul.table_title li{
-  background-color: #252730;
-  border-right: 1px solid #4A4C55;
+  background: #f5feff;
+  border-bottom: 1px solid #dee2e6;
 }
-.remuneration .customTable ul.table_content+.table_content li{
-  border-left: 1px solid #4A4C55;
-}
-.remuneration .customTable ul li:first-child{
-  border-bottom: 1px solid #4A4C55;
-  background-color: #252730;
-  position: sticky;
-  top: 0;
-  cursor: move;
+.remuneration .customTable ul{
+  width: calc(140px * 28);
 }
 .remuneration .customTable li{
-  padding: 12px;
-  height: 50px;
+  padding: 8px;
+  flex: 0 0 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #dee2e6;
 }
-.remuneration .customTable li+li{
-  border-top: 1px solid #4A4C55;
+.remuneration .customTable li:not(.name)+li{
+  border-left: 1px solid #dee2e6;
 }
 .remuneration .customTable li.name{
-  height: 75px;
+  justify-content: left;
+  position: sticky;
+  left: 0;
+  cursor: move;
+  background: #f5feff;
+  border-right: 1px solid #dee2e6;
 }
 .remuneration .customTable li p.green{
   color: #198754;
 }
 .remuneration .publictitle{
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
 }
 .remuneration .publictitle .time{
@@ -54,18 +57,17 @@
 }
 .remuneration .control a.add{
   font-size: 14px;
-  font-weight: 300;
+  font-weight: 400;
   padding: 3px 16px;
-  color: #feeeaf;
-  border: 1px solid #DEB103;
+  color: #058296;
+  border: 1px solid #058296;
   display: flex;
   align-items: center;
 }
 .remuneration .control a.add:hover{
   font-size: 15px;
-  font-weight: 600;
-  color: #252730;
-  background: #DEB103;
+  color: #fff;
+  background: #058296;
 }
 .remuneration .control a.add .lds-ring{
   margin-left: 8px;
@@ -74,26 +76,15 @@
 .remuneration .control a.add.active .lds-ring{
   display: inline-block;
 }
-/* .remuneration .control a.add{
-  margin-left: 5px;
-  width: 24px;
-  display: flex;
-  align-items: center;
-} */
-/* .remuneration .control a.add svg{
-  margin-top: 1px;
-  fill: #3A61F6;
-} */
 .remuneration .control a.delet{
   width: 18px;
   position: absolute;
-  right: 5px;
-  bottom: 8px;
+  right: 8px;
+  bottom: 2px;
 }
 .remuneration .control a.delet svg{
   fill: #F95F53;
 } 
-
 /*lds-ring*/
 .lds-ring {
   display: inline-block;

@@ -11,54 +11,70 @@ const {
   stockKdFn
 } = require("../plugin/stockFn");
 
+async function nowPage({row}) {
+  const data = {}
+  //更新時間
+  data['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date'];
+  //id
+  data['id'] = row['id']
+  //股名
+  data['stockname'] = row['stockname'];
+  //股號
+  data['stockno'] = row['stockno'];
+  //stockdata 
+  const stockdata= row['stockdata']?JSON.parse(row['stockdata']):'';
+  //今年每月報酬
+  data['stockPayMonth'] = stockPayMoreMonth(stockdata);
+  //最近6年每年報酬
+  data['stockPayYear'] = await stockPayMoreYear(stockdata,6);
+  //年化報酬率
+  data['stockCagr'] = stockCagr(data['stockPayYear']);
+  //淨值
+  if(row['networthdata']){
+    let networthdata = JSON.parse(row['networthdata']);
+    networthdata = networthdata[networthdata.length-1]
+    // console.log(`networthdata,${networthdata}`)
+    data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
+  }
+  //殖利率
+  let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
+  yieldObj = stockYieldPrice(yieldObj,stockdata);
+  // row['stockYield'] = yieldObj.stockYield;//每年殖利率
+  data['average'] = yieldObj.average;//平均股利
+  data['averageYield'] =yieldObj.averageYield;//平均殖利率
+  data['nowYield'] = yieldObj.nowYield;//目前殖利率
+  data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
+  data['fairPrice'] = yieldObj.fairPrice;//合理
+  data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+  //4年高低點
+  // row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
+  //夏普值
+  const sharpedata = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7)[0]:'';
+  // console.log('夏普值',sharpedata)
+  data['sharpe'] = sharpedata?sharpedata['sharpe']:'0';
+  data['beta'] = sharpedata?sharpedata['beta']:'0';
+  data['deviation'] = sharpedata?sharpedata['deviation']:'0';
+  //周kd
+  data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
+  //
+  // console.log('60',data)
+  return data;
+}
 async function search(req, res) {
   console.log(`---------查詢股票---------`)
-  const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at from stock ORDER BY sort ASC' )
+  const data = []
+  const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at,sharpedata from stock ORDER BY sort ASC' )
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
     console.log(`--stockno:${row['stockno']}--`)
-    //更新時間
-    row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
-    //stockdata 
-    row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
-    //今年每月報酬
-    row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
-    //最近8年每年報酬
-    row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],8);
-    //年化報酬率
-    row['stockCagr'] = stockCagr(row['stockPayYear']);
-    //淨值
-    if(row['networthdata']){
-      let networthdata = JSON.parse(row['networthdata']);
-      networthdata = networthdata[networthdata.length-1]
-      // console.log(`networthdata,${networthdata}`)
-      row['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
-    }
-    //殖利率
-    let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
-    yieldObj = stockYieldPrice(yieldObj,row['stockdata']);
-    row['stockYield'] = yieldObj.stockYield;//每年殖利率
-    row['average'] = yieldObj.average;//平均股利
-    row['averageYield'] =yieldObj.averageYield;//平均殖利率
-    row['nowYield'] = yieldObj.nowYield;//目前殖利率
-    row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-    row['fairPrice'] = yieldObj.fairPrice;//合理
-    row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-    //4年高低點
-    row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
-    //周kd
-    row['wkd_d'] = stockKdFn(stockdataFn_w(row['stockdata']))['last_d'];
-  
-    //移除不需要的值
-    delete row.stockdata
-    delete row.yielddata
-    delete row.updated_at
-    console.log(`row,${JSON.stringify(row)}`)
+    data.push(await nowPage({row:row}))
+    // console.log(`row,${JSON.stringify(data)}`)
   }
+  // console.log(`row,${JSON.stringify(data)}`)
   // res.send(rows)
   res.render('remuneration',{
     'active': 'remuneration',
-    'data': rows,
+    'data': data,
   })
 }
 async function add(req, res) {
@@ -88,50 +104,53 @@ async function add(req, res) {
       return false;
     }
     // console.log(jsons)
-    const data = {}
-    //stockdata 轉換 parse
-    // console.log(JSON.stringify(jsons))
-    const stockdata = jsons['stockdata']?JSON.parse(jsons['stockdata']):''
-    // console.log(`抓取數量:${stockdata.length}`)
-    //股名
-    data['stockname'] = jsons['stockName']
-    //股號
-    data['stockno'] = stockno
-    //今年月報酬
-    data['stockPayMonth'] = stockPayMoreMonth(stockdata)
-    //8年報酬
-    data['stockPayYear'] = stockPayMoreYear(stockdata,8)
-    //年化報酬率
-    data['stockCagr'] = stockCagr(data['stockPayYear'])
-    //殖利率
-    const yielddata = jsons['yielddata']?JSON.parse(jsons['yielddata']):'';
-    const yieldObj = stockYieldPrice(yielddata,stockdata);
-    data['stockYield'] = yieldObj.stockYield;//每年殖利率
-    data['average'] = yieldObj.average;//平均股利
-    data['averageYield'] =yieldObj.averageYield;//平均殖利率
-    data['nowYield'] = yieldObj.nowYield;//目前殖利率
-    data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-    data['fairPrice'] = yieldObj.fairPrice;//合理
-    data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-    //4年高低點
-    data['highLowPrice'] = stockHighLowPriceMoreYear(stockdata,4);
-    //周kd
-    data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
-    //目前淨值
-    if(jsons['networthdata']){
-      let networthdata = JSON.parse(jsons['networthdata']);
-      networthdata = networthdata[networthdata.length-1]
-      // console.log(`networthdata,${networthdata}`)
-      data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
-    }else{
-      data['networthdata'] = 0;
-    }
-    //id
-    data['id'] = jsons['insertId']
+    // const data = {}
+    // //stockdata 轉換 parse
+    // // console.log(JSON.stringify(jsons))
+    // const stockdata = jsons['stockdata']?JSON.parse(jsons['stockdata']):''
+    // // console.log(`抓取數量:${stockdata.length}`)
+    // //股名
+    // data['stockname'] = jsons['stockName']
+    // //股號
+    // data['stockno'] = stockno
+    // //今年月報酬
+    // data['stockPayMonth'] = stockPayMoreMonth(stockdata)
+    // //8年報酬
+    // data['stockPayYear'] = stockPayMoreYear(stockdata,8)
+    // //年化報酬率
+    // data['stockCagr'] = stockCagr(data['stockPayYear'])
+    // //殖利率
+    // const yielddata = jsons['yielddata']?JSON.parse(jsons['yielddata']):'';
+    // const yieldObj = stockYieldPrice(yielddata,stockdata);
+    // data['stockYield'] = yieldObj.stockYield;//每年殖利率
+    // data['average'] = yieldObj.average;//平均股利
+    // data['averageYield'] =yieldObj.averageYield;//平均殖利率
+    // data['nowYield'] = yieldObj.nowYield;//目前殖利率
+    // data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
+    // data['fairPrice'] = yieldObj.fairPrice;//合理
+    // data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+    // //4年高低點
+    // data['highLowPrice'] = stockHighLowPriceMoreYear(stockdata,4);
+    // //周kd
+    // data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
+    // //目前淨值
+    // if(jsons['networthdata']){
+    //   let networthdata = JSON.parse(jsons['networthdata']);
+    //   networthdata = networthdata[networthdata.length-1]
+    //   // console.log(`networthdata,${networthdata}`)
+    //   data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
+    // }else{
+    //   data['networthdata'] = 0;
+    // }
+    // //id
+    // data['id'] = jsons['insertId']
+    
+    // //移除不需要的值
+    // delete data.stockdata
+    // delete data.updated_at
 
-    //移除不需要的值
-    delete data.stockdata
-    delete data.updated_at
+    const data = await nowPage({row:jsons});
+    console.log(data)
 
     res.json({result:'true',data: data })
   }

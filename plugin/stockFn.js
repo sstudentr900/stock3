@@ -30,7 +30,7 @@ function getNowTimeObj(obj){
   }
 }
 function getMonthly({year,json}){
-  //2020-01-01~2020-02-01~2020-03-01
+  //取得每月 2020-01-01~2020-02-01~2020-03-01
   const arr = []
   const array = []
   const yearNumber = (new Date().getFullYear()-Number(year))+1

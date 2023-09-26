@@ -193,7 +193,7 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 50,
+      right: 80,
       top: 30,
       bottom: 50
     },
@@ -230,7 +230,7 @@ window.onload=async function(){
     ],
     series: [
       {
-        name: '買賣合計累積',
+        name: '合計',
         type: 'bar',
         yAxisIndex: 0,
         data: pageJson['threecargo_data'],
@@ -297,7 +297,7 @@ window.onload=async function(){
     ],
     series: [
       {
-        name: '合計期貨買賣超',
+        name: '合計',
         type: 'bar',
         yAxisIndex: 0,
         data: pageJson['threefutures_data'],

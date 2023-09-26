@@ -22,7 +22,7 @@ window.onload=async function(){
   const line_chart_option = {
     animation: true,
     title: {
-      text: `${pageJson['stockname']} 日K線`,
+      text: `${pageJson['stockname']?pageJson['stockname']:''} 日K線`,
     },
     legend: {
       top: 3,
@@ -182,7 +182,7 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 50,
+      right: 80,
       top: 30,
       bottom: 50
     },
@@ -205,12 +205,10 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
-        // min: 26,
         position: 'right',
       },
       {
         type: 'value',
-        // min: 3000,
         position: 'left',
         splitLine: {
           show: false, //分線關閉
@@ -228,7 +226,7 @@ window.onload=async function(){
         }
       },
       {
-        name: '大盤指數',
+        name: pageJson['stockno'],
         type: 'line',
         smooth: true,
         yAxisIndex: 1,
@@ -249,7 +247,7 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 50,
+      right: 80,
       top: 30,
       bottom: 50
     },
@@ -272,21 +270,19 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
-        // min: 26,
         position: 'right',
       },
-      {
-        type: 'value',
-        // min: 3000,
-        position: 'left',
-        splitLine: {
-          show: false, //分線關閉
-        },
-      }
+      // {
+      //   type: 'value',
+      //   position: 'left',
+      //   splitLine: {
+      //     show: false, //分線關閉
+      //   },
+      // }
     ],
     series: [
       {
-        name: '400張以下',
+        name: '1000張以上',
         type: 'bar',
         yAxisIndex: 0,
         data: pageJson['holder_data'],
@@ -294,20 +290,20 @@ window.onload=async function(){
           color: '#a3b3b5', // 柱子颜色
         }
       },
-      {
-        name: '大盤指數',
-        type: 'line',
-        smooth: true,
-        yAxisIndex: 1,
-        data: pageJson['holder_market'],
-        lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
-        },
-        itemStyle: {
-          opacity: 0, //點隱蔽
-        }
-      }
+      // {
+      //   name: pageJson['stockno'],
+      //   type: 'line',
+      //   smooth: true,
+      //   yAxisIndex: 1,
+      //   data: pageJson['holder_market'],
+      //   lineStyle: {
+      //     color: '#058296', // 线条颜色
+      //     width: 3,      // 线条宽度
+      //   },
+      //   itemStyle: {
+      //     opacity: 0, //點隱蔽
+      //   }
+      // }
     ]
   };
   line_chart.setOption(line_chart_option);

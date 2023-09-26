@@ -18,7 +18,9 @@ async function stockGetData(stockno,from,to){
 }
 
 //
-stockGetData('^TWII','2023-08-16','2023-09-16').then((jsons)=>{
+$stockno = '^TWII';
+$stockno = '00713.TW';
+stockGetData($stockno,'2023-09-15','2023-09-26').then((jsons)=>{
   console.log('21',jsons)
 }).catch((jsons)=>{
   console.log('23',jsons)

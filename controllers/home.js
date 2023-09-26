@@ -13,7 +13,7 @@ async function search(req, res) {
   for (const row of rows) {
      //加權指數
     const data = JSON.parse(row['twii'])
-    const twii = data.slice(-60)
+    const twii = data.slice(-132)
     row['twii_date'] = twii.map(item=>item.date)
     row['twii_price'] = twii.map(item=>[item.open,item.close,item.low,item.hight])
     row['twii_vol'] = twii.map(item=>item.volume)
@@ -30,8 +30,8 @@ async function search(req, res) {
     //3大法人日期
     row['threecargo_date'] = threecargo.map(({date})=>date)
     //3大法人合計累加
-    row['threecargo_data'] = getAccumulate({obj:threecargo.map(({total})=>Number(total))})
-    // row['threecargo_data'] = threecargo.map(({total})=>Number(total))
+    // row['threecargo_data'] = getAccumulate({obj:threecargo.map(({total})=>Number(total))})
+    row['threecargo_data'] = threecargo.map(({total})=>Number(total))
     //3大法人_加權指數
     row['threecargo_market'] = threecargo.map(({date})=>{
       const obj = data.find(obj=>date==obj.date)
@@ -39,13 +39,15 @@ async function search(req, res) {
     })
     //3大法人期貨買賣超
     const threefutures = JSON.parse(row['threefutures'])
-    const threefutures_data = threefutures.map(({foreign,letter,proprietor})=>(Number(foreign)+Number(letter)+Number(proprietor)).toFixed(2))
     row['threefutures'] = getSort({obj:row['threefutures'],number:10})
     // //3大法人日期
     row['threefutures_date'] = threefutures.map(({date})=>date)
     // //3大法人資料
-    // row['threefutures_data'] = getAccumulate({obj:threefutures_data})
+    const threefutures_data = threefutures.map(({foreign,letter,proprietor})=>(Number(foreign)+Number(letter)+Number(proprietor)).toFixed(2))
     row['threefutures_data'] = threefutures_data
+    // row['threefutures_data'] = getAccumulate({obj:threefutures_data})
+    // row['threefutures_data'] = threefutures.map(({foreign})=>foreign)
+  
     // //3大法人_加權指數
     row['threefutures_market'] = threefutures.map(({date})=>{
       const obj = data.find(obj=>date==obj.date)
@@ -68,7 +70,7 @@ async function search(req, res) {
     //除息股票
     row['exdividend'] = getSort({obj:row['exdividend'],number:54}).filter((item,index)=>{
       console.log()
-      const date = item.ex_date.replaceAll('/','-')
+      const date = item.ex_date.split('/').join('-')
       if(date>=getNowTimeObj()['date']){
         return item;
       }
