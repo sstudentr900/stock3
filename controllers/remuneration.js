@@ -103,54 +103,8 @@ async function add(req, res) {
       res.json({result:'false',message:'找不到資料'})
       return false;
     }
-    // console.log(jsons)
-    // const data = {}
-    // //stockdata 轉換 parse
-    // // console.log(JSON.stringify(jsons))
-    // const stockdata = jsons['stockdata']?JSON.parse(jsons['stockdata']):''
-    // // console.log(`抓取數量:${stockdata.length}`)
-    // //股名
-    // data['stockname'] = jsons['stockName']
-    // //股號
-    // data['stockno'] = stockno
-    // //今年月報酬
-    // data['stockPayMonth'] = stockPayMoreMonth(stockdata)
-    // //8年報酬
-    // data['stockPayYear'] = stockPayMoreYear(stockdata,8)
-    // //年化報酬率
-    // data['stockCagr'] = stockCagr(data['stockPayYear'])
-    // //殖利率
-    // const yielddata = jsons['yielddata']?JSON.parse(jsons['yielddata']):'';
-    // const yieldObj = stockYieldPrice(yielddata,stockdata);
-    // data['stockYield'] = yieldObj.stockYield;//每年殖利率
-    // data['average'] = yieldObj.average;//平均股利
-    // data['averageYield'] =yieldObj.averageYield;//平均殖利率
-    // data['nowYield'] = yieldObj.nowYield;//目前殖利率
-    // data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-    // data['fairPrice'] = yieldObj.fairPrice;//合理
-    // data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-    // //4年高低點
-    // data['highLowPrice'] = stockHighLowPriceMoreYear(stockdata,4);
-    // //周kd
-    // data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
-    // //目前淨值
-    // if(jsons['networthdata']){
-    //   let networthdata = JSON.parse(jsons['networthdata']);
-    //   networthdata = networthdata[networthdata.length-1]
-    //   // console.log(`networthdata,${networthdata}`)
-    //   data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
-    // }else{
-    //   data['networthdata'] = 0;
-    // }
-    // //id
-    // data['id'] = jsons['insertId']
-    
-    // //移除不需要的值
-    // delete data.stockdata
-    // delete data.updated_at
-
     const data = await nowPage({row:jsons});
-    console.log(data)
+    // console.log(data)
 
     res.json({result:'true',data: data })
   }

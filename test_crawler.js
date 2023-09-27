@@ -10,15 +10,16 @@ async function crawlerStock(){
   for (const [index, row] of rows.entries()) {
     //跑股票
     await stockCrawler(row)
+    
     //只抓2筆
-    if(index>=1){break;}
+    // if(index>=1){break;}
   }
 
   // market 大盤
-  // const rows2 = await dbQuery( 'SELECT * from market where id=1' )
-  // if(!rows2){console.log(`crawlerStock_market失敗跳出`)}
-  // // console.log(`rows2,${JSON.stringify(rows2[0])}`)
-  // await stockCrawler_market(rows2[0])
+  const rows2 = await dbQuery( 'SELECT * from market where id=1' )
+  if(!rows2){console.log(`crawlerStock_market失敗跳出`)}
+  // console.log(`rows2,${JSON.stringify(rows2[0])}`)
+  await stockCrawler_market(rows2[0])
 }
 crawlerStock()
 

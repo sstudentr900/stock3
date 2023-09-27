@@ -13,6 +13,80 @@ const {
   getMa
 } = require("../plugin/stockFn");
 
+async function nowPage({row}) {
+  const data = {}
+  // //更新時間
+  data['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
+  // //stockname
+  data['stockno'] = row['stockno'];
+  // //stockname
+  data['stockname'] = row['stockname'];
+  // //stockdata 
+  data['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
+  const stockdataLess = data['stockdata'].slice(-132)
+  data['stock_date'] = stockdataLess.map(item=>item.date)
+  data['stock_price'] = stockdataLess.map(item=>[item.open,item.close,item.low,item.hight])
+  data['stock_vol'] = stockdataLess.map(item=>item.volume)
+  data['stock_ma5'] = getMa(5,stockdataLess)
+  data['stock_ma10'] = getMa(10,stockdataLess)
+  data['stock_ma20'] = getMa(20,stockdataLess)
+  //法人買賣超和融資融劵		
+  // data['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
+  const threecargo = row['threecargo']?JSON.parse(row['threecargo']):''
+  data['threecargo'] = getSort({obj:row['threecargo'],number:18})
+  //法人買賣超_日期
+  data['threecargo_date'] = threecargo.map(({date})=>date)
+  //法人買賣超
+  // console.log(threecargo)
+  data['threecargo_data'] = threecargo.map(({totle})=>totle)
+  //法人買賣超_加權指數
+  data['threecargo_market'] = threecargo.map(({date})=>{
+    const obj = data['stockdata'].find(item=>date==item.date)
+    return obj?Number(obj.close):0
+  })
+  //股東持股分級週統計圖	
+  const holder = JSON.parse(row['holder'])
+  data['holder'] = getSort({obj:row['holder'],number:18})
+  //法人買賣超_日期
+  data['holder_date'] = holder.map(({date})=>date)
+  //法人買賣超
+  data['holder_data'] = holder.map(({big1001})=>big1001.split(',').join(''))
+  //法人買賣超_加權指數
+  data['holder_market'] = holder.map(({date})=>{
+    const obj = data['stockdata'].find(item=>item.date == date)
+    return obj?Number(obj.close):0
+  })
+  //今年每月報酬
+  // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
+  //最近5年每年報酬
+  data['stockPayYear'] = await stockPayMoreYear(data['stockdata'],5);
+  //年化報酬率
+  data['stockCagr'] = stockCagr(data['stockPayYear']);
+  //淨值
+  // row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
+  data['networthdata'] = getSort({obj:row['networthdata'],number:6})
+  //殖利率
+  row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
+  const yieldObj = stockYieldPrice(row['yielddata'],data['stockdata']);
+  row['stockYield'] = yieldObj.stockYield;//每年殖利率
+  // data['average'] = yieldObj.average;//平均股利
+  // data['averageYield'] =yieldObj.averageYield;//平均殖利率
+  data['nowYield'] = yieldObj.nowYield;//目前殖利率
+  data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
+  data['fairPrice'] = yieldObj.fairPrice;//合理
+  data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+  //持股產業
+  data['industry'] = row['industry']?JSON.parse(row['industry']):'';
+  //持股明細
+  data['shareholding'] = row['shareholding']?JSON.parse(row['shareholding']):'';
+  //夏普值
+  data['sharpedata'] = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7):'';
+  //5年高低點
+  data['highLowPrice'] = stockHighLowPriceMoreYear(data['stockdata'],5);
+  //周kd
+  data['wkd_d'] = stockKdFn(stockdataFn_w(data['stockdata']))['last_d'];
+  return data;
+}
 async function search(req, res) {
   console.log(`---------查詢股票---------`)
   const params = req.params
@@ -27,101 +101,32 @@ async function search(req, res) {
     })
     return false;
   }
+  let data = ''
   const stockno = params.stockno
-  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,holder,shareholding,industry,sharpedata,updated_at from stock WHERE stockno = ?',[stockno] )
-  if(!rows.length){
-    console.log(`serch,沒有值,重新抓取`)
-    res.render('individual',{
-      'active': 'individual',
-      'result':'false',
-      'message':'資料庫沒有值',
-      'data': 0,
-    })
-
+  const rows = await dbQuery( 'SELECT networthdata,stockname,stockno,stockdata,yielddata,threecargo,financing,holder,shareholding,industry,sharpedata,updated_at from stock WHERE stockno = ?',[stockno] )
+  if(rows.length){
+    console.log(`serch有值`)
+    data = await nowPage({row:rows[0]})
   }else{
-    // console.log(`serch,有值`)
-    for (const row of rows) {
-      // console.log(`--stockno:${row['stockno']}--`)
-      
-      //更新時間
-      row['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
-      //stockdata 
-      row['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
-      const data = row['stockdata'].slice(-132)
-      row['stock_date'] = data.map(item=>item.date)
-      row['stock_price'] = data.map(item=>[item.open,item.close,item.low,item.hight])
-      row['stock_vol'] = data.map(item=>item.volume)
-      row['stock_ma5'] = getMa(5,data)
-      row['stock_ma10'] = getMa(10,data)
-      row['stock_ma20'] = getMa(20,data)
-      //法人買賣超和融資融劵		
-      // row['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
-      const threecargo = JSON.parse(row['threecargo'])
-      row['threecargo'] = getSort({obj:row['threecargo'],number:18})
-      //法人買賣超_日期
-      row['threecargo_date'] = threecargo.map(({date})=>date)
-      //法人買賣超
-      row['threecargo_data'] = threecargo.map(({totle})=>totle.split(',').join(''))
-      //法人買賣超_加權指數
-      row['threecargo_market'] = threecargo.map(({date})=>{
-        const obj = row['stockdata'].find(item=>date==item.date)
-        return obj?Number(obj.close):0
+    console.log(`serch沒有該股重新抓取，stockno:${stockno}`)
+    //抓取資料
+    const jsons = await stockCrawler({'stockno':stockno})
+    if(!jsons){
+      console.log('serch找不到資料')
+      res.render('individual',{
+        'active': 'individual',
+        'result':'false',
+        'message':'找不到資料',
+        'data': 0,
       })
-      //股東持股分級週統計圖	
-      const holder = JSON.parse(row['holder'])
-      row['holder'] = getSort({obj:row['holder'],number:18})
-      //法人買賣超_日期
-      row['holder_date'] = holder.map(({date})=>date)
-      //法人買賣超
-      row['holder_data'] = holder.map(({big1001})=>big1001.split(',').join(''))
-      //法人買賣超_加權指數
-      row['holder_market'] = holder.map(({date})=>{
-        const obj = row['stockdata'].find(item=>item.date == date)
-        return obj?Number(obj.close):0
-      })
-      //今年每月報酬
-      // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
-      //最近5年每年報酬
-      row['stockPayYear'] = await stockPayMoreYear(row['stockdata'],5);
-      //年化報酬率
-      row['stockCagr'] = stockCagr(row['stockPayYear']);
-      //淨值
-      // row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
-      row['networthdata'] = getSort({obj:row['networthdata'],number:6})
-      //殖利率
-      row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
-      const yieldObj = stockYieldPrice(row['yielddata'],row['stockdata']);
-      row['stockYield'] = yieldObj.stockYield;//每年殖利率
-      // row['average'] = yieldObj.average;//平均股利
-      // row['averageYield'] =yieldObj.averageYield;//平均殖利率
-      row['nowYield'] = yieldObj.nowYield;//目前殖利率
-      row['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-      row['fairPrice'] = yieldObj.fairPrice;//合理
-      row['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-      //持股產業
-      row['industry'] = row['industry']?JSON.parse(row['industry']):'';
-      //持股明細
-      row['shareholding'] = row['shareholding']?JSON.parse(row['shareholding']):'';
-      //夏普值
-      row['sharpedata'] = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7):'';
-      //5年高低點
-      row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],5);
-      //周kd
-      row['wkd_d'] = stockKdFn(stockdataFn_w(row['stockdata']))['last_d'];
-    
-      //移除不需要的值
-      delete row.stockdata
-      delete row.yielddata
-      delete row.updated_at
-      // console.log(`row,${JSON.stringify(row)}`)
+      return false;
     }
-    // console.log(rows[0])
-    // res.send(rows)
-    res.render('individual',{
-      'active': 'individual',
-      'data': rows[0],
-    })
+    data = await nowPage({row:jsons})
   }
+  res.render('individual',{
+    'active': 'individual',
+    'data': data,
+  })
 }
 // async function add(req, res) {
 //   console.log(`---------增加股票---------`)

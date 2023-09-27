@@ -44,43 +44,76 @@ function stockPromise(obj){
     },0)
   })
 }
-async function stockYield(stockno){
-  const json = []
-  const dt = getNowTimeObj();
-  const year = ((dt['year']*1)-1)+''; //抓取前年
-  const options  = {
-    url: `https://goodinfo.tw/tw/StockDividendPolicy.asp?STOCK_ID=${stockno}`,
-    method: 'GET',
-    headers:{
-      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
-    }
-  }
-  return await stockPromise(options)
-  .then(body=>{
-    // console.log(body)
-    const $ = cheerio.load(body);
-    const table = $("#tblDetail tbody tr");
-    for (let i = 1; i < table.length; i++) {
-      const tr = table.eq(i); 
-      const td = tr.find('td');
-      if(!td.html())continue;
-      const nowYear = td.eq(0).find('b').text();//除息年
-      // console.log(判斷年是數字)
-      if(!isNaN(Number(nowYear,10)) && nowYear<= year){
-        const dividend = td.eq(1).text();//現金股利
-        console.log(dividend,!(!isNaN(Number(dividend,10)) && dividend>0))
-        if(!(!isNaN(Number(dividend,10)) && dividend>0))break;//判斷現金是數字大於0
-        const yield = td.eq(18).text();//平均殖利率
-        json.push(Object.assign({ nowYear, dividend, yield }))
-        if(json.length>4)break; //最多抓5年
+async function stockYield({stockno,yielddata}){
+  console.log(`stockYield,殖利率,https://histock.tw/stock/${stockno}/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF`)
+  yielddata = yielddata?JSON.parse(yielddata):yielddata
+  const before_year = ((getNowTimeObj()['year']*1)-1)+''; //前年
+  const yield = async function(before_year){
+    const options  = {
+      url: `https://histock.tw/stock/${stockno}/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF`,
+      method: 'GET',
+      headers:{
+        'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
       }
     }
-    return json
-  })
-  .catch((error)=>{
-    console.log(`抓取${stockno}殖利率錯誤,${error}`)
-    return false
-  })
+    return await stockPromise(options)
+    .then(body=>{
+      // console.log(body)
+      const $ = cheerio.load(body);
+      const trs = $("table.tb-stock.text-center.tbBasic tr");
+      const json = [];
+      let dividend = '';//現金股利
+      let yield = '';//平均殖利率
+      for (let i = 1; i < trs.length; i++) {
+        //判斷有td
+        const td = trs.eq(i).find('td');
+        if(!td.html())continue;
+        //判斷年是數字且不能抓今年
+        const date = td.eq(1).text();//除息年
+        if(!isNaN(Number(date,10)) && date<= before_year){
+          // 上一筆和這筆年一樣
+          const last = json[json.length-1]
+          dividend = td.eq(6).text();//現金股利
+          yield = td.eq(9).text().split('%')[0];//平均殖利率
+          //判斷年一樣就累加
+          if(json.length && last['date'] == date){
+            last['dividend'] = (Number(last['dividend'])+Number(dividend)).toFixed(2)
+            last['yield'] = (Number(last['yield'])+Number(yield)).toFixed(2)
+          }else{
+            json.push(Object.assign({ date, dividend, yield }))
+          }
+          if(json.length>4)break; //最多抓5年
+        }
+      }
+      //小到大
+      json.sort((o1,o2)=>{
+        return Number(o1['date'])-Number(o2['date']);
+      })
+
+      if(!json.length){
+        console.log(`stockYield,抓取資料失敗`)
+        return false;
+      }
+      console.log(`stockYield,抓取資料量:${json.length})}`)
+      return JSON.stringify(json);
+    })
+    .catch((error)=>{
+      console.log(`stockYield,抓取${stockno}殖利率錯誤,${error}`)
+      return false;
+    })
+  }
+  if(yielddata && yielddata.slice(-1)[0]['date']==before_year){
+    console.log(`stockYield,有值,前年${before_year}和資料年${yielddata.slice(-1)[0]['date']}一樣跳出`)
+    return false;
+  }
+  if(yielddata && yielddata.slice(-1)[0]['date']<before_year){
+    console.log(`stockYield,有值,前年${before_year}和資料年${yielddata.slice(-1)[0]['date']}不同,抓取`)
+    return await yield(before_year);
+  }
+  if( !yielddata ){
+    console.log(`stockYield,資料庫沒有值,抓取`)
+    return await yield(before_year);
+  }
 }
 function stockYieldPrice(yielddata,stockdata){
   console.log('跑股利便宜昂貴價')
@@ -111,12 +144,13 @@ function stockYieldPrice(yielddata,stockdata){
   }
 }
 async function aa(){
-  const jsons = await stockYield('0056')
-  if(jsons.length){
-    console.log(`jsons,${jsons}`)
-    const Price = stockYieldPrice(jsons)
-    console.log(`Price,${JSON.stringify(Price)}`)
-  }
-  console.log(`繼續執行其他程式`)
+  const jsons = await stockYield({stockno:'00713'})
+  console.log(`jsons,${jsons}`)
+  // if(jsons.length){
+  //   console.log(`jsons,${jsons}`)
+  //   const Price = stockYieldPrice(jsons)
+  //   console.log(`Price,${JSON.stringify(Price)}`)
+  // }
+  // console.log(`繼續執行其他程式`)
 }
 aa()

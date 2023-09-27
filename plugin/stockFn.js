@@ -82,7 +82,7 @@ function getMa(dayCount, data) {
     }
     var sum = 0;
     for (var j = 0; j < dayCount; j++) {
-      console.log(i,j,data[i - j],data[i - j]['close'])
+      // console.log(i,j,data[i - j],data[i - j]['close'])
       sum += +data[i - j]['close'];
     }
     result.push((sum / dayCount).toFixed(2));

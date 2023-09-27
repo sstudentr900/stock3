@@ -727,10 +727,9 @@ async function stockGetExdividend({stockdata}){
       const td = exdividend.eq(i).find('td');
       if(td.length==4){
         // console.log(td.text())
-        const dates = td.eq(1).text().trim().split('/')
-        obj['ex_date'] = `${dates[0]}-${dates[1]}-${dates[2]}`;//日期
-        // console.log(`stockGetUpDownNumber,${ex_date},${obj['ex_date']},${ex_date>=obj['ex_date']}`)
-        if(ex_date && ex_date>=obj['ex_date']){continue;}
+        obj['ex_date'] = td.eq(1).text().trim().split('/').join('-');//日期
+        console.log(`stockGetUpDownNumber,${ex_date},${obj['ex_date']},${obj['ex_date']>=ex_date}`)
+        if(obj['ex_date']>=ex_date){continue;}
         obj['date'] = getNowTimeObj()['date']
         obj['name'] = td.eq(0).text().trim()//名稱
         obj['exdividend'] = `${td.eq(2).text().trim()} ${td.eq(3).text().trim()}`;//股利
@@ -807,7 +806,7 @@ async function stockGetShareholder({dataDate}){
     //股東
     const shareholder_date = $("aside>div.row>div.col-12").eq(2).find("div.col-5.box-title.text-right").text();
     const shareholder = $("aside>div.row>div.col-12").eq(2).find("tbody tr");
-    console.log('shareholder_date',shareholder_date)
+    // console.log('shareholder_date',shareholder_date)
     let shareholder_annotation = 'add';
     for (let i = 1; i < shareholder.length; i++) {
       const obj = {}
@@ -815,7 +814,7 @@ async function stockGetShareholder({dataDate}){
       if(i>1 && td.length==1)shareholder_annotation = 'reduce';//註解
       if(td.length==2){
         obj['date'] = shareholder_date//日期
-        console.log(`stockGetShareholder,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
+        // console.log(`stockGetShareholder,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
         if(dataDate && dataDate>=obj['date']){continue;}
         obj['name'] = td.eq(0).text().trim();//名稱
         obj['number'] = td.eq(1).text().trim();//數量
@@ -844,9 +843,13 @@ async function stockRanking({dataDate}){
     // console.log(body)
     const $ = cheerio.load(body);
     //上市三大法人排名
-    const card = $(".col-12.col-lg-4 .row>.col-12").eq(2).find('.card>.card-body.top-line');
-    const date = card.find('.row>.col-5.box-title.text-right').text().trim();
-    if(date>=dataDate){console.log(`stockRanking,抓取上市三大法人排名,日期依樣${date},${dataDate}跳出`);return false;}
+    const card = $("aside .row>.col-12").eq(2).find('.card');
+    const date = card.find('.row .col-5.box-title.text-right').text().trim();
+    if(!date){
+      console.log(`stockRanking,抓取上市三大法人排名,${date}`)
+    }
+    // console.log(848,dataDate,date)
+    if(dataDate>=date){console.log(`stockRanking,抓取上市三大法人排名,${dataDate}>=${date}跳出`);return false;}
     const trs = card.find('.row+.box-sub-title+.table-responsive-md tr');
     const trs2 = card.find('.row+.box-sub-title+.table-responsive-md+.box-sub-title+.table-responsive-md tr');
     const json = [
@@ -873,7 +876,7 @@ async function stockRanking({dataDate}){
     return json;
   })
   .catch((error)=>{
-    console.log(`stockRanking,抓取上下跌家數錯誤,${error}`)
+    console.log(`stockRanking,抓取上市三大法人排名,${error}`)
     return false
   })
 }
@@ -1063,14 +1066,8 @@ async function stockDollars({dataDate}){
 }
 async function stockYield({stockno,yielddata}){
   console.log(`stockYield,殖利率,https://histock.tw/stock/${stockno}/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF`)
-  //沒值
-  // if(!stockno){console.log(`stockYield,stockno沒有值`);return false;}
-  //延遲1秒
-  await sleep(2000);
   yielddata = yielddata?JSON.parse(yielddata):yielddata
-  const dt = getNowTimeObj();
-  const year = dt['year']; //今年
-  const before_year = ((year*1)-1)+''; //前年
+  const before_year = ((getNowTimeObj()['year']*1)-1)+''; //前年
   const yield = async function(before_year){
     const options  = {
       url: `https://histock.tw/stock/${stockno}/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF`,
@@ -1084,28 +1081,27 @@ async function stockYield({stockno,yielddata}){
       // console.log(body)
       const $ = cheerio.load(body);
       const trs = $("table.tb-stock.text-center.tbBasic tr");
-      // const stockName = $(".bg_h0.fw_normal .link_blue").text().trim().split(/\s+/)[1];
-      // console.log(48,$(".bg_h0.fw_normal .link_blue").text().trim().split(/\s+/)[1])
-      const json = []
-      let year='' 
+      const json = [];
+      let dividend = '';//現金股利
+      let yield = '';//平均殖利率
       for (let i = 1; i < trs.length; i++) {
+        //判斷有td
         const td = trs.eq(i).find('td');
         if(!td.html())continue;
+        //判斷年是數字且不能抓今年
         const date = td.eq(1).text();//除息年
-        let dividend = '';//現金股利
-        let yield = '';//平均殖利率
-        // console.log(判斷年是數字且不能抓今年)
         if(!isNaN(Number(date,10)) && date<= before_year){
-          // console.log(dividend,!(!isNaN(Number(dividend,10)) && dividend>0))
-          // if(!(!isNaN(Number(dividend,10)) && dividend>0))break;//判斷現金是數字大於0
           // 上一筆和這筆年一樣
-          if(json.length && json[json.length-1]['date'] == date){
-            
+          const last = json[json.length-1]
+          dividend = td.eq(6).text();//現金股利
+          yield = td.eq(9).text().split('%')[0];//平均殖利率
+          //判斷年一樣就累加
+          if(json.length && last['date'] == date){
+            last['dividend'] = (Number(last['dividend'])+Number(dividend)).toFixed(2)
+            last['yield'] = (Number(last['yield'])+Number(yield)).toFixed(2)
+          }else{
+            json.push(Object.assign({ date, dividend, yield }))
           }
-          dividend = td.eq(1).text();//現金股利
-          yield = td.eq(6).text();//平均殖利率
-          json.push(Object.assign({ date, dividend, yield }))
-          year = date;
           if(json.length>4)break; //最多抓5年
         }
       }
@@ -1118,9 +1114,8 @@ async function stockYield({stockno,yielddata}){
         console.log(`stockYield,抓取資料失敗`)
         return false;
       }
-
       console.log(`stockYield,抓取資料量:${json.length})}`)
-      return {'yield':JSON.stringify(json),'stockName':stockName};
+      return JSON.stringify(json);
     })
     .catch((error)=>{
       console.log(`stockYield,抓取${stockno}殖利率錯誤,${error}`)
@@ -1251,6 +1246,7 @@ async function stocksharpe({stockno,nowDate}){
 }
 async function stockGetData2({dataDate,stockno,nowDate}){
   // await sleep(2000);
+  stockno=='^TWII'?'加權指數':stockno
   console.log(`stockGetData2,抓取個股,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
   await sleep(20000)
   const year = nowDate.split('-')[0]
@@ -1271,10 +1267,10 @@ async function stockGetData2({dataDate,stockno,nowDate}){
     for (let i = 0; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
-      const dates = td.eq(0).text().trim().split('/')//日期
-      obj['date'] = `${year}-${dates[0]}-${dates[1]}`
+      const dates = td.eq(0).text().trim().split('/').join('-')//日期
+      obj['date'] = `${year}-${dates}`
       // console.log(`stockGetData2,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
-      if(dataDate && dataDate>=obj['date']){continue;}
+      if(dataDate && dataDate>obj['date']){continue;}
       obj['open'] = td.eq(1).text().trim();
       obj['hight'] = td.eq(2).text().trim();
       obj['low'] = td.eq(3).text().trim();
@@ -1322,10 +1318,6 @@ async function stockGetData({stockno,dataDate,nowDate}){
       }
       return jsons;
     }
-    // if(!jsons.length){
-    //   console.log(`stockGetData,yahooFinance沒有資料跳出`)
-    //   return false
-    // }
 
     //修改和移除空白 jsons
     const array = [] 
@@ -1464,16 +1456,16 @@ async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno}){
     for (let i = 0; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
-      console.log('1388',td.text())
+      // console.log('1388',td.text())
       obj['date'] = td.eq(0).text().trim()
       // console.log(`stockGetStockThreeCargo,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate>=obj['date']){continue;}
-      obj['foreign'] = td.eq(1).text().trim();//外資
-      obj['letter'] = td.eq(3).text().trim();//投信
-      obj['proprietor'] = td.eq(4).text().trim();//自營
-      obj['totle'] = Number(obj['foreign'])+Number(obj['letter'])+Number(obj['proprietor']);//合計
-      obj['foreignhold'] = td.eq(2).text().trim();//外資持股
-      obj['proprietor_hedging'] = td.eq(5).text().trim();//自營避險
+      obj['foreign'] = td.eq(1).text().trim().split(',').join('');//外資
+      obj['letter'] = td.eq(3).text().trim().split(',').join('');//投信
+      obj['proprietor'] = td.eq(4).text().trim().split(',').join('');//自營
+      obj['totle'] = (Number(obj['foreign'])+Number(obj['letter'])+Number(obj['proprietor']))+'';//合計
+      obj['foreignhold'] = td.eq(2).text().trim().split(',').join('');//外資持股
+      obj['proprietor_hedging'] = td.eq(5).text().trim().split(',').join('');//自營避險
       json.push(obj)
     }
 
@@ -1495,9 +1487,9 @@ async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno}){
   })
 }
 async function stockGetfinancing({dataDate='2015-01-01',stockno}){
-  console.log(`stockGetfinancing,抓取個股融資融劵,https://agdstock.club/lgpd/${stockno}`)
+  console.log(`stockGetfinancing,抓取個股融資融劵,https://agdstock.club/LoanAndLending/${stockno}`)
   const options  = {
-    url: `https://agdstock.club/lgpd/${stockno}`,
+    url: `https://agdstock.club/LoanAndLending/${stockno}`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -1515,12 +1507,12 @@ async function stockGetfinancing({dataDate='2015-01-01',stockno}){
       obj['date'] = td.eq(0).text().trim()
       // console.log(`stockGetfinancing,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate>=obj['date']){continue;}
-      obj['financing'] = td.eq(1).text().trim();//融資	
-      obj['financing_balance'] = td.eq(2).text().trim();//融資餘額
-      obj['lending'] = td.eq(3).text().trim();//融劵
-      obj['lending_balance'] = td.eq(4).text().trim();//融劵餘額
-      obj['Borrow'] = td.eq(5).text().trim();//借券	
-      obj['Borrow_balance'] = td.eq(6).text().trim();//借券餘額
+      obj['financing'] = td.eq(1).text().trim().split(',').join('');//融資	
+      obj['financing_balance'] = td.eq(2).text().trim().split(',').join('');//融資餘額
+      obj['lending'] = td.eq(3).text().trim().split(',').join('');//融劵
+      obj['lending_balance'] = td.eq(4).text().trim().split(',').join('');//融劵餘額
+      obj['Borrow'] = td.eq(5).text().trim().split(',').join('');//借券	
+      obj['Borrow_balance'] = td.eq(6).text().trim().split(',').join('');//借券餘額
       json.push(obj)
     }
     if(!json.length){
@@ -1564,12 +1556,12 @@ async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
       obj['date'] = td.eq(0).text().trim()
       // console.log(`stockGetStockHolder,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate>=obj['date']){continue;}
-      obj['big50'] = td.eq(2).text().trim();//大於10張
-      obj['big100'] = td.eq(3).text().trim();//大於50張
-      obj['big400'] = td.eq(4).text().trim();//大於100張
-      obj['big800'] = td.eq(5).text().trim();//大於200張
-      obj['big1000'] = td.eq(6).text().trim();
-      obj['big1001'] = td.eq(7).text().trim();
+      obj['big50'] = td.eq(2).text().trim().split(',').join('');//大於10張
+      obj['big100'] = td.eq(3).text().trim().split(',').join('');//大於50張
+      obj['big400'] = td.eq(4).text().trim().split(',').join('');//大於100張
+      obj['big800'] = td.eq(5).text().trim().split(',').join('');//大於200張
+      obj['big1000'] = td.eq(6).text().trim().split(',').join('');
+      obj['big1001'] = td.eq(7).text().trim().split(',').join('');
       json.push(obj)
     }
 
@@ -1621,47 +1613,47 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   const result = {}
   result.stockno = stockno;
 
-  // console.log(`抓取${stockno}資料`)
-  // const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':`${stockno}.TW`})
-  // stockdataValue?result.stockdata = stockdataValue:'';
+  console.log(`抓取${stockno}資料`)
+  const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':`${stockno}.TW`})
+  stockdataValue?result.stockdata = stockdataValue:'';
 
   console.log(`抓取${stockno}殖利率`)
-  const yieldObj = await stockYield({stockno,yielddata})
-  yieldObj && yieldObj['yield']?result.yielddata = yieldObj['yield']:'';
+  const yieldValue = await stockYield({stockno,yielddata})
+  yieldValue?result.yielddata = yieldValue:'';
 
-  // if(!stockname){
-  //   console.log(`抓取${stockno}股名`)
-  //   const stocknameValue = await stockGetname({stockno})
-  //   stocknameValue?result.stockname = stocknameValue:'';
-  // }
+  if(!stockname){
+    console.log(`抓取${stockno}股名`)
+    const stocknameValue = await stockGetname({stockno})
+    stocknameValue?result.stockname = stocknameValue:'';
+  }
 
-  // console.log(`抓取${stockno}淨值`)
-  // const networthValue = await stockIsGetValue({'fnName': stockNetWorth,'stockdata':networthdata,'stockno':stockno})
-  // networthValue?result.networthdata = networthValue:'';
+  console.log(`抓取${stockno}淨值`)
+  const networthValue = await stockIsGetValue({'fnName': stockNetWorth,'stockdata':networthdata,'stockno':stockno})
+  networthValue?result.networthdata = networthValue:'';
 
-  // console.log(`抓取${stockno}夏普值`)
-  // const sharpeValue = await stockIsGetValue({'fnName': stocksharpe,'stockdata':sharpedata,'stockno':stockno})
-  // sharpeValue?result.sharpedata = sharpeValue:'';
+  console.log(`抓取${stockno}夏普值`)
+  const sharpeValue = await stockIsGetValue({'fnName': stocksharpe,'stockdata':sharpedata,'stockno':stockno})
+  sharpeValue?result.sharpedata = sharpeValue:'';
 
-  // console.log(`抓取${stockno}法人買賣超`)
-  // const threecargoValue = await stockIsGetValue({'fnName': stockGetStockThreeCargo,'stockdata':threecargo,'stockno':stockno})
-  // threecargoValue?result.threecargo = threecargoValue:'';
+  console.log(`抓取${stockno}法人買賣超`)
+  const threecargoValue = await stockIsGetValue({'fnName': stockGetStockThreeCargo,'stockdata':threecargo,'stockno':stockno})
+  threecargoValue?result.threecargo = threecargoValue:'';
 
-  // console.log(`抓取${stockno}融資融劵`)
-  // const financingValue = await stockIsGetValue({'fnName': stockGetfinancing,'stockdata':financing,'stockno':stockno})
-  // financingValue?result.financing = financingValue:'';
+  console.log(`抓取${stockno}融資融劵`)
+  const financingValue = await stockIsGetValue({'fnName': stockGetfinancing,'stockdata':financing,'stockno':stockno})
+  financingValue?result.financing = financingValue:'';
 
-  // console.log(`抓取${stockno}股東持股分級週統計圖`)
-  // const holderValue = await stockIsGetValue({'fnName': stockGetStockHolder,'stockdata':holder,'stockno':stockno})
-  // holderValue?result.holder = holderValue:'';
+  console.log(`抓取${stockno}股東持股分級週統計圖`)
+  const holderValue = await stockIsGetValue({'fnName': stockGetStockHolder,'stockdata':holder,'stockno':stockno})
+  holderValue?result.holder = holderValue:'';
 
-  // console.log(`抓取${stockno}產業`)
-  // const industryValue = await stockIsGetValue({'fnName': stockindustry,'stockdata':industry,'stockno':stockno})
-  // industryValue?result.industry = industryValue:'';
+  console.log(`抓取${stockno}產業`)
+  const industryValue = await stockIsGetValue({'fnName': stockindustry,'stockdata':industry,'stockno':stockno})
+  industryValue?result.industry = industryValue:'';
 
-  // console.log(`抓取${stockno}持股`)
-  // const shareholdingValue = await stockIsGetValue({'fnName': stockShareholding,'stockdata':shareholding,'stockno':stockno})
-  // shareholdingValue?result.shareholding = shareholdingValue:'';
+  console.log(`抓取${stockno}持股`)
+  const shareholdingValue = await stockIsGetValue({'fnName': stockShareholding,'stockdata':shareholding,'stockno':stockno})
+  shareholdingValue?result.shareholding = shareholdingValue:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){
