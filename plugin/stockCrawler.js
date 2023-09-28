@@ -1613,6 +1613,16 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   const result = {}
   result.stockno = stockno;
 
+  if(!stockname){
+    console.log(`抓取${stockno}股名`)
+    const stocknameValue = await stockGetname({stockno})
+    if(stocknameValue){
+      result.stockname = stocknameValue
+    }else{
+      return false;
+    }
+  }
+
   console.log(`抓取${stockno}資料`)
   const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':`${stockno}.TW`})
   stockdataValue?result.stockdata = stockdataValue:'';
@@ -1620,12 +1630,6 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   console.log(`抓取${stockno}殖利率`)
   const yieldValue = await stockYield({stockno,yielddata})
   yieldValue?result.yielddata = yieldValue:'';
-
-  if(!stockname){
-    console.log(`抓取${stockno}股名`)
-    const stocknameValue = await stockGetname({stockno})
-    stocknameValue?result.stockname = stocknameValue:'';
-  }
 
   console.log(`抓取${stockno}淨值`)
   const networthValue = await stockIsGetValue({'fnName': stockNetWorth,'stockdata':networthdata,'stockno':stockno})
@@ -1658,7 +1662,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   //判斷沒有資料跳出
   if(!Object.values(result).length){
     console.log(`stockCrawler沒有資料跳出`)
-    // return false;
+    return false;
   }else{
     //存資料庫
     if(id){

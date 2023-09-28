@@ -14,6 +14,10 @@ const {
 } = require("../plugin/stockFn");
 
 async function nowPage({row}) {
+  if(!row){
+    console.log(`nowPage,row沒有值跳出`)
+    return false;
+  }
   const data = {}
   // //更新時間
   data['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date']
@@ -30,7 +34,7 @@ async function nowPage({row}) {
   data['stock_ma5'] = getMa(5,stockdataLess)
   data['stock_ma10'] = getMa(10,stockdataLess)
   data['stock_ma20'] = getMa(20,stockdataLess)
-  //法人買賣超和融資融劵		
+  //法人買賣超
   // data['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
   const threecargo = row['threecargo']?JSON.parse(row['threecargo']):''
   data['threecargo'] = getSort({obj:row['threecargo'],number:18})
@@ -41,6 +45,19 @@ async function nowPage({row}) {
   data['threecargo_data'] = threecargo.map(({totle})=>totle)
   //法人買賣超_加權指數
   data['threecargo_market'] = threecargo.map(({date})=>{
+    const obj = data['stockdata'].find(item=>date==item.date)
+    return obj?Number(obj.close):0
+  })
+  //融資融劵		
+  // data['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
+  const financing = row['financing']?JSON.parse(row['financing']):''
+  data['financing'] = getSort({obj:row['financing'],number:18})
+  //法人買賣超_日期
+  data['financing_date'] = financing.map(({date})=>date)
+  //法人買賣超
+  data['financing_data'] = financing.map(({totle})=>totle)
+  //法人買賣超_加權指數
+  data['financing_market'] = financing.map(({date})=>{
     const obj = data['stockdata'].find(item=>date==item.date)
     return obj?Number(obj.close):0
   })
@@ -95,8 +112,6 @@ async function search(req, res) {
     console.log(`來源資料錯誤:${params.stockno}-${JSON.stringify(params)}`)
     res.render('individual',{
       'active': 'individual',
-      'result':'false',
-      'message':'來源資料錯誤',
       'data': 0,
     })
     return false;
@@ -112,16 +127,11 @@ async function search(req, res) {
     //抓取資料
     const jsons = await stockCrawler({'stockno':stockno})
     if(!jsons){
-      console.log('serch找不到資料')
-      res.render('individual',{
-        'active': 'individual',
-        'result':'false',
-        'message':'找不到資料',
-        'data': 0,
-      })
-      return false;
+      console.log('serch抓取不到資料')
+      data = 0;
+    }else{
+      data = await nowPage({row:jsons})
     }
-    data = await nowPage({row:jsons})
   }
   res.render('individual',{
     'active': 'individual',

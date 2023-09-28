@@ -1,5 +1,9 @@
 window.onload=async function(){
-  console.log(pageJson)
+  if(!pageJson){
+    alert('找不到資料')
+    window.location = './';
+    return false;
+  }
   const line_chart = echarts.init(document.getElementById('line_chart'));
   //三大法人和融資融劵
   const threecargo_chart = echarts.init(document.getElementById('threecargo_chart'));
