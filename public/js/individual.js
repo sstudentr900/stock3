@@ -1,4 +1,5 @@
 window.onload=async function(){
+  console.log(pageJson )
   if(!pageJson){
     alert('找不到資料')
     window.location = './';
@@ -7,12 +8,14 @@ window.onload=async function(){
   const line_chart = echarts.init(document.getElementById('line_chart'));
   //三大法人和融資融劵
   const threecargo_chart = echarts.init(document.getElementById('threecargo_chart'));
+  const financing_chart = echarts.init(document.getElementById('financing_chart'));
   //股東持股分級週統計圖
   const holder_chart = echarts.init(document.getElementById('holder_chart'));
   window.addEventListener('resize', function() {
     line_chart.resize();
     threecargo_chart.resize();
     holder_chart.resize();
+    financing_chart.resize();
   });
   let color = {
     up: '#c40f0fd3',
@@ -221,7 +224,7 @@ window.onload=async function(){
     ],
     series: [
       {
-        name: '合計',
+        name: '合計累加',
         type: 'bar',
         yAxisIndex: 0,
         data: pageJson['threecargo_data'],
@@ -235,6 +238,71 @@ window.onload=async function(){
         smooth: true,
         yAxisIndex: 1,
         data: pageJson['threecargo_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      // 线条宽度
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
+  const financing_chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 80,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true
+        },
+        data: pageJson['financing_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        position: 'right',
+      },
+      {
+        type: 'value',
+        position: 'left',
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '融資餘額',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['financing_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: pageJson['stockno'],
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['financing_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
           width: 3,      // 线条宽度
@@ -286,7 +354,7 @@ window.onload=async function(){
     ],
     series: [
       {
-        name: '1000張以上',
+        name: '400張以上累加',
         type: 'bar',
         yAxisIndex: 0,
         data: pageJson['holder_data'],
@@ -313,4 +381,5 @@ window.onload=async function(){
   line_chart.setOption(line_chart_option);
   threecargo_chart.setOption(threecargo_chart_option);
   holder_chart.setOption(holder_chart_option);
+  financing_chart.setOption(financing_chart_option);
 }

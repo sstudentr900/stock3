@@ -15,7 +15,7 @@ async function search(req, res) {
     const data = JSON.parse(row['twii'])
     const twii = data.slice(-132)
     row['twii_date'] = twii.map(item=>item.date)
-    row['twii_price'] = twii.map(item=>[item.open,item.close,item.low,item.hight])
+    row['twii_price'] = twii.map(item=>[item.open,item.close,item.low,item.high])
     row['twii_vol'] = twii.map(item=>item.volume)
     row['wii_ma5'] = getMa(5,twii)
     row['wii_ma10'] = getMa(10,twii)
@@ -30,8 +30,8 @@ async function search(req, res) {
     //3大法人日期
     row['threecargo_date'] = threecargo.map(({date})=>date)
     //3大法人合計累加
-    // row['threecargo_data'] = getAccumulate({obj:threecargo.map(({total})=>Number(total))})
-    row['threecargo_data'] = threecargo.map(({total})=>Number(total))
+    row['threecargo_data'] = getAccumulate({obj:threecargo.map(({total})=>Number(total))})
+    // row['threecargo_data'] = threecargo.map(({total})=>Number(total))
     //3大法人_加權指數
     row['threecargo_market'] = threecargo.map(({date})=>{
       const obj = data.find(obj=>date==obj.date)
@@ -107,6 +107,47 @@ async function search(req, res) {
         return obj?Number(obj.close):0
       })
     }
+    //恐慌指數
+    if(row['vix']){
+      const vix = JSON.parse(row['vix'])
+      //恐慌指數日期
+      row['vix_date'] = vix.map(({date})=>date)
+      //恐慌指數資料
+      row['vix_data'] = vix.map(({number})=>Number(number))
+      //恐慌指數_加權指數
+      // row['vix_market'] = vix.map(({date})=>{
+      //   const obj = data.find(obj=>date==obj.date)
+      //   return obj?Number(obj.close):0
+      // })
+      row['vix_market'] = vix.map(({date})=>{
+        let number = 0
+        const obj = data.find((obj,index)=>{
+          number = index;
+          return date==obj.date
+        })
+        return obj?Number(obj.close):data[number].close
+      })
+      delete row.vix
+    }
+    //貪婪指數
+    if(row['greedy']){
+      const greedy = JSON.parse(row['greedy'])
+      //貪婪指數日期
+      row['greedy_date'] = greedy.map(({date})=>date)
+      //貪婪指數資料
+      row['greedy_data'] = greedy.map(({data})=>Number(data))
+      //貪婪指數_加權指數
+      row['greedy_market'] = greedy.map(({date})=>{
+        let number = 0
+        const obj = data.find((obj,index)=>{
+          number = index;
+          return date==obj.date
+        })
+        return obj?Number(obj.close):data[number].close
+      })
+      delete row.greedy
+    }
+
 
     //移除不需要的值和值沒有轉JSON.parse
     // delete row.ranking

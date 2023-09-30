@@ -10,7 +10,8 @@ const {
   stockdataFn_w,
   stockKdFn,
   getSort,
-  getMa
+  getMa,
+  getAccumulate
 } = require("../plugin/stockFn");
 
 async function nowPage({row}) {
@@ -29,7 +30,7 @@ async function nowPage({row}) {
   data['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
   const stockdataLess = data['stockdata'].slice(-132)
   data['stock_date'] = stockdataLess.map(item=>item.date)
-  data['stock_price'] = stockdataLess.map(item=>[item.open,item.close,item.low,item.hight])
+  data['stock_price'] = stockdataLess.map(item=>[item.open,item.close,item.low,item.high])
   data['stock_vol'] = stockdataLess.map(item=>item.volume)
   data['stock_ma5'] = getMa(5,stockdataLess)
   data['stock_ma10'] = getMa(10,stockdataLess)
@@ -43,6 +44,7 @@ async function nowPage({row}) {
   //法人買賣超
   // console.log(threecargo)
   data['threecargo_data'] = threecargo.map(({totle})=>totle)
+  data['threecargo_data'] = getAccumulate({ obj:data['threecargo_data'] })
   //法人買賣超_加權指數
   data['threecargo_market'] = threecargo.map(({date})=>{
     const obj = data['stockdata'].find(item=>date==item.date)
@@ -52,11 +54,11 @@ async function nowPage({row}) {
   // data['threecargo'] = row['threecargo']?JSON.parse(row['threecargo']):'';
   const financing = row['financing']?JSON.parse(row['financing']):''
   data['financing'] = getSort({obj:row['financing'],number:18})
-  //法人買賣超_日期
+  //融資融劵_日期
   data['financing_date'] = financing.map(({date})=>date)
-  //法人買賣超
-  data['financing_data'] = financing.map(({totle})=>totle)
-  //法人買賣超_加權指數
+  //融資融劵
+  data['financing_data'] = financing.map(({financing_balance})=>Number(financing_balance))
+  //融資融劵_加權指數
   data['financing_market'] = financing.map(({date})=>{
     const obj = data['stockdata'].find(item=>date==item.date)
     return obj?Number(obj.close):0
@@ -64,11 +66,15 @@ async function nowPage({row}) {
   //股東持股分級週統計圖	
   const holder = JSON.parse(row['holder'])
   data['holder'] = getSort({obj:row['holder'],number:18})
-  //法人買賣超_日期
+  //股東持股分級_日期
   data['holder_date'] = holder.map(({date})=>date)
-  //法人買賣超
-  data['holder_data'] = holder.map(({big1001})=>big1001.split(',').join(''))
-  //法人買賣超_加權指數
+  //股東持股分級
+  data['holder_data'] = holder.map(({big50,big100,big400,big800,big1000,big1001})=>{
+    return Number(big400.split(',').join(''))+Number(big800.split(',').join(''))+Number(big1000.split(',').join(''))+Number(big1001.split(',').join(''))
+    // return Number(big50.split(',').join(''))+Number(big100.split(',').join(''))
+  })
+  data['holder_data'] = getAccumulate({ obj:data['holder_data'] })
+  //股東持股分級_加權指數
   data['holder_market'] = holder.map(({date})=>{
     const obj = data['stockdata'].find(item=>item.date == date)
     return obj?Number(obj.close):0
@@ -85,7 +91,7 @@ async function nowPage({row}) {
   //殖利率
   row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
   const yieldObj = stockYieldPrice(row['yielddata'],data['stockdata']);
-  row['stockYield'] = yieldObj.stockYield;//每年殖利率
+  data['stockYield'] = yieldObj.stockYield;//每年殖利率
   // data['average'] = yieldObj.average;//平均股利
   // data['averageYield'] =yieldObj.averageYield;//平均殖利率
   data['nowYield'] = yieldObj.nowYield;//目前殖利率
@@ -101,7 +107,8 @@ async function nowPage({row}) {
   //5年高低點
   data['highLowPrice'] = stockHighLowPriceMoreYear(data['stockdata'],5);
   //周kd
-  data['wkd_d'] = stockKdFn(stockdataFn_w(data['stockdata']))['last_d'];
+  // data['wkd_d'] = stockKdFn(stockdataFn_w(data['stockdata']))['last_d'];
+
   return data;
 }
 async function search(req, res) {
@@ -122,6 +129,7 @@ async function search(req, res) {
   if(rows.length){
     console.log(`serch有值`)
     data = await nowPage({row:rows[0]})
+    console.log(data)
   }else{
     console.log(`serch沒有該股重新抓取，stockno:${stockno}`)
     //抓取資料
@@ -130,6 +138,7 @@ async function search(req, res) {
       console.log('serch抓取不到資料')
       data = 0;
     }else{
+      console.log('serch抓取資料')
       data = await nowPage({row:jsons})
     }
   }

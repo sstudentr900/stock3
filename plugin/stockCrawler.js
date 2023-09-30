@@ -2,7 +2,7 @@ const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('../plugin/db')
 const request = require("request");//抓取整個網頁的程式碼
 const cheerio = require("cheerio");//後端的 jQuery
 const yahooFinance = require('yahoo-finance');
-const { getNowTimeObj } = require("./stockFn");
+const { getNowTimeObj,getToISOString } = require("./stockFn");
 function waitForElement({selector, timeout = 10000}) {
   console.log(`等待${selector},加載`)
   return new Promise((resolve, reject) => {
@@ -617,13 +617,10 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
   return JSON.stringify(stockdata);
 }
 async function stockGetThreeCargo({dataDate}){
-  console.log(`stockGetThreeCargo,抓取3大法人買賣超融資融卷,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE`)
-  await sleep(20000)
-  const json = []
-  const dt = getNowTimeObj();
-  const year = dt['year']; //抓取前年
+  console.log(`stockGetThreeCargo,抓取3大法人買賣超融資融卷,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365`)
+  // await sleep(20000)
   const options  = {
-    url: `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE`,
+    url: `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -631,6 +628,9 @@ async function stockGetThreeCargo({dataDate}){
   }
   return await stockPromise(options)
   .then(body=>{
+    const json = []
+    let year = getNowTimeObj()['year']; 
+    // let moon = ''; 
     // console.log(body)
     const $ = cheerio.load(body);
     const table = $("#divPriceDetail table tr[align='center']");
@@ -638,15 +638,18 @@ async function stockGetThreeCargo({dataDate}){
       const obj = {}
       const td = table.eq(i).find('td');
       const dates = td.eq(0).text().split('/')
-      obj['date'] = `${year}-${dates[0]}-${dates[1]}`
+      //1月變12月，年要減1
+      if(table.eq(i-1).find('td').eq(0).text().split('/')[0]==1 && dates[0]==12){year = year-1}
+      const date = `${year}-${dates[0]}-${dates[1]}`
       // if(dataDate && !(dataDate<=obj['date'])){continue;}
-      // console.log(`stockGetThreeCargo,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
-      if(dataDate && dataDate>=obj['date']){continue;}
+      // console.log(`stockGetThreeCargo,${dataDate},${date},${dataDate>=date}`)
+      if(dataDate && dataDate>=date){continue;}
       // obj['open'] = td.eq(1).text();//指數
       // obj['high'] = td.eq(2).text();//指數
       // obj['low'] = td.eq(3).text();//指數
       // obj['close'] = td.eq(4).text();//指數收盤
       // obj['Volume'] = td.eq(8).text();//指數
+      obj['date'] = date
       obj['foreign'] = td.eq(10).text();//外資
       obj['letter'] = td.eq(11).text();//投信
       obj['proprietor'] = td.eq(12).text();//自營商
@@ -706,7 +709,7 @@ async function stockGetListedUpDown({dataDate}){
   })
 }
 async function stockGetExdividend({stockdata}){
-  console.log(`stockGetExdividendData,抓取除息股票,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
+  console.log(`stockGetExdividend,抓取除息股票,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
   await sleep(20000)
   const options  = {
     url: `https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`,
@@ -727,10 +730,10 @@ async function stockGetExdividend({stockdata}){
       const td = exdividend.eq(i).find('td');
       if(td.length==4){
         // console.log(td.text())
-        obj['ex_date'] = td.eq(1).text().trim().split('/').join('-');//日期
-        console.log(`stockGetUpDownNumber,${ex_date},${obj['ex_date']},${obj['ex_date']>=ex_date}`)
-        if(obj['ex_date']>=ex_date){continue;}
         obj['date'] = getNowTimeObj()['date']
+        obj['ex_date'] = td.eq(1).text().trim().split('/').join('-');//日期
+        // console.log(`stockGetExdividend,${obj['ex_date']},${ex_date},${obj['ex_date']<ex_date}`)
+        if(obj['ex_date']<ex_date){continue;}
         obj['name'] = td.eq(0).text().trim()//名稱
         obj['exdividend'] = `${td.eq(2).text().trim()} ${td.eq(3).text().trim()}`;//股利
         json.push(obj)
@@ -739,7 +742,7 @@ async function stockGetExdividend({stockdata}){
     return json
   })
   .catch((error)=>{
-    console.log(`stockGetExdividendData,抓取錯誤,${error}`)
+    console.log(`stockGetExdividend,抓取錯誤,${error}`)
     return false
   })
 }
@@ -1064,6 +1067,90 @@ async function stockDollars({dataDate}){
     return false;
   })
 }
+async function stockVix({dataDate}){
+  console.log(`stockVix,抓取恐慌指數,https://histock.tw/index/VIX`)
+  const options  = {
+    url: `https://histock.tw/index/VIX`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+    },
+  }
+  return await stockPromise(options)
+  .then(async (body)=>{
+    // console.log(body)
+    const $ = cheerio.load(body);
+    const json=[]
+    const trs = $("#LBlock_23 table tr");
+    for (let i = 1; i < trs.length; i++) {
+      const obj = {}
+      const td = trs.eq(i).find('td');
+      const date = trs.eq(i).find('th').text().trim().split('/').join('-');
+      // console.log(dataDate,date,!date,dataDate>=date)
+      if(!td || !date || dataDate && dataDate>=date){continue;}
+      obj['date'] = date;
+      obj['number'] = td.eq(0).text().trim();//指數
+      json.push(obj)
+    }
+    if(!json.length){console.log(`stockVix 沒有值`);return false;}
+    //排小到大
+    json.sort((o1,o2)=>{
+      o1 = o1['date'].split('-').join('')
+      o2 = o2['date'].split('-').join('')
+      return o1-o2;
+    })
+    // console.log(json);
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stockVix 錯誤,${error}`)
+    return false;
+  })
+}
+async function stockGreedy({dataDate}){
+  console.log(`stockGreedy,抓取貪婪指數,https://production.dataviz.cnn.io/index/fearandgreed/graphdata`)
+  const options  = {
+    url: `https://production.dataviz.cnn.io/index/fearandgreed/graphdata`,
+    method: 'GET',
+    headers:{
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,vi;q=0.6,zh-CN;q=0.5',
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+    },
+  }
+  return await stockPromise(options)
+  .then(async (body)=>{
+    const data = JSON.parse(body)['fear_and_greed_historical']['data'];
+    if(!data){console.log(`stockGreedy 沒有值`)}
+    const json=[];
+    for (let i = 1; i < data.length; i++) {
+      const date = getToISOString(data[i].x)
+      if(dataDate && dataDate>=date){continue;}
+      let text = '';
+      if(data[i].rating=='greed'){
+        text = '貪婪'
+      }else if(data[i].rating=='extreme greed'){
+        text = '極度貪婪'
+      }else if(data[i].rating=='neutral'){
+        text = '中性的'
+      }else if(data[i].rating=='fear'){
+        text = '恐懼'
+      }else if(data[i].rating=='extreme fear'){
+        text = '極度恐懼'
+      }
+      json.push({
+        date: date,
+        data: Math.round(data[i].y),
+        text: text
+      })
+    }
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stockGreedy,貪婪指數錯誤,${error}`)
+    return false;
+  })
+}
 async function stockYield({stockno,yielddata}){
   console.log(`stockYield,殖利率,https://histock.tw/stock/${stockno}/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF`)
   yielddata = yielddata?JSON.parse(yielddata):yielddata
@@ -1248,7 +1335,7 @@ async function stockGetData2({dataDate,stockno,nowDate}){
   // await sleep(2000);
   stockno=='^TWII'?'加權指數':stockno
   console.log(`stockGetData2,抓取個股,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
-  await sleep(20000)
+  // await sleep(20000)
   const year = nowDate.split('-')[0]
   const options  = {
     url: `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`,
@@ -1271,11 +1358,11 @@ async function stockGetData2({dataDate,stockno,nowDate}){
       obj['date'] = `${year}-${dates}`
       // console.log(`stockGetData2,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate && dataDate>obj['date']){continue;}
-      obj['open'] = td.eq(1).text().trim();
-      obj['hight'] = td.eq(2).text().trim();
-      obj['low'] = td.eq(3).text().trim();
-      obj['close'] = td.eq(4).text().trim();
-      obj['volume'] = td.eq(8).text().trim();
+      obj['open'] = td.eq(1).text().trim().split(',').join('');
+      obj['high'] = td.eq(2).text().trim().split(',').join('');
+      obj['low'] = td.eq(3).text().trim().split(',').join('');
+      obj['close'] = td.eq(4).text().trim().split(',').join('');
+      obj['volume'] = td.eq(8).text().trim().split(',').join('');
       json.push(obj)
     }
     //排小到大
@@ -1331,12 +1418,12 @@ async function stockGetData({stockno,dataDate,nowDate}){
         if(date >= dataDate){
           array.push({
             'date': date,
-            'open': Number(json['open']).toFixed(2),
-            'hight': Number(json['high']).toFixed(2),
-            'low': Number(json['low']).toFixed(2),
-            'close': Number(json['close']).toFixed(2),
+            'open': Math.round((Number(json['open']+ Number.EPSILON) * 100)) / 100,
+            'high': Math.round((Number(json['high']+ Number.EPSILON) * 100)) / 100,
+            'low': Math.round((Number(json['low']+ Number.EPSILON) * 100)) / 100,
+            'close': Math.round((Number(json['close']+ Number.EPSILON) * 100)) / 100,
             // 'symbol': json['symbol']
-            'volume': Number(json['volume']).toFixed(2)
+            'volume': (Number(json['volume'])/1000).toFixed(2)
           })
         }
       }
@@ -1679,7 +1766,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
   console.log(`stockCrawler,結束`)
 }
-async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,ranking}){
+async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,ranking,vix,greedy}){
   console.log(`stockCrawler_market開始`)
   //result
   const result = {}
@@ -1727,6 +1814,14 @@ async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,l
   console.log(`美金`)
   const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
   dollarsData?result.dollars = dollarsData:'';
+
+  console.log(`恐慌指數`)
+  const vixData = await stockIsGetValue({'fnName': stockVix,'stockdata':vix})
+  vixData?result.vix = vixData:'';
+
+  console.log(`貪婪指數`)
+  const greedyData = await stockIsGetValue({'fnName': stockGreedy,'stockdata':greedy})
+  greedyData?result.greedy = greedyData:'';
 
   //判斷沒有資料跳出
   if(!Object.values(result).length){

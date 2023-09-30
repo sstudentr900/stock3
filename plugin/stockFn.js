@@ -29,6 +29,11 @@ function getNowTimeObj(obj){
     "datetime": datetime
   }
 }
+const getToISOString = (ts) => {
+  const d = new Date(ts);
+  let datestr = d .toISOString().slice(0,10);
+  return datestr;
+}
 function getMonthly({year,json}){
   //取得每月 2020-01-01~2020-02-01~2020-03-01
   const arr = []
@@ -531,6 +536,7 @@ module.exports={
   stockHighLowPriceMoreYear,
   stockYieldPrice,
   getNowTimeObj,
+  getToISOString,
   stockPayMoreYear,
   stockPayMoreMonth,
   stockKdFn,

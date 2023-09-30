@@ -8,6 +8,9 @@ async function crawlerStock(){
   if(!rows){console.log(`crawlerStock失敗跳出`)}
   // for (const row of rows) {
   for (const [index, row] of rows.entries()) {
+    //等
+    await sleep(20000)
+
     //跑股票
     await stockCrawler(row)
     

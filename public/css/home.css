@@ -26,24 +26,26 @@
   top: 0;
   z-index: 1;
 }
-.home .prosperity .title{
+/* .home .prosperity .title{
   display: block;
-}
-.home .prosperity .customTable{
+} */
+/* .home .prosperity .customTable{
   height: 400px;
   width: 100%;
-}
-.home .prosperity .item{
+} */
+.home .title .item{
   display: flex;
 }
-.home .prosperity .item li{
-  font-size: 13px;
+.home .title .item li{
+  font-size: 12px;
   color: #7d7b8a;
 }
-.home .prosperity .item li+li{
+.home .title .item li+li{
   margin-left: 10px;
-
 }
+
+.home #vix_chart,
+.home #greedy_chart,
 .home #threecargo_chart,
 .home #threefutures_chart,
 .home #updownnumber_chart,
