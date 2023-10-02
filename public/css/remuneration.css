@@ -31,36 +31,21 @@
 .remuneration input[type=number] {
   -moz-appearance: textfield;
 }
-
-
-
-
-
-.publicGrid2{
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(2,1fr);
+.remuneration .items{
+  align-items: end;
 }
-.publicGrid3{
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(3,1fr);
-}
-.publicGrid4{
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(4,1fr);
-}
-.publicGrid5{
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(5,1fr);
-}
+
+/*publicForm*/
 .publicForm {
   margin-bottom: 24px;
 }
+.publicForm .items{
+  display: flex;
+  gap: 20px;
+}
 .publicForm .item{
   margin-bottom: 8px;
+  width: 100%;
 }
 .publicForm label{
   font-size: 12px;

@@ -57,7 +57,7 @@ async function nowPage({stocks,date_start,date_end}) {
 async function search(req, res) {
   // console.log(`---------查詢股票---------`)
   const stocks = ['0050','0056','00713']
-  const date_start = '2020-01-01'
+  const date_start = getNowTimeObj({year:'-3'})['date']
   const date_end = getNowTimeObj()['date']
   const data = await nowPage({
     stocks: stocks,
