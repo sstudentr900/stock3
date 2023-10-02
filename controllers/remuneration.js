@@ -3,6 +3,7 @@ const { stockCrawler } = require("../plugin/stockCrawler");
 const { stockAvenge,getNowTimeObj } = require("../plugin/stockFn");
 
 async function nowPage({stocks,date_start,date_end}) {
+  console.log(`nowPage,stockno,date_start,date_end,${stocks,date_start,date_end}`)
   let data = [];
   let date = []
   for(const stockno of stocks) {
@@ -23,14 +24,14 @@ async function nowPage({stocks,date_start,date_end}) {
       }
       stockdata = jsons
     }
-    console.log(`nowPage,抓取資料1,${date_start,date_end}}`)
+    // console.log(`nowPage,抓取資料1,${date_start,date_end}}`)
     //抓取資料
     stockdata = JSON.parse(stockdata).filter(function(obj){
       if(obj.date<=date_end && obj.date>=date_start){
         return obj;
       }
     })
-    console.log(`nowPage,抓取資料2,${stockdata},${JSON.stringify(stockdata)}`)
+    // console.log(`nowPage,抓取資料2,${stockdata},${JSON.stringify(stockdata)}`)
     const obj = {}
     obj.name = stockno
     obj.type = 'line'
@@ -63,12 +64,11 @@ async function search(req, res) {
     date_start: date_start,
     date_end: date_end
   })
-  
+  data.date_start=date_start  
+  data.date_end=date_end  
+  data.stocks=stocks  
   res.render('remuneration',{
     'active': 'remuneration',
-    'stocks': stocks,
-    'date_start': date_start,
-    'date_end': date_end,
     'data': data,
   })
 }
@@ -88,7 +88,6 @@ async function search_post(req, res) {
   }
   res.json({result:'true',data: data})
 }
-
 
 module.exports = { 
   search,

@@ -114,5 +114,12 @@ window.onload=async function(){
     window.location = './';
     return false;
   }
-  creatChart(pageJson.data)
+  const publicForm = document.querySelector('.publicForm')
+  const stocks = [...publicForm.querySelectorAll('[name="stock[]"]')]
+  publicForm.querySelector('[name="date_start"]').value = pageJson.date_start;
+  publicForm.querySelector('[name="date_end"]').value = pageJson.date_end;
+  pageJson.stocks.forEach((el,index)=>{
+    stocks[index].value = el
+  })
+  creatChart(pageJson)
 }
