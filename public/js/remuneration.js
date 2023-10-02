@@ -1,5 +1,7 @@
 function creatChart(data){
+  console.log('2',data)
   const chart = echarts.init(document.getElementById('chart'));
+  chart.resize();
   window.addEventListener('resize', function() {
     chart.resize();
   });
@@ -70,9 +72,10 @@ function creatChart(data){
     //   }
     // ]
   };
-  chart.setOption(chart_option);
+  chart.setOption(chart_option, true);
 }
 function serchStrock(){
+  console.log('serchStrock')
   const publicForm = document.querySelector('.publicForm')
   const stocks = [...publicForm.querySelectorAll('[name="stock[]"]')].map(el=>el.value).filter(el => el)
   const date_start = publicForm.querySelector('[name="date_start"]').value
