@@ -1,180 +1,118 @@
-var dragStrockTarget;
-function dragStrock(item){
-  function dragstart(evt) {
-    // console.log('dragstart-拖拉節點-1')
-    dragStrockTarget = evt.target
-    // console.log('target1',dragStrockTarget)
-    // console.log('evt1',evt.target.innerHTML)
-    evt.dataTransfer.setData("text/plain", evt.target.innerHTML);
-    evt.dataTransfer.effectAllowed = "move";
-  }
-  function dragover(evt) {
-    // console.log('dragover-拖拉到當前節點時，在當前節點持續觸發-3')
-    evt.preventDefault();//取消預設行為，才能使用 drop
-    evt.dataTransfer.dropEffect = "move";
-  }
-  function dropped(evt) {
-    // console.log('dropped-拖拉過程會持續觸發-5')
-    evt.preventDefault();
-    evt.stopPropagation();
-    // console.log('target2',dragStrockTarget)
-    // console.log('evt2',evt.target.closest('.table_content').innerHTML)
-    if (confirm('你要改變股票順序嗎') == true) {
-      dragStrockTarget.innerHTML = evt.target.closest('.table_content').innerHTML;
-      evt.target.closest('.table_content').innerHTML = evt.dataTransfer.getData("text/plain");
-
-      //updat sort
-      const sortObj = [...document.querySelectorAll('.table_content')].map((o,i)=>{
-        const delet = o.querySelector('.delet')
-        return {'id': delet.dataset.id,'sort':i+1}
-      })
-      // console.log(sortObj)
-      getJSON({
-        'url': './remuneration/sort',
-        'method': 'POST',
-        'body': sortObj
-      }).then(function (json) {
-        // alert(json.message)
-      });
-    }
-  }
-  // function dragenter(evt){
-  //   console.log('dragenter-拖拉進當前節點-2')
-  //   console.log(evt.target)
-  // }
-  // function dragLeave(evt){
-  //   console.log('dragLeave-拖拉離開當前節點範圍時-4')
-  //   console.log(evt.target)
-  // }
-  // function dragend(evt){
-  //   console.log('dragend-拖拉結束時-6')
-  //   // console.log(evt.target)
-  
-  // }
-  // function mouseenter(){
-  //   console.log('mouseenter-進入')
-  // }
-  // function mouseleave(){
-  //   console.log('mouseleave-超出外框')
-  //   if(!dragStrockTarget)return false;
-  //   if (confirm('你確定你要刪除該股票') == true) {
-  //     const delet = dragStrockTarget.querySelector('.delet')
-  //     // console.log(delet)
-  //     deletStrockfetch(dragStrockTarget,delet.dataset.id)
-  //   }
-  //   dragStrockTarget = null
-  // }
-
-  item.addEventListener('dragstart', dragstart);//拖拉節點
-  // item.addEventListener('dragenter', dragenter);//拖拉進當前節點
-  item.addEventListener('dragover', dragover);//拖拉到當前節點時，在當前節點持續觸發
-  // item.addEventListener('dragleave', dragLeave);//拖拉離開當前節點範圍時
-  item.addEventListener('drop', dropped);//拖拉過程會持續觸發
-  // item.addEventListener('dragend', dragend);//拖拉結束時
-  //超出外框-刪除
-  // document.querySelector('.publicBox').addEventListener('mouseleave',mouseleave)
-  // publicBox.addEventListener('mouseenter',mouseenter,false)
-}
-function creatStrockHtml(data){
-  // console.log('creatStrockHtml')
-  const isActive = (avenge)=>{
-    return Math.sign(parseInt(avenge))<0?'green':''
-  }
-  const stockPayYear = data['stockPayYear'].map(element => {
-    return `<li class="${element.year}"><p class="${isActive(element.avenge)}">${element.avenge}</p></li>`
-  }).join('');
-  const stockPayMonth =data['stockPayMonth'].map(element => {
-    return `<li class="${element.month}"><p class="${isActive(element.avenge)}">${element.avenge}</p></li>`
-  }).join('');
-  // const stockYield =data['stockYield'].map(element => {
-  //   return `<li class="${element.nowYear}"><p class="${isActive(element.yield)}">${element.yield}</p></li>`
-  // }).join('');
-  // const highLowPrice =data['highLowPrice'].map(element => {
-  //   return `<li class="${element.year}"><p>${element.max} / ${element.min}</p></li>`
-  // }).join('');
-  const html = `<ul class="table_content table_content_${data["id"]}" draggable="true">  
-    <li class="name">
-      <div class="text">
-        <p class="publicEllipsis1">${data['stockname']}</p>
-        <p>${data['stockno']}</p>
-      </div>
-      <div class="control">
-        <a href="javascript:;" class="delet" onclick="deletStrock(this)" data-id="${data["id"]}">
-          <svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.002 2.005c5.518 0 9.998 4.48 9.998 9.997 0 5.518-4.48 9.998-9.998 9.998-5.517 0-9.997-4.48-9.997-9.998 0-5.517 4.48-9.997 9.997-9.997zm0 1.5c-4.69 0-8.497 3.807-8.497 8.497s3.807 8.498 8.497 8.498 8.498-3.808 8.498-8.498-3.808-8.497-8.498-8.497zm4.253 7.75h-8.5c-.414 0-.75.336-.75.75s.336.75.75.75h8.5c.414 0 .75-.336.75-.75s-.336-.75-.75-.75z" fill-rule="nonzero"></path></svg>
-        </a>
-      </div>
-    </li>
-    ${stockPayYear}
-    <li><p>${data['stockCagr']}</p></li>
-    ${stockPayMonth}
-    <li><p>${data['average']}</p></li>
-    <li><p>${data['averageYield']}</p></li>
-    <li><p>${data['nowYield']}</p></li>
-    <li><p>${data['cheapPrice']}</p></li>
-    <li><p>${data['fairPrice']}</p></li>
-    <li><p>${data['expensivePrice']}</p></li>
-    <li><p>${data['networthdata']}</p></li>
-    <li><p>${data['sharpe']}</p></li>
-    <li><p>${data['beta']}</p></li>
-    <li><p>${data['deviation']}</p></li>
-    <li><p>${data['wkd_d']}</p></li>
-  </ul>`
-  document.querySelector('.customTable').insertAdjacentHTML('beforeend',html)
-  return `.table_content_${data["id"]}`;
-}
-function addStrock(){
-  // console.log('addStrock')
-  const stockno = window.prompt('您好!請輸入股號', '0050');
-  if (stockno) {
-    //load
-    const add = document.querySelector('.control .add')
-    add.onclick = null
-    add.classList.add('active')
-    getJSON({
-      'url': './remuneration',
-      'method': 'POST',
-      'body': {
-        'stockno': stockno,
-        // 'stockname': stockname
+function creatChart(data){
+  const chart = echarts.init(document.getElementById('chart'));
+  window.addEventListener('resize', function() {
+    chart.resize();
+  });
+  const chart_option = {
+    title: {
+      show: false // 隐藏标题
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 30,
+      top: 40,
+      bottom: 20,
+      containLabel: true
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      // show: false // 隐藏图例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        data: data.date,
+        axisTick: {
+          // alignWithLabel: true,
+          show: false,//刻度
+        },
+        axisLine: {
+          show: false,//線
+        }
+        // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
       }
-    }).then(function (json) {
-      //load
-      add.onclick = addStrock
-      add.classList.remove('active')
-      if(json.result=='false'){alert(json.message);return false;}
-      // json.data.stockno = stockno
-      // json.data.stockname = stockname
-      const nowObj = creatStrockHtml(json.data)
-      dragStrock(document.querySelector(nowObj))
-      alert(`新增${stockno}成功`)
-    });
-    // const stockname = window.prompt('請輸入股名', '元大台灣50');
-    // if (stockname) {
-    // } 
-  } 
+    ],
+    yAxis:  {
+      type: 'value',
+      axisLabel: {
+        formatter: '{value} %'
+      }
+    },
+    series: data.data,
+    // series: [
+    //   {
+    //     name: 'Email',
+    //     type: 'line',
+    //     data: [120, 132, 101, 134, 90, 230, 210]
+    //   },
+    //   {
+    //     name: 'Union Ads',
+    //     type: 'line',
+    //     data: [220, 182, 191, 234, 290, 330, 310]
+    //   },
+    //   {
+    //     name: 'Video Ads',
+    //     type: 'line',
+    //     data: [150, 232, 201, 154, 190, 330, 410]
+    //   },
+    //   {
+    //     name: 'Direct',
+    //     type: 'line',
+    //     data: [320, 332, 301, 334, 390, 330, 320]
+    //   },
+    //   {
+    //     name: 'Search Engine',
+    //     type: 'line',
+    //     data: [820, 932, 901, 934, 1290, 1330, 1320]
+    //   }
+    // ]
+  };
+  chart.setOption(chart_option);
 }
-function deletStrockfetch(obj,id){
-  getJSON({
-      'url': `./remuneration/${id}`,
-      'method': 'DELETE'
-    }).then(function (json) {
-      obj.remove();
-      // alert(json.message)
-    });
-}
-function deletStrock(obj){
-  event.stopPropagation()//停止冒泡
-  if (confirm('你確定你要刪除該股票') == true) {
-    const o = obj.closest('.table_content')
-    const delet = o.querySelector('.delet')
-    console.log(o,delet.dataset.id)
-    deletStrockfetch(o,delet.dataset.id)
+function serchStrock(){
+  const publicForm = document.querySelector('.publicForm')
+  const stocks = [...publicForm.querySelectorAll('[name="stock[]"]')].map(el=>el.value).filter(el => el)
+  const date_start = publicForm.querySelector('[name="date_start"]').value
+  const date_end = publicForm.querySelector('[name="date_end"]').value
+  // console.log(stock,date_start,date_end)
+  if(!stocks.length){
+    alert('比較股號未填')
   }
+  if(!date_start){
+    alert('開始時間未填')
+  }
+  if(!date_end){
+    alert('結束時間未填')
+  }
+  const serch = publicForm.querySelector('.serch')
+  serch.onclick = null
+  serch.classList.add('active')
+  getJSON({
+    'url': './remuneration',
+    'method': 'POST',
+    'body': {
+      'stocks': stocks,
+      'date_start': date_start,
+      'date_end': date_end,
+    }
+  }).then(function (json) {
+    console.log(json)
+    //load
+    serch.onclick = serchStrock
+    serch.classList.remove('active')
+    if(json.result=='false'){alert(json.message);return false;}
+    creatChart(json.data)
+  });
 }
-(async function(){
-  //創建html
+window.onload=async function(){
   console.log(pageJson)
-  pageJson.forEach(d=>creatStrockHtml(d))
-  //拖移
-  document.querySelectorAll('.table_content').forEach(o=>dragStrock(o))
-}())
+  if(!pageJson){
+    alert('找不到資料')
+    window.location = './';
+    return false;
+  }
+  creatChart(pageJson.data)
+}

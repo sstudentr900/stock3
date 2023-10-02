@@ -95,7 +95,7 @@ function getMa(dayCount, data) {
   return result;
 }
 function stockAvenge(startPrice,endPrice){
-  return (((endPrice-startPrice)/startPrice)*100).toFixed(2)+'%'
+  return (((endPrice-startPrice)/startPrice)*100).toFixed(2)
 }
 function stockYieldPrice(yielddata,stockdata){
   console.log(`stockYieldPrice,股利便宜昂貴價`)
@@ -228,14 +228,14 @@ function stockPay(stockdata,time){
   if(start){
     // const percentage = (((end-start)/start)*100).toFixed(2)+'%'
     // console.log(time,end,start,percentage)
-    return stockAvenge(start,end)
+    return stockAvenge(start,end);
   }else{
-    return '0%'
+    return 0;
   }
 }
 function stockPayOneYear(stockdata,year){
   if(!stockdata.length)return;
-  // console.log(`跑${year}報酬`)
+  console.log(`stockPayOneYear,跑${year}報酬`)
   // stockdata = JSON.parse(stockdata)
   const array = stockdata.filter(({date})=>{
     return date>=`${year}-01-01` && date<=`${year}-12-31`;
@@ -544,5 +544,6 @@ module.exports={
   getMonthly,
   getSort,
   getMa,
-  getAccumulate
+  getAccumulate,
+  stockAvenge,
 }

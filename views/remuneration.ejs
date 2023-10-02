@@ -2,55 +2,93 @@
 <html lang="en">
 <head>
   <%- include('publicHead') -%>
-  <link rel="stylesheet" href="css/remuneration.css">
+  <link rel="stylesheet" href="css/<%= active %>.css">
 </head>
 <body>
   <div class="publicPage <%= active %>">
     <%- include('publicNav') %>
     <div class="publicContent">
       <div class="publicWidth">
-        <div class="publicBox">
-          <div class="publictitle">
-            <div class="title">
-              <h4>股票報酬統計</h4>
-              <p class="time">更新時間 : <%= data[0]['dataDate'] %></p>
+        <div class="publictitle">
+          <div class="title">
+            <h4>股票報酬</h4>
+          </div>
+        </div>
+        <form action="" class="publicForm">
+          <div class="publicGrid5">
+            <div class="item">
+              <div class="label">
+                <label for="stock">比較股號</label>
+              </div>
+              <div class="input">
+                <input type="number" name="stock[]" value="0050" placeholder="0050">
+              </div>
             </div>
-            <div class="control">
-              <a href="javascript:;" class="add" onClick="addStrock()">
-                新增
-                <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-                <!-- <svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12.002 2c5.518 0 9.998 4.48 9.998 9.998 0 5.517-4.48 9.997-9.998 9.997-5.517 0-9.997-4.48-9.997-9.997 0-5.518 4.48-9.998 9.997-9.998zm0 1.5c-4.69 0-8.497 3.808-8.497 8.498s3.807 8.497 8.497 8.497 8.498-3.807 8.498-8.497-3.808-8.498-8.498-8.498zm-.747 7.75h-3.5c-.414 0-.75.336-.75.75s.336.75.75.75h3.5v3.5c0 .414.336.75.75.75s.75-.336.75-.75v-3.5h3.5c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-3.5v-3.5c0-.414-.336-.75-.75-.75s-.75.336-.75.75z" fill-rule="nonzero"/></svg> -->
+            <div class="item">
+              <div class="label">
+                <label for="stock">比較股號</label>
+              </div>
+              <div class="input">
+                <input type="number" name="stock[]" value="00713" placeholder="0050">
+              </div>
+            </div>
+            <div class="item">
+              <div class="label">
+                <label for="stock">比較股號</label>
+              </div>
+              <div class="input">
+                <input type="number" name="stock[]" value="0056" placeholder="0050">
+              </div>
+            </div>
+            <div class="item">
+              <div class="label">
+                <label for="stock">比較股號</label>
+              </div>
+              <div class="input">
+                <input type="number" name="stock[]" placeholder="0050">
+              </div>
+            </div>
+            <div class="item">
+              <div class="label">
+                <label for="stock">比較股號</label>
+              </div>
+              <div class="input">
+                <input type="number" name="stock[]" placeholder="0050">
+              </div>
+            </div>
+          </div>
+          <div class="publicGrid3">
+            <div class="item">
+              <div class="label">
+                <label for="date_start">開始時間</label>
+              </div>
+              <div class="input">
+                <input type="date" name="date_start" id="date_start" value="2023-01-01">
+              </div>
+            </div>
+            <div class="item">
+              <div class="label">
+                <label for="date_end">結束時間</label>
+              </div>
+              <div class="input">
+                <input type="date" name="date_end" id="date_end" value="2023-02-01">
+              </div>
+            </div>
+            <div class="item">
+              <a href="javascript:;" class="btn serch" onClick="serchStrock()">
+                送出<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
               </a>
             </div>
           </div>
-          <div class="customTable">
-            <ul class="table_title">
-              <li class="name"><p>名稱</p></li>
-              <% data[0]['stockPayYear'].forEach(function(y) { %>
-                <li class="<%= y.year %>"><p><%= y.year %>年報酬</p></li>
-              <% }); %>
-              <li><p>年化報酬</p></li>
-              <% data[0]['stockPayMonth'].forEach(function(m) { %>
-                <li class="<%= m.month %>"><p><%= m.month %>月報酬</p></li>
-              <% }); %>
-              <li><p>平均股利</p></li>
-              <li><p>平均殖利率</p></li>
-              <li><p>目前殖利率</p></li>
-              <li><p>便宜價(6%)</p></li>
-              <li><p>合理價(5%)</p></li>
-              <li><p>昂貴價(3%)</p></li>
-              <li><p>目前價 / 淨值</p></li>
-              <li><p>夏普值</p></li>
-              <li><p>Beta</p></li>
-              <li><p>標準差</p></li>
-              <li><p>周D值</p></li>
-            </ul>
-          </div>
+        </form>
+        <div class="publicBox">
+          <div id="chart"></div>
         </div>
       </div>
     </div>
     <%- include('publicFooter') %>
   </div>
-  <script src="./js/remuneration.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script src="./js/<%= active %>.js"></script>
 </body>
 </html>

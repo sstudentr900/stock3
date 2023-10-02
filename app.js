@@ -1,5 +1,6 @@
 const express = require('express');
 const remuneration = require('./controllers/remuneration');
+const compare = require('./controllers/compare');
 const home = require('./controllers/home');
 const individual = require('./controllers/individual');
 const app = express(); //載入express模組
@@ -34,12 +35,16 @@ app.get('/', home.search)
 app.get('/individual/:stockno', individual.search)
 //查詢股票報酬
 app.get('/remuneration', remuneration.search)
+//查詢股票報酬
+app.post('/remuneration', remuneration.search_post)
+//查詢股票比較
+app.get('/compare', compare.search)
 //增加股票報酬
-app.post('/remuneration',remuneration.add)
+app.post('/compare',compare.add)
 //刪除股票報酬
-app.delete('/remuneration/:id',remuneration.delet)
+app.delete('/compare/:id',compare.delet)
 //排序股票報酬
-app.post('/remuneration/sort',remuneration.sort)
+app.post('/compare/sort',compare.sort)
 
 //發送文字
 // app.get('/test', function(req, res){

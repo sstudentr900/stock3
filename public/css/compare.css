@@ -1,0 +1,123 @@
+.compare .publicContent{
+  padding-bottom: 0;
+}
+.compare .customTable{
+  border: 1px solid #dee2e6;
+  height: calc(100vh - 100px - 77px - 48px - 67px);
+  overflow: auto;
+}
+.compare .customTable ul,
+.compare .customTable .table_title{
+  border: none;
+  background: none;
+  border-bottom: none;
+}
+.compare .customTable ul.table_title{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.compare .customTable ul.table_title li{
+  background: #f5feff;
+  border-bottom: 1px solid #dee2e6;
+}
+.compare .customTable ul{
+  width: calc(140px * 28);
+}
+.compare .customTable li{
+  padding: 8px;
+  flex: 0 0 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #dee2e6;
+}
+.compare .customTable li:not(.name)+li{
+  border-left: 1px solid #dee2e6;
+}
+.compare .customTable li.name{
+  justify-content: left;
+  position: sticky;
+  left: 0;
+  cursor: move;
+  background: #f5feff;
+  border-right: 1px solid #dee2e6;
+}
+.compare .customTable li p.green{
+  color: #198754;
+}
+.compare .publictitle{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.compare .publictitle .time{
+  font-size: 12px;
+  color: #7d7b8a;
+}
+.compare .control a.add{
+  font-size: 14px;
+  font-weight: 400;
+  padding: 3px 16px;
+  color: #058296;
+  border: 1px solid #058296;
+  display: flex;
+  align-items: center;
+}
+.compare .control a.add:hover{
+  font-size: 15px;
+  color: #fff;
+  background: #058296;
+}
+.compare .control a.add .lds-ring{
+  margin-left: 8px;
+  display: none;
+}
+.compare .control a.add.active .lds-ring{
+  display: inline-block;
+}
+.compare .control a.delet{
+  width: 18px;
+  position: absolute;
+  right: 8px;
+  bottom: 2px;
+}
+.compare .control a.delet svg{
+  fill: #F95F53;
+} 
+/*lds-ring*/
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  /* margin: 8px; */
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: currentColor transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

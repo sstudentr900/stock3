@@ -1,96 +1,96 @@
-.remuneration .publicContent{
-  padding-bottom: 0;
+.remuneration .publicContent>.publicWidth{
+  display: block;
 }
-.remuneration .customTable{
-  border: 1px solid #dee2e6;
-  height: calc(100vh - 100px - 77px - 48px - 67px);
-  overflow: auto;
+.remuneration .publictitle h4{
+  font-size: 24px;
+  font-weight: bold;
 }
-.remuneration .customTable ul,
-.remuneration .customTable .table_title{
-  border: none;
-  background: none;
-  border-bottom: none;
+.remuneration .publicGrid3{
+  align-items: end;
 }
-.remuneration .customTable ul.table_title{
-  position: sticky;
-  top: 0;
-  z-index: 1;
+.remuneration .publicBox{
+  min-height: calc(100vh - 100px - 77px - 35px - 12px - 155px - 24px);
+  display: flex;
+  align-items: center;
 }
-.remuneration .customTable ul.table_title li{
-  background: #f5feff;
-  border-bottom: 1px solid #dee2e6;
+.remuneration #chart{
+  width: 100%;
+  height: 400px;
 }
-.remuneration .customTable ul{
-  width: calc(140px * 28);
+/*lds-ring*/
+.remuneration a.lds-ring{
+  margin-left: 8px;
+  margin-top: 3px;
 }
-.remuneration .customTable li{
-  padding: 8px;
-  flex: 0 0 140px;
+/*type=number*/
+.remuneration input[type=number]::-webkit-outer-spin-button,
+.remuneration input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.remuneration input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+
+
+
+.publicGrid2{
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2,1fr);
+}
+.publicGrid3{
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3,1fr);
+}
+.publicGrid4{
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4,1fr);
+}
+.publicGrid5{
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(5,1fr);
+}
+.publicForm {
+  margin-bottom: 24px;
+}
+.publicForm .item{
+  margin-bottom: 8px;
+}
+.publicForm label{
+  font-size: 12px;
+}
+.publicForm input{
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+}
+.publicForm .btn{
+  background-color: #058296;
+  padding: 12px;
+  color: #fff;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #dee2e6;
 }
-.remuneration .customTable li:not(.name)+li{
-  border-left: 1px solid #dee2e6;
-}
-.remuneration .customTable li.name{
-  justify-content: left;
-  position: sticky;
-  left: 0;
-  cursor: move;
-  background: #f5feff;
-  border-right: 1px solid #dee2e6;
-}
-.remuneration .customTable li p.green{
-  color: #198754;
-}
-.remuneration .publictitle{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.remuneration .publictitle .time{
-  font-size: 12px;
-  color: #7d7b8a;
-}
-.remuneration .control a.add{
-  font-size: 14px;
-  font-weight: 400;
-  padding: 3px 16px;
-  color: #058296;
-  border: 1px solid #058296;
-  display: flex;
-  align-items: center;
-}
-.remuneration .control a.add:hover{
-  font-size: 15px;
-  color: #fff;
-  background: #058296;
-}
-.remuneration .control a.add .lds-ring{
-  margin-left: 8px;
-  display: none;
-}
-.remuneration .control a.add.active .lds-ring{
+/*lds-ring*/
+.active .lds-ring{
   display: inline-block;
 }
-.remuneration .control a.delet{
-  width: 18px;
-  position: absolute;
-  right: 8px;
-  bottom: 2px;
-}
-.remuneration .control a.delet svg{
-  fill: #F95F53;
-} 
-/*lds-ring*/
 .lds-ring {
   display: inline-block;
   position: relative;
   width: 14px;
   height: 14px;
+  display: none;
 }
 .lds-ring div {
   box-sizing: border-box;

@@ -1710,7 +1710,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
     }
   }
 
-  console.log(`抓取${stockno}資料`)
+  console.log(`抓取${stockno}股票資料`)
   const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':`${stockno}.TW`})
   stockdataValue?result.stockdata = stockdataValue:'';
 
@@ -1766,7 +1766,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
   console.log(`stockCrawler,結束`)
 }
-async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,ranking,vix,greedy}){
+async function stockCrawler_market({id,twii,threecargo,ranking,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,vix,greedy}){
   console.log(`stockCrawler_market開始`)
   //result
   const result = {}
@@ -1846,4 +1846,5 @@ async function stockCrawler_market({id,twii,threecargo,threefutures,exdividend,l
 module.exports={
   stockCrawler_market,
   stockCrawler,
+  sleep
 }

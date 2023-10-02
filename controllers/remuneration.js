@@ -1,144 +1,96 @@
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('../plugin/db')
 const { stockCrawler } = require("../plugin/stockCrawler");
-const { 
-  stockPayMoreYear,
-  stockYieldPrice,
-  stockPayMoreMonth,
-  stockCagr,
-  getNowTimeObj,
-  stockHighLowPriceMoreYear,
-  stockdataFn_w,
-  stockKdFn
-} = require("../plugin/stockFn");
+const { stockAvenge,getNowTimeObj } = require("../plugin/stockFn");
 
-async function nowPage({row}) {
-  const data = {}
-  //更新時間
-  data['dataDate'] = getNowTimeObj({'date':row['updated_at']})['date'];
-  //id
-  data['id'] = row['id']
-  //股名
-  data['stockname'] = row['stockname'];
-  //股號
-  data['stockno'] = row['stockno'];
-  //stockdata 
-  const stockdata= row['stockdata']?JSON.parse(row['stockdata']):'';
-  //今年每月報酬
-  data['stockPayMonth'] = stockPayMoreMonth(stockdata);
-  //最近6年每年報酬
-  data['stockPayYear'] = await stockPayMoreYear(stockdata,6);
-  //年化報酬率
-  data['stockCagr'] = stockCagr(data['stockPayYear']);
-  //淨值
-  if(row['networthdata']){
-    let networthdata = JSON.parse(row['networthdata']);
-    networthdata = networthdata[networthdata.length-1]
-    // console.log(`networthdata,${networthdata}`)
-    data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
+async function nowPage({stocks,date_start,date_end}) {
+  let data = [];
+  let date = []
+  for(const stockno of stocks) {
+    console.log(`nowPage,stockno,${stockno}`)
+    let stockdata = await dbQuery( 'SELECT stockdata from stock WHERE stockno = ?',[stockno])
+    stockdata = stockdata[0]['stockdata']
+    console.log(`nowPage,stockdata.length,${stockdata.length}`)
+    if(!stockdata.length){
+      let jsons = await stockCrawler({'stockno':stockno})
+      jsons = JSON.parse(jsons['stockdata'])
+      console.log(`nowPage,jsons,${jsons}`)
+      if(!jsons){
+        console.log(`nowPage,找不到資料`)
+        data = []
+        // res.json({result:'false',message:'找不到資料'})
+        return false;
+        break;
+      }
+      stockdata = jsons
+    }
+    console.log(`nowPage,抓取資料1,${date_start,date_end}}`)
+    //抓取資料
+    stockdata = JSON.parse(stockdata).filter(function(obj){
+      if(obj.date<=date_end && obj.date>=date_start){
+        return obj;
+      }
+    })
+    console.log(`nowPage,抓取資料2,${stockdata},${JSON.stringify(stockdata)}`)
+    const obj = {}
+    obj.name = stockno
+    obj.type = 'line'
+    obj.data = []
+    for (let index = 0; index < stockdata.length; index++) {
+      if(index==0){
+        obj.data.push(0)
+      }else{
+        obj.data.push(stockAvenge(stockdata[0].close, stockdata[index].close))
+      }
+    }
+    // obj.data = stockdata.map(el=>el.close)
+    data.push(obj)
+    date = stockdata.map(el=>el.date)
   }
-  //殖利率
-  let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
-  yieldObj = stockYieldPrice(yieldObj,stockdata);
-  // row['stockYield'] = yieldObj.stockYield;//每年殖利率
-  data['average'] = yieldObj.average;//平均股利
-  data['averageYield'] =yieldObj.averageYield;//平均殖利率
-  data['nowYield'] = yieldObj.nowYield;//目前殖利率
-  data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-  data['fairPrice'] = yieldObj.fairPrice;//合理
-  data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
-  //4年高低點
-  // row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
-  //夏普值
-  const sharpedata = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7)[0]:'';
-  // console.log('夏普值',sharpedata)
-  data['sharpe'] = sharpedata?sharpedata['sharpe']:'0';
-  data['beta'] = sharpedata?sharpedata['beta']:'0';
-  data['deviation'] = sharpedata?sharpedata['deviation']:'0';
-  //周kd
-  data['wkd_d'] = stockKdFn(stockdataFn_w(stockdata))['last_d'];
-  //
-  // console.log('60',data)
-  return data;
+  console.log(`nowPage,data,${JSON.stringify(data)},date,${date}`)
+  // res.json({ result:'true',data: {data:data,date:date} })
+  return {
+    data:data,
+    date:date,
+  };
 }
 async function search(req, res) {
-  console.log(`---------查詢股票---------`)
-  const data = []
-  const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at,sharpedata from stock ORDER BY sort ASC' )
-  if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
-  for (const row of rows) {
-    console.log(`--stockno:${row['stockno']}--`)
-    data.push(await nowPage({row:row}))
-    // console.log(`row,${JSON.stringify(data)}`)
-  }
-  // console.log(`row,${JSON.stringify(data)}`)
-  // res.send(rows)
+  // console.log(`---------查詢股票---------`)
+  const stocks = ['0050','0056','00713']
+  const date_start = '2020-01-01'
+  const date_end = getNowTimeObj()['date']
+  const data = await nowPage({
+    stocks: stocks,
+    date_start: date_start,
+    date_end: date_end
+  })
+  
   res.render('remuneration',{
     'active': 'remuneration',
+    'stocks': stocks,
+    'date_start': date_start,
+    'date_end': date_end,
     'data': data,
   })
 }
-async function add(req, res) {
-  console.log(`---------增加股票---------`)
+async function search_post(req, res) {
   const params = req.body
-  // if(!params.stockname || !params.stockno){
-  if(!params.stockno){
-    // console.log(`來源資料錯誤:${params.stockname}-${params.stockno}-${JSON.stringify(params)}`)
-    console.log(`來源資料錯誤:${params.stockno}-${JSON.stringify(params)}`)
-    res.json({result:'false',message:'來源資料錯誤'})
+  if(!params.stocks.length || !params.date_start || !params.date_end ){
+    console.log(`search_post,資料錯誤,${JSON.stringify(params)}`)
+    res.json({result:'false',message:'資料錯誤'})
     return false;
   }
-  const stockno = params.stockno
-  const stocknoArray = await dbQuery( 'SELECT id from stock WHERE stockno = ?',[stockno])
-  // console.log(`stocknoArray,${stocknoArray.length}`)
-  if(stocknoArray.length){
-    console.log('false,資料重複')
-    res.json({result:'false',message:'資料重複'})
+  // await nowPage({stocks:params.stocks,date_start:params.date_start,date_end:params.date_end,res:res})
+  const data = await nowPage({stocks:params.stocks,date_start:params.date_start,date_end:params.date_end})
+  // console.log(`search_post,${data}`)
+  if(!data.data){
+    res.json({result:'false',message:'找不到資料'})
     return false;
-  }else{
-    console.log(`stockno:${stockno}`)
-    //抓取資料
-    const jsons = await stockCrawler({'stockno':stockno})
-    if(!jsons){
-      console.log('找不到資料')
-      res.json({result:'false',message:'找不到資料'})
-      return false;
-    }
-    const data = await nowPage({row:jsons});
-    // console.log(data)
+  }
+  res.json({result:'true',data: data})
+}
 
-    res.json({result:'true',data: data })
-  }
-}
-async function delet(req, res) {
-  console.log(`---------刪除股票-----------`)
-  const params = req.params
-  const id = params.id
-  console.log(`id:${id}`)
-  if(!id){
-    console.log(`來源資料錯誤:${params}`)
-    res.json({result:'false',message:'來源資料錯誤'})
-    return false;
-  }
-  const rows = await dbDelete('stock',id)
-  if(rows){
-    res.json({result:'true',message:'刪除股票成功'})
-  }else{
-    res.json({result:'false',message:'刪除股票失敗'})
-  }
-}
-async function sort(req, res) {
-  console.log(`---------排序股票報酬---------`)
-  const params = req.body
-  for (const param of params) {
-    // console.log(param['sort'],param['id'])
-    await dbUpdata('stock',{'sort':param['sort']},param['id'])
-  }
-  res.json({result:'true',message: '股票排序成功'})
-}
 
 module.exports = { 
   search,
-  add,
-  delet,
-  sort
+  search_post
 }
