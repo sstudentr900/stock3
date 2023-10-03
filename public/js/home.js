@@ -1,5 +1,10 @@
 window.onload=async function(){
-  console.log(pageJson)
+  // console.log(pageJson)
+  if(!pageJson){
+    alert('找不到資料')
+    window.location = './';
+    return false;
+  }
   //大盤
   const weighted_chart = echarts.init(document.getElementById('weighted_chart'));
   //三大買賣
@@ -214,8 +219,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['threecargo_date']
       }
     ],
@@ -281,8 +290,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['threefutures_date']
       }
     ],
@@ -348,8 +361,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          // alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['updownnumber_date']
       }
     ],
@@ -415,8 +432,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          // alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['prosperity_date']
       }
     ],
@@ -494,8 +515,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          // alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['dollars_date']
       }
     ],
@@ -574,8 +599,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['vix_date']
       }
     ],
@@ -654,8 +683,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['greedy_date']
       }
     ],

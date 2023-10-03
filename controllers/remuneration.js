@@ -3,18 +3,17 @@ const { stockCrawler } = require("../plugin/stockCrawler");
 const { stockAvenge,getNowTimeObj } = require("../plugin/stockFn");
 
 async function nowPage({stocks,date_start,date_end}) {
-  console.log(`nowPage,stockno,date_start,date_end,${stocks,date_start,date_end}`)
+  // console.log(`nowPage,stockno,date_start,date_end,${stocks,date_start,date_end}`)
   let data = [];
   let date = []
   for(const stockno of stocks) {
-    console.log(`nowPage,stockno,${stockno}`)
-    let stockdata = await dbQuery( 'SELECT stockdata from stock WHERE stockno = ?',[stockno])
-    stockdata = stockdata[0]['stockdata']
-    console.log(`nowPage,stockdata.length,${stockdata.length}`)
+    // console.log(`nowPage,stockno,${stockno}`)
+    let stockdata = await dbQuery( 'SELECT stockdata,stockname from stock WHERE stockno = ?',[stockno])
+    console.log(`nowPage,stockno,${stockno},stockdata.length,${stockdata.length}`)
     if(!stockdata.length){
       let jsons = await stockCrawler({'stockno':stockno})
       jsons = JSON.parse(jsons['stockdata'])
-      console.log(`nowPage,jsons,${jsons}`)
+      // console.log(`nowPage,jsons,${jsons}`)
       if(!jsons){
         console.log(`nowPage,找不到資料`)
         data = []
@@ -22,7 +21,9 @@ async function nowPage({stocks,date_start,date_end}) {
         return false;
         break;
       }
-      stockdata = jsons
+      stockdata = jsons['stockdata']
+    }else{
+      stockdata = stockdata[0]['stockdata']
     }
     // console.log(`nowPage,抓取資料1,${date_start,date_end}}`)
     //抓取資料
@@ -47,7 +48,7 @@ async function nowPage({stocks,date_start,date_end}) {
     data.push(obj)
     date = stockdata.map(el=>el.date)
   }
-  console.log(`nowPage,data,${JSON.stringify(data)},date,${date}`)
+  // console.log(`nowPage,data,${JSON.stringify(data)},date,${date}`)
   // res.json({ result:'true',data: {data:data,date:date} })
   return {
     data:data,
@@ -56,7 +57,7 @@ async function nowPage({stocks,date_start,date_end}) {
 }
 async function search(req, res) {
   // console.log(`---------查詢股票---------`)
-  const stocks = ['0050','0056','00713']
+  const stocks = ['00692','0056','00713','00731','00878','00728']
   const date_start = getNowTimeObj({year:'-3'})['date']
   const date_end = getNowTimeObj()['date']
   const data = await nowPage({

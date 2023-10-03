@@ -37,33 +37,40 @@ async function search(req, res) {
       const obj = data.find(obj=>date==obj.date)
       return obj?Number(obj.close):0
     })
-    //3大法人期貨買賣超
+    //期貨買賣超
     const threefutures = JSON.parse(row['threefutures'])
     row['threefutures'] = getSort({obj:row['threefutures'],number:10})
-    // //3大法人日期
+    //期貨買賣超_日期
     row['threefutures_date'] = threefutures.map(({date})=>date)
-    // //3大法人資料
+    //期貨買賣超_資料
     const threefutures_data = threefutures.map(({foreign,letter,proprietor})=>(Number(foreign)+Number(letter)+Number(proprietor)).toFixed(2))
     row['threefutures_data'] = threefutures_data
     // row['threefutures_data'] = getAccumulate({obj:threefutures_data})
     // row['threefutures_data'] = threefutures.map(({foreign})=>foreign)
-  
-    // //3大法人_加權指數
+    //期貨買賣超_加權指數
     row['threefutures_market'] = threefutures.map(({date})=>{
-      const obj = data.find(obj=>date==obj.date)
-      return obj?Number(obj.close):0
+      let number = 0
+      const obj = data.find((obj,index)=>{
+        number = index;
+        return date==obj.date
+      })
+      return obj?Number(obj.close):Number(data[number].close)
     })
-    //大盤上下跌家數
+    //上下跌家數
     const updownnumber = JSON.parse(row['updownnumber'])
     row['updownnumber'] = getSort({obj:row['updownnumber'],number:10})
-    //3大法人日期
+    //上下跌家數_日期
     row['updownnumber_date'] = updownnumber.map(({date})=>date)
-    //3大法人資料
+    //上下跌家數_資料
     row['updownnumber_data'] = updownnumber.map(({Diffhome})=>Number(Diffhome))
-    //3大法人_加權指數
+    //上下跌家數__加權指數
     row['updownnumber_market'] = updownnumber.map(({date})=>{
-      const obj = data.find(obj=>date==obj.date)
-      return obj?Number(obj.close):0
+      let number = 0
+      const obj = data.find((obj,index)=>{
+        number = index;
+        return date==obj.date
+      })
+      return obj?Number(obj.close):Number(data[number].close)
     })
     //上市類股漲跌
     row['listed'] = getSort({obj:row['listed'],number:54})
@@ -103,8 +110,14 @@ async function search(req, res) {
       row['dollars_data'] = dollars.map(({dollars})=>Number(dollars))
       //美金_加權指數
       row['dollars_market'] = dollars.map(({date})=>{
-        const obj = data.find(obj=>date==obj.date)
-        return obj?Number(obj.close):0
+        // const obj = data.find(obj=>date==obj.date)
+        // return obj?Number(obj.close):0
+        let number = 0
+        const obj = data.find((obj,index)=>{
+          number = index;
+          return date==obj.date
+        })
+        return obj?Number(obj.close):Number(data[number].close)
       })
     }
     //恐慌指數
@@ -125,7 +138,7 @@ async function search(req, res) {
           number = index;
           return date==obj.date
         })
-        return obj?Number(obj.close):data[number].close
+        return obj?Number(obj.close):Number(data[number].close)
       })
       delete row.vix
     }
@@ -143,7 +156,7 @@ async function search(req, res) {
           number = index;
           return date==obj.date
         })
-        return obj?Number(obj.close):data[number].close
+        return obj?Number(obj.close):Number(data[number].close)
       })
       delete row.greedy
     }

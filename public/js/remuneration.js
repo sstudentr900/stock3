@@ -108,7 +108,7 @@ function serchStrock(){
   });
 }
 window.onload=async function(){
-  console.log(pageJson)
+  // console.log(pageJson)
   if(!pageJson){
     alert('找不到資料')
     window.location = './';

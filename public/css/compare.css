@@ -22,7 +22,13 @@
   border-bottom: 1px solid #dee2e6;
 }
 .compare .customTable ul{
-  width: calc(140px * 28);
+  width: calc(140px * 19);
+}
+.compare .customTable ul.table_content{
+  cursor: move;
+}
+.compare .customTable ul.table_content:hover{
+  background: #f5feff;
 }
 .compare .customTable li{
   padding: 8px;
@@ -39,10 +45,24 @@
   justify-content: left;
   position: sticky;
   left: 0;
-  cursor: move;
   background: #f5feff;
   border-right: 1px solid #dee2e6;
 }
+.compare .customTable li.name .stockno{
+  display: flex;
+  align-items: center;
+}
+.compare .customTable li.name a.delet{
+  width: 18px;
+  height: 18px;
+  margin-left: 3px;
+  margin-top: 2px;
+}
+.compare .customTable li.name a.delet svg{
+  fill: #F95F53;
+  width: 100%;
+  height: auto;
+} 
 .compare .customTable li p.green{
   color: #198754;
 }
@@ -76,15 +96,6 @@
 .compare .control a.add.active .lds-ring{
   display: inline-block;
 }
-.compare .control a.delet{
-  width: 18px;
-  position: absolute;
-  right: 8px;
-  bottom: 2px;
-}
-.compare .control a.delet svg{
-  fill: #F95F53;
-} 
 /*lds-ring*/
 .lds-ring {
   display: inline-block;

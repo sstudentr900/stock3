@@ -167,7 +167,7 @@
                 <% if(data['stockPayYear']){data['stockPayYear'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li class='date'><p><%= o.year %>年</p></li>
-                  <li><p><%= o.avenge %></p></li>
+                  <li><p><%= o.avenge %>%</p></li>
                 </ul>
                 <% });} %>
                 <% if(data['stockCagr']){%>
@@ -233,13 +233,13 @@
                 <% if(data['stockYield']){data['stockYield'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li class='date'><p><%= o.nowYear %>年</p></li>
-                  <li><p><%= o.dividend %> / <%= o.yield %></p></li>
+                  <li><p><%= o.dividend %> / <%= o.yield %>%</p></li>
                 </ul>
                 <% });} %>
                 <% if(data['nowYield']){ %>
                   <ul class="table_content">
                     <li class='date'><p>目前殖利率</p></li>
-                    <li><p><%= data['nowYield'] %></p></li>
+                    <li><p><%= data['nowYield'] %>%</p></li>
                   </ul>
                 <% } %>
               </div>
@@ -295,7 +295,7 @@
                 <% if(data['industry']){data['industry'].forEach(function(o) { %>
                   <ul class="table_content" data-date="<%= o.date %>">
                     <li><p><%= o.name %></p></li>
-                    <li><p><%= o.proportion %></p></li>
+                    <li><p><%= o.proportion %>%</p></li>
                   </ul>
                 <% });} %>
               </div>
@@ -315,7 +315,7 @@
                 <% if(data['shareholding']){data['shareholding'].forEach(function(o) { %>
                   <ul class="table_content" data-date="<%= o.date %>">
                     <li><p class="publicEllipsis1"><%= o.name %></p></li>
-                    <li><p><%= o.proportion %></p></li>
+                    <li><p><%= o.proportion %>%</p></li>
                   </ul>
                 <% });} %>
               </div>

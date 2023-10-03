@@ -6,16 +6,16 @@ async function crawlerStock(){
   //個股
   const rows = await dbQuery( 'SELECT * from stock' )
   if(!rows){console.log(`crawlerStock失敗跳出`)}
-  // for (const row of rows) {
   for (const [index, row] of rows.entries()) {
-    //等
-    await sleep(20000)
-
+  // for (const row of rows) {
     //跑股票
     await stockCrawler(row)
     
     //只抓2筆
     // if(index>=1){break;}
+
+    //等
+    await sleep(20000)
   }
 
   // market 大盤

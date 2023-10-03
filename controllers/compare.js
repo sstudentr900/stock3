@@ -6,7 +6,7 @@ const {
   stockPayMoreMonth,
   stockCagr,
   getNowTimeObj,
-  stockHighLowPriceMoreYear,
+  stockPay,
   stockdataFn_w,
   stockKdFn
 } = require("../plugin/stockFn");
@@ -23,29 +23,35 @@ async function nowPage({row}) {
   data['stockno'] = row['stockno'];
   //stockdata 
   const stockdata= row['stockdata']?JSON.parse(row['stockdata']):'';
+  //5日報酬
+  data['stockPayFiveDay'] = stockPay(stockdata,5);
+  //10日報酬
+  data['stockPayTenDay'] = stockPay(stockdata,10);
+  //20日報酬
+  data['stockPayTwentyDay'] = stockPay(stockdata,20);
   //今年每月報酬
-  data['stockPayMonth'] = stockPayMoreMonth(stockdata);
+  data['stockPayMonth'] = stockPayMoreMonth(stockdata,3);
   //最近6年每年報酬
   data['stockPayYear'] = await stockPayMoreYear(stockdata,6);
   //年化報酬率
   data['stockCagr'] = stockCagr(data['stockPayYear']);
   //淨值
-  if(row['networthdata']){
-    let networthdata = JSON.parse(row['networthdata']);
-    networthdata = networthdata[networthdata.length-1]
-    // console.log(`networthdata,${networthdata}`)
-    data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
-  }
+  // if(row['networthdata']){
+  //   let networthdata = JSON.parse(row['networthdata']);
+  //   networthdata = networthdata[networthdata.length-1]
+  //   // console.log(`networthdata,${networthdata}`)
+  //   data['networthdata'] = `${networthdata['price']} / ${networthdata['networth']}`
+  // }
   //殖利率
   let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
   yieldObj = stockYieldPrice(yieldObj,stockdata);
   // row['stockYield'] = yieldObj.stockYield;//每年殖利率
-  data['average'] = yieldObj.average;//平均股利
-  data['averageYield'] =yieldObj.averageYield;//平均殖利率
+  // data['average'] = yieldObj.average;//平均股利
+  // data['averageYield'] =yieldObj.averageYield;//平均殖利率
   data['nowYield'] = yieldObj.nowYield;//目前殖利率
-  data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
-  data['fairPrice'] = yieldObj.fairPrice;//合理
-  data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
+  // data['cheapPrice']  = yieldObj.cheapPrice;//便宜 
+  // data['fairPrice'] = yieldObj.fairPrice;//合理
+  // data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
   //4年高低點
   // row['highLowPrice'] = stockHighLowPriceMoreYear(row['stockdata'],4);
   //夏普值

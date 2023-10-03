@@ -12,7 +12,7 @@
         <div class="publicBox">
           <div class="publictitle">
             <div class="title">
-              <h4>股票比較</h4>
+              <h4>股票比較表</h4>
               <p class="time">更新時間 : <%= data[0]['dataDate'] %></p>
             </div>
             <div class="control">
@@ -25,25 +25,28 @@
           </div>
           <div class="customTable">
             <ul class="table_title">
-              <li class="name"><p>名稱</p></li>
-              <% data[0]['stockPayYear'].forEach(function(y) { %>
-                <li class="<%= y.year %>"><p><%= y.year %>年報酬</p></li>
-              <% }); %>
-              <li><p>年化報酬</p></li>
+              <li class="name" data-sort="asc"><p>名稱</p></li>
+              <li data-sort="asc"><p>5日報酬</p></li>
+              <li data-sort="asc"><p>10日報酬</p></li>
+              <li data-sort="asc"><p>20日報酬</p></li>
               <% data[0]['stockPayMonth'].forEach(function(m) { %>
-                <li class="<%= m.month %>"><p><%= m.month %>月報酬</p></li>
+                <li class="<%= m.month %>" data-sort="asc"><p><%= m.month %>月報酬</p></li>
               <% }); %>
-              <li><p>平均股利</p></li>
-              <li><p>平均殖利率</p></li>
-              <li><p>目前殖利率</p></li>
-              <li><p>便宜價(6%)</p></li>
+              <% data[0]['stockPayYear'].forEach(function(y) { %>
+                <li class="<%= y.year %>" data-sort="asc"><p><%= y.year %>年報酬</p></li>
+              <% }); %>
+              <li data-sort="asc"><p>年化報酬</p></li>
+              <!-- <li><p>平均股利</p></li>
+              <li><p>平均殖利率</p></li> -->
+              <li data-sort="asc"><p>目前殖利率</p></li>
+              <!--<li><p>便宜價(6%)</p></li>
               <li><p>合理價(5%)</p></li>
               <li><p>昂貴價(3%)</p></li>
-              <li><p>目前價 / 淨值</p></li>
-              <li><p>夏普值</p></li>
-              <li><p>Beta</p></li>
-              <li><p>標準差</p></li>
-              <li><p>周D值</p></li>
+              <li><p>目前價 / 淨值</p></li> -->
+              <li data-sort="asc"><p>夏普值</p></li>
+              <li data-sort="asc"><p>Beta</p></li>
+              <li data-sort="asc"><p>標準差</p></li>
+              <li data-sort="asc"><p>周D值</p></li>
             </ul>
           </div>
         </div>

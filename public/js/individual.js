@@ -1,5 +1,5 @@
 window.onload=async function(){
-  console.log(pageJson )
+  // console.log(pageJson )
   if(!pageJson){
     alert('找不到資料')
     window.location = './';
@@ -204,8 +204,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          // alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['threecargo_date']
       }
     ],
@@ -269,8 +273,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['financing_date']
       }
     ],
@@ -334,8 +342,12 @@ window.onload=async function(){
       {
         type: 'category',
         axisTick: {
-          alignWithLabel: true
+          alignWithLabel: true,
+          show: false,//刻度
         },
+        // axisLine: {
+        //   show: false,//線
+        // },
         data: pageJson['holder_date']
       }
     ],

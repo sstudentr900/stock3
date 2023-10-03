@@ -142,17 +142,17 @@ function stockYieldPrice(yielddata,stockdata){
     // console.log(`stockYieldPrice,yearTotle,${yearTotle}`)
     const yearLength = yielddata.length
     // console.log(`stockYieldPrice,yearLength,${yearLength}`)
-    return (yearTotle/yearLength).toFixed(2)+'%';
+    return (yearTotle/yearLength).toFixed(2);
   }
 
   //n天殖利率(股票殖利率 = 現金股利 ÷ 股價)
   const yieldFn = (stockdata,average,day)=>{
     const nowClose = stockdata[stockdata.length-day]?.close
     if(nowClose){
-      const num = ((average/nowClose)*100).toFixed(2)+'%'
+      const num = ((average/nowClose)*100).toFixed(2)
       return {yield:num,close:nowClose};
     }else{
-      return {yield:'0%',close:0};
+      return {yield:'0',close:'0'};
     }
   }
 
@@ -167,7 +167,7 @@ function stockYieldPrice(yielddata,stockdata){
       return{
         'nowYear': item.date,
         'dividend': item.dividend,
-        'yield': `${item.yield}%`,
+        'yield': item.yield,
       }
     })
     // console.log(`json,${JSON.stringify(json)}`)
@@ -221,7 +221,7 @@ function stockYieldPrice(yielddata,stockdata){
   }
 }
 function stockPay(stockdata,time){
-  console.log('跑股票報酬')
+  console.log('跑股票日報酬')
   const end = stockdata[stockdata.length-1]['close']
   const start = stockdata[stockdata.length-(1+time)]?.close
   //https://bobbyhadz.com/blog/javascript-cannot-read-property-of-undefined
@@ -287,16 +287,44 @@ function stockPayMoreYear(stockdata,number){
   }
   return row;
 }
-function stockPayMoreMonth(stockdata){
+function stockPayMoreMonth(stockdata,number){
   console.log(`stockPayMoreMonth,跑每月報酬`)
   const nowTimeObj = getNowTimeObj()
   const year = nowTimeObj['year']
-  const nowMonth = nowTimeObj['month']
-  const row = []
+  const nowMonth = Number(nowTimeObj['month'])
+  const row = [];
+  let month_s = '';
+  let month_e = '';
+  number = Number(number)
+  if(nowMonth>number){
+    month_e = nowMonth
+    month_s = (nowMonth-number+1)
+    // nowMonth = 7
+    // month_s = 5
+    // XX      = 6        
+    // month_e = 7
+
+    // nowMonth = 9
+    // month_s = 7
+    // XX      = 8        
+    // month_e = 9
+  }else{
+    month_s = number-nowMonth
+    month_e = month_s+number-1
+    // nowMonth = 2
+    // month_s = 1
+    // XX      = 2        
+    // month_e = 3
+
+    // nowMonth = 1
+    // month_s = 2
+    // XX      = 3        
+    // month_e = 4
+  }
   //沒值
   if(!stockdata.length){
     console.log('stockPayMoreMonth,沒有股票資料')
-    for(let i=1;i<=nowMonth;i++){
+    for(let i=1;i<=number;i++){
       row.push({
         'month': ('0'+i).slice(-2),
         'avenge': '0'
@@ -304,13 +332,14 @@ function stockPayMoreMonth(stockdata){
     }
     return row;
   }
+
   //有值
-  for(let i=1;i<=nowMonth;i++){
+  for(let i=month_s;i<=month_e;i++){
     const obj = {}
     const month = ('0'+i).slice(-2)
     // console.log(`${year}-${month}-01`)
     const dates = stockdata.filter(({date})=>{
-      return date>=`${year}-01-01` && date<=`${year}-${month}-31`;
+      return date>=`${year}-${month}-01` && date<=`${year}-${month}-31`;
     })
     obj['month'] = month
     if(dates.length){
@@ -335,11 +364,11 @@ function stockCagr(stockPayYear){
   
   //year
   const date = stockPayYear.filter(({avenge})=>{
-    return avenge.includes('%');
+    return avenge!=0;
   })
   //total
   const total = date.reduce((accumulator, currentValue, currentIndex, array)=>{
-    const avengeValue = currentValue.avenge.split('%')[0]*1;
+    const avengeValue = currentValue.avenge*1;
     return accumulator + avengeValue;
   },0).toFixed(2) 
   //結果
