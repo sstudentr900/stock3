@@ -220,10 +220,10 @@ function stockYieldPrice(yielddata,stockdata){
     expensivePrice: (average*32).toFixed(2), //昂貴
   }
 }
-function stockPay(stockdata,time){
-  console.log('跑股票日報酬')
+function stockPay(stockdata,number){
+  console.log(`跑股票${number}日報酬`)
   const end = stockdata[stockdata.length-1]['close']
-  const start = stockdata[stockdata.length-(1+time)]?.close
+  const start = stockdata[stockdata.length-(1+number)]?.close
   //https://bobbyhadz.com/blog/javascript-cannot-read-property-of-undefined
   if(start){
     // const percentage = (((end-start)/start)*100).toFixed(2)+'%'

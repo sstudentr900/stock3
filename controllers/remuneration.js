@@ -4,12 +4,15 @@ const { stockAvenge,getNowTimeObj } = require("../plugin/stockFn");
 
 async function nowPage({stocks,date_start,date_end}) {
   // console.log(`nowPage,stockno,date_start,date_end,${stocks,date_start,date_end}`)
-  let data = [];
+  //date
+  const dateData = await dbQuery( 'SELECT stockdata from stock WHERE stockno = ?',['0050'])
+  const date = JSON.parse(dateData[0]['stockdata']).filter(el=>el.date<=date_end && el.date>=date_start).map(obj=>obj.date)
+  const data = [];
   for(const stockno of stocks) {
     console.log(`nowPage,stockno,${stockno}`)
-    let stockname='';
+    let stockname = ''
     let stockdata = await dbQuery( 'SELECT stockdata,stockname from stock WHERE stockno = ?',[stockno])
-    // console.log(`nowPage,stockdata.length,${stockdata.length}`)
+    console.log(`nowPage,stockdata.length,${stockdata.length}`)
     if(!stockdata.length){
       let jsons = await stockCrawler({'stockno':stockno})
       // console.log(`nowPage,jsons,${jsons}`)
@@ -20,13 +23,13 @@ async function nowPage({stocks,date_start,date_end}) {
         return false;
         // break;
       }
-      stockdata = jsons['stockdata']
       stockname = jsons['stockname']
+      stockdata = jsons['stockdata']
     }else{
-      stockdata = stockdata[0]['stockdata']
       stockname = stockdata[0]['stockname']
+      stockdata = stockdata[0]['stockdata']
     }
-    // console.log(`nowPage,抓取資料1,${date_start,date_end}}`)
+    // console.log(`nowPage,stockname,${ stockname }`)
     //抓取收盤資料
     stockdata = date.map(date=>{
       let value = JSON.parse(stockdata).find(obj=>obj.date==date)
@@ -54,12 +57,12 @@ async function nowPage({stocks,date_start,date_end}) {
     // console.log(`stockdata2`,stockdata)
     //組圖表
     const obj = {}
-    obj.name = `${stockname}(${stockno})`
+    obj.name = `${stockname}{${stockno})`
     obj.type = 'line'
     obj.data = stockdata
     data.push(obj)
   }
-  // console.log(`nowPage,data,${JSON.stringify(data)},date,${date}`)
+  // console.log(`nowPage,data,${JSON.stringify(data)}`)
   // res.json({ result:'true',data: {data:data,date:date} })
   return {
     data: data,
