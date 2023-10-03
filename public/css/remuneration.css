@@ -5,9 +5,6 @@
   font-size: 24px;
   font-weight: bold;
 }
-.remuneration .publicGrid3{
-  align-items: end;
-}
 .remuneration .publicBox{
   min-height: calc(100vh - 100px - 77px - 35px - 12px - 155px - 24px);
   display: flex;
@@ -42,6 +39,7 @@
 .publicForm .items{
   display: flex;
   gap: 20px;
+  align-items: end;
 }
 .publicForm .item{
   margin-bottom: 8px;
