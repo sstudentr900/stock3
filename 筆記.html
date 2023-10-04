@@ -119,7 +119,6 @@
     </ul>
     <hr> -->
 
-
     <h2>JavaScript 陣列函數</h2>
     <pre class="prettyprint">
       <xmp></xmp>
@@ -131,7 +130,6 @@
       </li>
     </ul>
     <hr>
-
 
     <h2>JavaScript object values null</h2>
     <pre class="prettyprint">
@@ -164,7 +162,6 @@
     </ul>
     <hr>
 
-
     <h2>JavaScript Remove object values </h2>
     <pre class="prettyprint">
       <xmp>
@@ -180,6 +177,42 @@
     </pre>
     <hr>
 
+
+    <h2>echarts 圖表</h2>
+    <h3>ECharts关于y轴刻度调整</h3>
+    <p></p>
+    <pre class="prettyprint">
+      <xmp>
+        1.
+        min:0,  //取0为最小刻度
+        max: 100, //取100为最大刻度
+
+        2.
+        min:'dataMin', //取最小值为最小刻度
+        max: 'dataMax', //取最大值为最大刻度
+
+        3.
+        min: function(value) {//取最小值向下取整为最小刻度
+            return Math.floor(value.min)
+        },
+        max: function(value) {//取最大值向上取整为最大刻度
+            return  Math.ceil(value.max) 
+        },
+
+        4.
+        scale: true, //自适应
+        minInterval: 0.1, //分割刻度
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://www.jianshu.com/p/34351adb4fc0">ECharts关于y轴刻度调整</a>
+      </li>
+      <li>
+        <a href="https://echarts.apache.org/zh/option.html#dataZoom-slider">echarts 中文</a>
+      </li>
+    </ul>
 
 
     <h2>同時運行Node.js服務器和Apache服務器</h2>
@@ -236,7 +269,7 @@
     <hr>
 
 
-    <h2>yahoo-finance 抓取股票</h2>
+    <h2>npm yahoo-finance 抓取股票</h2>
     <h3>1.安裝</h3>
     <pre class="prettyprint">
       <xmp>
@@ -251,23 +284,8 @@
     </ul>
     <hr>
 
-    <h2>echarts 圖</h2>
-    <!-- <h3>1.安裝</h3>
-    <pre class="prettyprint">
-      <xmp>
-        npm install --save yahoo-finance
-      </xmp>
-    </pre> -->
-    <h4>參考</h4>
-    <ul>
-      <li>
-        <a href="https://echarts.apache.org/examples/zh/index.html#chart-type-map">echarts</a>
-      </li>
-    </ul>
-    <hr>
 
-
-    <h2>Express</h2>
+    <h2>npm Express</h2>
     <p>Express前後端網頁框架</p>
     <h3>1.安裝</h3>
     <pre class="prettyprint">
@@ -300,7 +318,7 @@
     <hr>
 
 
-    <h2>EJS</h2>
+    <h2>npm EJS</h2>
     <p>是一個簡易的模板語法</p>
     <h3>安裝</h3>
     <pre class="prettyprint">
@@ -357,7 +375,7 @@
     </ul>
     <hr>
 
-    <h2>cron 排程任務的工具 </h2>
+    <h2>npm cron 排程任務的工具 </h2>
     <h3>安裝</h3>
     <pre class="prettyprint">
       <xmp>
@@ -427,22 +445,7 @@
     <hr>
 
 
-    <h2>圖表</h2>
-    <h3></h3>
-    <p></p>
-    <pre class="prettyprint">
-      <xmp>
-      </xmp>
-    </pre>
-    <h4>參考</h4>
-    <ul>
-      <li>
-        <a href="https://www.npmjs.com/package/echarts">Apache ECharts</a>
-      </li>
-    </ul>
-    <hr>
-
-    <h2>mysql</h2>
+    <h2>npm mysql</h2>
     <h3>sql datetime to node.js</h3>
     <p>sql時間轉換</p>
     <pre class="prettyprint">
@@ -481,5 +484,13 @@
       </li>
     </ul>
     <hr>
+
+
+
+    <h2>未實現</h2>
+    <p>股票回測</p>
+    <p>KD圖表</p>
+    <p>融資圖表</p>
+    <p>圖表標買進線</p>
   </body>
 </html>

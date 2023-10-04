@@ -31,7 +31,6 @@ window.onload=async function(){
     vix_chart.resize();
     greedy_chart.resize();
   });
-  // 指定图表的配置项和数据
   let color = {
     up: '#c40f0fd3',
     down: '#058296',
@@ -126,19 +125,17 @@ window.onload=async function(){
       },
     }],
     dataZoom: [
-    {
-      type: 'inside',
-      xAxisIndex: [0, 1],
-      start: 0,
-      end: 100
-    },
-    {
-      type: 'slider',
-      handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-      xAxisIndex: [0, 1],
-      start: 0,
-      end: 100
-    }],
+      {
+        type: 'slider',
+        // handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        xAxisIndex: [0, 1],//控制第一二窗口
+        start: 80,//0-100 左從哪邊開始
+        end: 100,//結束
+        showDetail: false,//顯示日期
+        // zoomLock: true,//不能縮放,只能平移
+        brushSelect: false,//關閉內選 刷選
+      }
+    ],
     series: [{
       name: '日K線',
       type: 'candlestick',
@@ -200,7 +197,7 @@ window.onload=async function(){
   };
   const threecargo_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -213,7 +210,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -231,13 +228,13 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
-        // min: 26,
         position: 'right',
+        scale: true, //顯示最大
       },
       {
         type: 'value',
-        // min: 3000,
         position: 'left',
+        scale: true, //顯示最大
         splitLine: {
           show: false, //分線關閉
         },
@@ -271,7 +268,7 @@ window.onload=async function(){
   };
   const threefutures_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -284,7 +281,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -302,13 +299,13 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
-        // min: 26,
         position: 'right',
+        scale: true, //顯示最大
       },
       {
         type: 'value',
-        // min: 3000,
         position: 'left',
+        scale: true, //顯示最大
         splitLine: {
           show: false, //分線關閉
         },
@@ -342,7 +339,7 @@ window.onload=async function(){
   };
   const updownnumber_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -355,7 +352,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -373,13 +370,13 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
-        // min: 26,
         position: 'right',
+        scale: true, //顯示最大
       },
       {
         type: 'value',
-        // min: 3000,
         position: 'left',
+        scale: true, //顯示最大
         splitLine: {
           show: false, //分線關閉
         },
@@ -413,7 +410,7 @@ window.onload=async function(){
   };
   const prosperity_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -426,7 +423,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -447,25 +444,15 @@ window.onload=async function(){
         // name: '景氣燈號',
         min: 3,
         position: 'right',
-        splitLine: {
-          lineStyle: {
-            // opacity: 0.2,
-          }
-        },
+        scale: true, //顯示最大
       },
       {
         type: 'value',
-        // name: '大盤指數',
-        min: 3000,
-        // max: 25,
+        scale: true, //顯示最大
         position: 'left',
-        // scale: true //放大
         splitLine: {
           show: false, //分線關閉
         },
-        // axisLabel: {
-        //   formatter: '{value} °C'
-        // }
       }
     ],
     series: [
@@ -496,7 +483,7 @@ window.onload=async function(){
   };
   const dollars_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -509,7 +496,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -530,17 +517,12 @@ window.onload=async function(){
         // name: '美金',
         min: 26,
         position: 'right',
-        splitLine: {
-          lineStyle: {
-            // opacity: 0.2,
-          }
-        },
+        scale: true, //顯示最大
       },
       {
         type: 'value',
         // name: '大盤指數',
-        min: 3000,
-        // max: 25,
+        scale: true, //顯示最大
         position: 'left',
         splitLine: {
           show: false, //分線關閉
@@ -580,7 +562,7 @@ window.onload=async function(){
   };
   const vix_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -593,7 +575,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -611,20 +593,12 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
-        // name: '美金',
-        // min: 26,
         position: 'right',
-        splitLine: {
-          lineStyle: {
-            // opacity: 0.2,
-          }
-        },
+        scale: true, //顯示最大
       },
       {
         type: 'value',
-        // name: '大盤指數',
-        min: 3000,
-        // max: 25,
+        scale: true, //顯示最大
         position: 'left',
         splitLine: {
           show: false, //分線關閉
@@ -664,7 +638,7 @@ window.onload=async function(){
   };
   const greedy_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -677,7 +651,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -695,11 +669,12 @@ window.onload=async function(){
     yAxis: [
       {
         type: 'value',
+        scale: true, //顯示最大
         position: 'right',
       },
       {
         type: 'value',
-        min: 3000,
+        scale: true, //顯示最大
         position: 'left',
         splitLine: {
           show: false, //分線關閉

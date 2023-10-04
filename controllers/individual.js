@@ -28,7 +28,8 @@ async function nowPage({row}) {
   data['stockname'] = row['stockname'];
   // //stockdata 
   data['stockdata'] = row['stockdata']?JSON.parse(row['stockdata']):'';
-  const stockdataLess = data['stockdata'].slice(-132)
+  // const stockdataLess = data['stockdata'].slice(-132)
+  const stockdataLess = data['stockdata']
   data['stock_date'] = stockdataLess.map(item=>item.date)
   data['stock_price'] = stockdataLess.map(item=>[item.open,item.close,item.low,item.high])
   data['stock_vol'] = stockdataLess.map(item=>item.volume)
@@ -76,8 +77,15 @@ async function nowPage({row}) {
   data['holder_data'] = getAccumulate({ obj:data['holder_data'] })
   //股東持股分級_加權指數
   data['holder_market'] = holder.map(({date})=>{
-    const obj = data['stockdata'].find(item=>item.date == date)
-    return obj?Number(obj.close):0
+    // const obj = data['stockdata'].find(item=>item.date == date)
+    // return obj?Number(obj.close):0
+    let number = 0
+    const obj = data['stockdata'].find((obj,index)=>{
+      number = index;
+      return date==obj.date
+    })
+    // console.log(obj)
+    return obj?Number(obj.close):Number(data['stockdata'][number].close)
   })
   //今年每月報酬
   // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);

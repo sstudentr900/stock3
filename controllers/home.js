@@ -86,40 +86,6 @@ async function search(req, res) {
     row['holder'] = getSort({obj:row['holder'],number:20})
     //羊群增減
     row['retail'] = getSort({obj:row['retail'],number:20})
-    //景氣對策信號
-    if(row['prosperity']){
-      const prosperity =  JSON.parse(row['prosperity']).slice(-60)
-      //日期
-      row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
-      //景氣對策信號
-      row['prosperity_data'] = prosperity.map(({point})=>point)
-      //景氣對策信號_加權指數
-      row['prosperity_market'] = prosperity.map(({date})=>{
-        const obj = data.find(obj=>{
-          return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
-        })
-        return obj?Number(obj.close):0
-      })
-    }
-    //美金
-    if(row['dollars']){
-      const dollars = getMonthly({ year:'2018',json:JSON.parse(row['dollars']) })
-      //日期
-      row['dollars_date'] = dollars.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
-      //美金資料
-      row['dollars_data'] = dollars.map(({dollars})=>Number(dollars))
-      //美金_加權指數
-      row['dollars_market'] = dollars.map(({date})=>{
-        // const obj = data.find(obj=>date==obj.date)
-        // return obj?Number(obj.close):0
-        let number = 0
-        const obj = data.find((obj,index)=>{
-          number = index;
-          return date==obj.date
-        })
-        return obj?Number(obj.close):Number(data[number].close)
-      })
-    }
     //恐慌指數
     if(row['vix']){
       const vix = JSON.parse(row['vix'])
@@ -159,6 +125,43 @@ async function search(req, res) {
         return obj?Number(obj.close):Number(data[number].close)
       })
       delete row.greedy
+    }
+    //景氣對策信號
+    if(row['prosperity']){
+      const prosperity =  JSON.parse(row['prosperity']).slice(-100)
+      //日期
+      // row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
+      row['prosperity_date'] = prosperity.map(({date})=>date)
+      //景氣對策信號
+      row['prosperity_data'] = prosperity.map(({point})=>point)
+      //景氣對策信號_加權指數
+      row['prosperity_market'] = prosperity.map(({date})=>{
+        const obj = data.find(obj=>{
+          return (date.split('-')[0]+'-'+date.split('-')[1])==(obj.date.split('-')[0]+'-'+obj.date.split('-')[1])
+        })
+        return obj?Number(obj.close):0
+      })
+    }
+    //美金
+    if(row['dollars']){
+      // const dollars = getMonthly({ year:'2018',json:JSON.parse(row['dollars']) })
+      const dollars = JSON.parse(row['dollars']) 
+      //日期
+      // row['dollars_date'] = dollars.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
+      row['dollars_date'] = dollars.map(({date})=>date)
+      //美金資料
+      row['dollars_data'] = dollars.map(({dollars})=>Number(dollars))
+      //美金_加權指數
+      row['dollars_market'] = dollars.map(({date})=>{
+        // const obj = data.find(obj=>date==obj.date)
+        // return obj?Number(obj.close):0
+        let number = 0
+        const obj = data.find((obj,index)=>{
+          number = index;
+          return date==obj.date
+        })
+        return obj?Number(obj.close):Number(data[number].close)
+      })
     }
 
 

@@ -71,7 +71,7 @@ async function nowPage({stocks,date_start,date_end}) {
 }
 async function search(req, res) {
   // console.log(`---------查詢股票---------`)
-  const stocks = ['00692','0056','00713','00731','00878','00728']
+  const stocks = ['00850','00713','00878']
   const date_start = getNowTimeObj({year:'-3'})['date']
   const date_end = getNowTimeObj()['date']
   // const stocks = ['0050']

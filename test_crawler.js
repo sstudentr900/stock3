@@ -4,19 +4,19 @@ const { stockCrawler,stockCrawler_market,sleep } = require("./plugin/stockCrawle
 //爬蟲股票
 async function crawlerStock(){
   //個股
-  const rows = await dbQuery( 'SELECT * from stock' )
-  if(!rows){console.log(`crawlerStock失敗跳出`)}
-  for (const [index, row] of rows.entries()) {
-  // for (const row of rows) {
-    //跑股票
-    await stockCrawler(row)
+  // const rows = await dbQuery( 'SELECT * from stock' )
+  // if(!rows){console.log(`crawlerStock失敗跳出`)}
+  // for (const [index, row] of rows.entries()) {
+  // // for (const row of rows) {
+  //   //跑股票
+  //   await stockCrawler(row)
     
-    //只抓2筆
-    // if(index>=1){break;}
+  //   //只抓2筆
+  //   // if(index>=1){break;}
 
-    //等
-    await sleep(20000)
-  }
+  //   //等
+  //   await sleep(20000)
+  // }
 
   // market 大盤
   const rows2 = await dbQuery( 'SELECT * from market where id=1' )

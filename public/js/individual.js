@@ -111,19 +111,17 @@ window.onload=async function(){
       },
     }],
     dataZoom: [
-    {
-      type: 'inside',
-      xAxisIndex: [0, 1],
-      start: 0,
-      end: 100
-    },
-    {
-      type: 'slider',
-      handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-      xAxisIndex: [0, 1],
-      start: 0,
-      end: 100
-    }],
+      {
+        type: 'slider',
+        // handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        xAxisIndex: [0, 1],//控制第一二窗口
+        start: 98,//0-100 左從哪邊開始
+        end: 100,//結束
+        showDetail: false,//顯示日期
+        // zoomLock: true,//不能縮放,只能平移
+        brushSelect: false,//關閉內選 刷選
+      }
+    ],
     series: [{
       name: '日K線',
       type: 'candlestick',
@@ -185,7 +183,7 @@ window.onload=async function(){
   };
   const threecargo_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -198,7 +196,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -217,10 +215,12 @@ window.onload=async function(){
       {
         type: 'value',
         position: 'right',
+        scale: true, //顯示最大
       },
       {
         type: 'value',
         position: 'left',
+        scale: true, //顯示最大
         splitLine: {
           show: false, //分線關閉
         },
@@ -243,18 +243,18 @@ window.onload=async function(){
         yAxisIndex: 1,
         data: pageJson['threecargo_market'],
         lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          color: '#058296', //線颜色
+          width: 3,      //線寬
         },
         itemStyle: {
-          opacity: 0, //點隱蔽
+          opacity: 0, //點
         }
       }
     ]
   };
   const financing_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -267,7 +267,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -286,10 +286,12 @@ window.onload=async function(){
       {
         type: 'value',
         position: 'right',
+        scale: true, //顯示最大
       },
       {
         type: 'value',
         position: 'left',
+        scale: true, //顯示最大
         splitLine: {
           show: false, //分線關閉
         },
@@ -312,18 +314,18 @@ window.onload=async function(){
         yAxisIndex: 1,
         data: pageJson['financing_market'],
         lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          color: '#058296', //線颜色
+          width: 3,      //線寬
         },
         itemStyle: {
-          opacity: 0, //點隱蔽
+          opacity: 0, //點
         }
       }
     ]
   };
   const holder_chart_option = {
     title: {
-      show: false // 隐藏标题
+      show: false //標題
     },
     grid: {
       left: 50, //畫面編距
@@ -336,7 +338,7 @@ window.onload=async function(){
       axisPointer: { type: 'cross' }
     },
     legend: {
-      show: false // 隐藏图例
+      show: false //圖例
     },
     xAxis: [
       {
@@ -355,14 +357,16 @@ window.onload=async function(){
       {
         type: 'value',
         position: 'right',
+        scale: true, //顯示最大
       },
-      // {
-      //   type: 'value',
-      //   position: 'left',
-      //   splitLine: {
-      //     show: false, //分線關閉
-      //   },
-      // }
+      {
+        type: 'value',
+        position: 'left',
+        scale: true, //顯示最大
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
     ],
     series: [
       {
@@ -374,20 +378,20 @@ window.onload=async function(){
           color: '#a3b3b5', // 柱子颜色
         }
       },
-      // {
-      //   name: pageJson['stockno'],
-      //   type: 'line',
-      //   smooth: true,
-      //   yAxisIndex: 1,
-      //   data: pageJson['holder_market'],
-      //   lineStyle: {
-      //     color: '#058296', // 线条颜色
-      //     width: 3,      // 线条宽度
-      //   },
-      //   itemStyle: {
-      //     opacity: 0, //點隱蔽
-      //   }
-      // }
+      {
+        name: pageJson['stockno'],
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['holder_market'],
+        lineStyle: {
+          color: '#058296', //線颜色
+          width: 3,      //線寬
+        },
+        itemStyle: {
+          opacity: 0, //點
+        }
+      }
     ]
   };
   line_chart.setOption(line_chart_option);
