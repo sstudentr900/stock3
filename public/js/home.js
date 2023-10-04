@@ -129,7 +129,7 @@ window.onload=async function(){
         type: 'slider',
         // handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
         xAxisIndex: [0, 1],//控制第一二窗口
-        start: 80,//0-100 左從哪邊開始
+        start: 95,//0-100 左從哪邊開始
         end: 100,//結束
         showDetail: false,//顯示日期
         // zoomLock: true,//不能縮放,只能平移
@@ -242,6 +242,19 @@ window.onload=async function(){
     ],
     series: [
       {
+        name: '融資',
+        type: 'line',
+        yAxisIndex: 0,
+        data: pageJson['threecargo_data_financing'],
+        lineStyle: {
+          color: '#56934f', 
+          width: 3,      //線寬
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      },
+      {
         name: '合計累加',
         type: 'bar',
         yAxisIndex: 0,
@@ -258,7 +271,7 @@ window.onload=async function(){
         data: pageJson['threecargo_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
@@ -329,7 +342,7 @@ window.onload=async function(){
         data: pageJson['threefutures_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
@@ -400,7 +413,7 @@ window.onload=async function(){
         data: pageJson['updownnumber_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
@@ -457,6 +470,41 @@ window.onload=async function(){
     ],
     series: [
       {
+        type:"line",
+        markLine:{   //警戒線
+          data:[ 
+            {
+              yAxis: 36,
+              lineStyle:{color:'#F95F53'},
+              label:{
+                // show: false,
+                color:'#F95F53',
+                fontSize:10,
+              }
+            },
+            {
+              yAxis: 16,
+              lineStyle:{color:'#F95F53'},
+              // lineStyle:{color:'#E28909'},
+              label:{
+                // show: false,
+                // color:'#E28909',
+                color:'#F95F53',
+                fontSize:10,
+              }
+            },
+          ],
+          silent: true, //鼠標移入線變粗
+          symbol:false,
+          //警戒線 颜色，宽度，類型
+          lineStyle:{ 
+            color:'red',
+            type:'dashed',//虚線
+            width: 1
+          },
+        }
+      },
+      {
         name: '景氣燈號',
         type: 'bar',
         yAxisIndex: 0,
@@ -473,7 +521,7 @@ window.onload=async function(){
         data: pageJson['prosperity_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
@@ -552,7 +600,7 @@ window.onload=async function(){
         data: pageJson['dollars_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
@@ -628,7 +676,7 @@ window.onload=async function(){
         data: pageJson['vix_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
@@ -704,13 +752,49 @@ window.onload=async function(){
         data: pageJson['greedy_market'],
         lineStyle: {
           color: '#058296', // 线条颜色
-          width: 3,      // 线条宽度
+          width: 3,      //線寬
         },
         itemStyle: {
           opacity: 0, //點隱蔽
         }
-      }
-    ]
+      },
+      {
+        type:"line",
+        markLine:{   //警戒線
+          data:[ 
+            {
+              yAxis: 75,
+              lineStyle:{color:'#F95F53'},
+              label:{
+                // show: false,
+                color:'#F95F53',
+                fontSize:10,
+                // formatter:(e)=>{returne.value}   //警戒線值 
+              }
+            },
+            {
+              yAxis: 25,
+              lineStyle:{color:'#F95F53'},
+              // lineStyle:{color:'#E28909'},
+              label:{
+                // show: false,
+                // color:'#E28909',
+                color:'#F95F53',
+                fontSize:10,
+              }
+            },
+          ],
+          silent: true, //鼠標移入線變粗
+          symbol:false,
+          //警戒線 颜色，宽度，類型
+          lineStyle:{ 
+            color:'red',
+            type:'dashed',//虚線
+            width: 1
+          },
+        }
+      },
+    ],
   };
   // 使用刚指定的配置项和数据显示图表。
   weighted_chart.setOption(weighted_chart_option);

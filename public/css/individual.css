@@ -17,6 +17,7 @@
 .individual .customTable ul.remark ol+ol{
   margin-top: 8px;
 }
+.individual #stockYieldPrice_chart,
 .individual #financing_chart,
 .individual #threecargo_chart,
 .individual #holder_chart,

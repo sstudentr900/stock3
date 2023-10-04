@@ -1,11 +1,13 @@
 window.onload=async function(){
-  // console.log(pageJson )
+  console.log(pageJson,Number(pageJson['expensivePrice']))
   if(!pageJson){
     alert('找不到資料')
     window.location = './';
     return false;
   }
   const line_chart = echarts.init(document.getElementById('line_chart'));
+  //殖利率的便宜合理昂貴價
+  // const stockYieldPrice_chart = echarts.init(document.getElementById('stockYieldPrice_chart'));
   //三大法人和融資融劵
   const threecargo_chart = echarts.init(document.getElementById('threecargo_chart'));
   const financing_chart = echarts.init(document.getElementById('financing_chart'));
@@ -181,6 +183,122 @@ window.onload=async function(){
       data: pageJson['stock_vol']
     }]
   };
+  // const stockYieldPrice_chart_option = {
+  //   title: {
+  //     show: false //標題
+  //   },
+  //   grid: {
+  //     left: 50, //畫面編距
+  //     right: 80,
+  //     top: 30,
+  //     bottom: 50
+  //   },
+  //   tooltip: {
+  //     trigger: 'axis',
+  //     axisPointer: { type: 'cross' }
+  //   },
+  //   legend: {
+  //     show: false //圖例
+  //   },
+  //   xAxis: [
+  //     {
+  //       type: 'category',
+  //       axisTick: {
+  //         // alignWithLabel: true,
+  //         show: false,//刻度
+  //       },
+  //       // axisLine: {
+  //       //   show: false,//線
+  //       // },
+  //       data: pageJson['threecargo_date']
+  //     }
+  //   ],
+  //   yAxis: [
+  //     // {
+  //     //   type: 'value',
+  //     //   position: 'right',
+  //     //   // scale: true, //顯示最大
+  //     // },
+  //     {
+  //       type: 'value',
+  //       position: 'left',
+  //       min: function(value) {
+  //         return Math.floor(value.min>pageJson['cheapPrice']?pageJson['cheapPrice']:value.min)
+  //       },
+  //       max: function(value) {
+  //         return Math.ceil(value.max>pageJson['cheapPrice']?value.max:pageJson['cheapPrice'])
+  //       },
+  //       // scale: true, //顯示最大
+  //       // splitLine: {
+  //       //   show: false, //分線關閉
+  //       // },
+  //     }
+  //   ],
+  //   series: [
+  //     {
+  //       type:"line",
+  //       // yAxisIndex: 0,
+  //       markLine:{   //警戒線
+  //         data:[ 
+  //           {
+  //             yAxis: Number(pageJson['expensivePrice']),
+  //             // yAxis: 48.76,
+  //             lineStyle:{color:'#F95F53'},
+  //             label:{
+  //               // show: false,
+  //               color:'#F95F53',
+  //               fontSize:10,
+  //             }
+  //           },
+  //           {
+  //             yAxis: Number(pageJson['fairPrice']),
+  //             // yAxis: 46,
+  //             lineStyle:{color:'#F95F53'},
+  //             label:{
+  //               // show: false,
+  //               color:'#F95F53',
+  //               fontSize:10,
+  //             }
+  //           },
+  //           {
+  //             yAxis: Number(pageJson['cheapPrice']),
+  //             // yAxis: 45,
+  //             lineStyle:{color:'#F95F53'},
+  //             // lineStyle:{color:'#E28909'},
+  //             label:{
+  //               // show: false,
+  //               // color:'#E28909',
+  //               color:'#F95F53',
+  //               fontSize:10,
+  //             }
+  //           },
+  //         ],
+  //         silent: true, //鼠標移入線變粗
+  //         symbol:false,
+  //         //警戒線 颜色，宽度，類型
+  //         lineStyle:{ 
+  //           color:'red',
+  //           type:'dashed',//虚線
+  //           width: 1
+  //         },
+  //       }
+  //     },
+  //     {
+  //       name: pageJson['stockno'],
+  //       type: 'line',
+  //       smooth: true,
+  //       // yAxisIndex: 0,
+  //       data: pageJson['threecargo_market'],
+  //       lineStyle: {
+  //         color: '#058296', //線颜色
+  //         width: 3,      //線寬
+  //       },
+  //       itemStyle: {
+  //         opacity: 0, //點
+  //       }
+  //     }
+  //   ]
+  // };
   const threecargo_chart_option = {
     title: {
       show: false //標題
@@ -394,6 +512,7 @@ window.onload=async function(){
       }
     ]
   };
+  // stockYieldPrice_chart.setOption(stockYieldPrice_chart_option);
   line_chart.setOption(line_chart_option);
   threecargo_chart.setOption(threecargo_chart_option);
   holder_chart.setOption(holder_chart_option);

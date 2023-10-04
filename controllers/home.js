@@ -13,7 +13,8 @@ async function search(req, res) {
   for (const row of rows) {
      //加權指數
     const data = JSON.parse(row['twii'])
-    const twii = data.slice(-132)
+    // const twii = data.slice(-132)
+    const twii = data
     row['twii_date'] = twii.map(item=>item.date)
     row['twii_price'] = twii.map(item=>[item.open,item.close,item.low,item.high])
     row['twii_vol'] = twii.map(item=>item.volume)
@@ -24,14 +25,16 @@ async function search(req, res) {
     row['date'] = getNowTimeObj({'date':row['updated_at']})['date']
     //上市三大法人排名
     row['ranking'] = getSort({obj:row['ranking'],number:18})
-    //3大法人買賣超融資卷
+    //3大法人_買賣超融資卷
     row['threecargofinancing'] = getSort({obj:row['threecargo'],number:10})
     const threecargo = JSON.parse(row['threecargo'])
-    //3大法人日期
+    //3大法人_日期
     row['threecargo_date'] = threecargo.map(({date})=>date)
-    //3大法人合計累加
+    //3大法人_合計累加
     row['threecargo_data'] = getAccumulate({obj:threecargo.map(({total})=>Number(total))})
     // row['threecargo_data'] = threecargo.map(({total})=>Number(total))
+    //3大法人_融資
+    row['threecargo_data_financing'] = threecargo.map(({financing})=>financing.split(',').join(''))
     //3大法人_加權指數
     row['threecargo_market'] = threecargo.map(({date})=>{
       const obj = data.find(obj=>date==obj.date)
@@ -43,8 +46,8 @@ async function search(req, res) {
     //期貨買賣超_日期
     row['threefutures_date'] = threefutures.map(({date})=>date)
     //期貨買賣超_資料
-    const threefutures_data = threefutures.map(({foreign,letter,proprietor})=>(Number(foreign)+Number(letter)+Number(proprietor)).toFixed(2))
-    row['threefutures_data'] = threefutures_data
+    row['threefutures_data'] = threefutures.map(({foreign,letter,proprietor})=>(Number(foreign)+Number(letter)+Number(proprietor)).toFixed(2))
+  
     // row['threefutures_data'] = getAccumulate({obj:threefutures_data})
     // row['threefutures_data'] = threefutures.map(({foreign})=>foreign)
     //期貨買賣超_加權指數
