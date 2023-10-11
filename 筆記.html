@@ -243,7 +243,7 @@
     <hr>
 
 
-    <h2>爬蟲 用 request + cheerio</h2>
+    <h2>爬蟲用 request + cheerio</h2>
     <h3>安裝</h3>
     <pre class="prettyprint">
       <xmp>
@@ -313,6 +313,9 @@
     <ul>
       <li>
         <a href="https://ithelp.ithome.com.tw/articles/10308430">Node.js - Express.js 介紹與起手式</a>
+      </li>
+      <li>
+        <a href="https://ithelp.ithome.com.tw/articles/10237562">參考</a>
       </li>
     </ul>
     <hr>
@@ -471,16 +474,35 @@
 
 
     <h2>Node.js-Express+MySQL</h2>
+    <p>安裝npm i mysql</p>
+    <h3></h3>
+    <pre>
+      <xmp>
+        var users = require('./routes/users');
+        // DataBase 
+        var mysql = require("mysql");
+        var con = mysql.createConnection({
+            host: "localhost",
+            user: "root",
+            password: "",
+            database: "test"
+        });
+        con.connect(function(err) {
+            if (err) {
+                console.log('connecting error');
+                return;
+            }
+            console.log('connecting success');
+        });
+      </xmp>
+    </pre>
     <h4>參考</h4>
     <ul>
       <li>
-        <a href="https://ithelp.ithome.com.tw/articles/10237562">參考</a>
+        <a href="https://dotblogs.com.tw/explooosion/2016/07/18/010601">參考</a>
       </li>
       <li>
         <a href="https://www.youtube.com/watch?v=f5kye3ESXE8&ab_channel=Raddy">參考</a>
-      </li>
-      <li>
-        <a href="https://dotblogs.com.tw/explooosion/2016/07/18/010601">參考</a>
       </li>
     </ul>
     <hr>
