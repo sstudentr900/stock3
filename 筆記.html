@@ -300,22 +300,42 @@
       <xmp>
         <!-- express 的靜態方法去找到要呈現的靜態檔案。需加上這一段 -->
         app.use(express.static('public'));
-      app.get("/", (req, res) => {
-        res.send("
-        <h1>這是 middleware 練習</h1>
-        "+ "
-        <img src="./images/book.jpg">
-        ");
-      });
+        app.get("/", (req, res) => {
+          res.send("
+          <h1>這是 middleware 練習</h1>
+          "+ "
+          <img src="./images/book.jpg">
+          ");
+        });
       </xmp>
     </pre>
     <h4>參考</h4>
     <ul>
       <li>
-        <a href="https://ithelp.ithome.com.tw/articles/10308430">Node.js - Express.js 介紹與起手式</a>
+        <a href="https://ithelp.ithome.com.tw/articles/10237562">參考</a>
       </li>
       <li>
-        <a href="https://ithelp.ithome.com.tw/articles/10237562">參考</a>
+        <a href="https://ithelp.ithome.com.tw/articles/10308430">Node.js - Express.js 介紹與起手式</a>
+      </li>
+    </ul>
+    <hr>
+
+    <h2>npm nodemon 自動刷新 </h2>
+    <p>安裝 npm i nodemon -D</p>
+    <h3>更改 package.json 的配置</h3>
+    <pre class="prettyprint">
+      <xmp>
+        "scripts": {
+          "start": "npm run build && node ./dist/index.js",
+          "start:dev": "nodemon --exec ts-node ./src/index.ts",
+          "build": "tsc"
+        }
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://ithelp.ithome.com.tw/articles/10239787">nodemon 自動刷新 </a>
       </li>
     </ul>
     <hr>
