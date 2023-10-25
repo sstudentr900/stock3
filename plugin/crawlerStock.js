@@ -3,18 +3,22 @@ const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('./db')
 const { sleep,stockCrawler,stockCrawler_market } = require("./stockCrawler");
 //爬蟲股票
 async function crawlerStock(){
- //個股
+  //個股
   const rows = await dbQuery( 'SELECT * from stock' )
   if(!rows){console.log(`crawlerStock失敗跳出`)}
-  for (const row of rows) {
+  for (const [index, row] of rows.entries()) {
+  // for (const row of rows) {
     //跑股票
-    // console.log(`----crawlerStock更新${row['stockno']}----`)
-    // const jsons = await stockCrawler(row)
-    // if(jsons){await dbUpdata('stock',jsons,row['id'])}
     await stockCrawler(row)
+    
+    //只抓2筆
+    // if(index>=1){break;}
+
+    //等
+    await sleep(20000)
   }
 
-  //market 大盤
+  // market 大盤
   const rows2 = await dbQuery( 'SELECT * from market where id=1' )
   if(!rows2){console.log(`crawlerStock_market失敗跳出`)}
   // console.log(`rows2,${JSON.stringify(rows2[0])}`)

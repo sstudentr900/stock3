@@ -1,14 +1,12 @@
 const CronJob = require('cron').CronJob;
 const { crawlerStock } = require("./crawlerStock.js"); //爬蟲股票
 new CronJob({
-  cronTime: '0 0 21 * * *',//每天早上8點執行
-  // cronTime: '* */3 * * * *',//每3分鐘執行一次
-  // cronTime: '10 * * * * *',//每分鐘的第10秒執行
-  onTick: async function () {
+  cronTime: '1 00 15 * * *',//時段(秒/分/時)
+  onTick: async function () { //執行程式
       console.log(`開始執行爬蟲排程作業： ${new Date()}`);
       await crawlerStock()
       console.log('排程作業執行完畢！');
   },
-  start: true,
-  timeZone: 'Asia/Taipei'
+  start: true, //自動
+  timeZone: 'Asia/Taipei',//時區
 });

@@ -14,9 +14,10 @@ const CronJob = require('cron').CronJob;
 //每天晚上 10點30分10秒時執行
 // 10 30 22 * * *
 
+
 //官網範例
 // const job = new CronJob(
-// 	'* * * * * *',
+// 	'* 30 9 * * *',
 // 	function() {
 // 		console.log('You will see this message every second');
 // 	},
@@ -25,14 +26,13 @@ const CronJob = require('cron').CronJob;
 // 	'Asia/Taipei'
 // );
 
-
 new CronJob({
-  cronTime: process.env.CRONJOB_TIME,//請編輯.env檔填上自己的爬蟲時段喔
-  onTick: async function () {
+  cronTime: '1 53 9 * * *',//時段(秒/分/時)
+  onTick: async function () { //執行程式
       console.log(`開始執行爬蟲排程作業： ${new Date()}`);
-      await crawler()
+      // await crawler()
       console.log('排程作業執行完畢！');
   },
-  start: true,
-  timeZone: 'Asia/Taipei'
+  start: true, //自動
+  timeZone: 'Asia/Taipei',//時區
 });
