@@ -206,6 +206,59 @@
         <a href="https://echarts.apache.org/zh/option.html#dataZoom-slider">echarts 中文</a>
       </li>
     </ul>
+    <h3>echarts tooltip(提示框)</h3>
+    <p></p>
+    <pre class="prettyprint">
+      <xmp>
+        tooltip: {
+          //'axis'：当鼠标悬停在坐标轴上的刻度线或者坐标轴标签上时触发 tooltip 显示。这可以用于显示坐标轴相关的信息。
+          trigger: 'axis',
+          // 十字准星线类型
+          axisPointer: { type: 'cross' }
+        },
+      </xmp>
+    </pre>
+    <h3>echarts style</h3>
+    <p>全局顏色順序跟series 一樣排序</p>
+    <pre class="prettyprint">
+      <xmp>
+        option = {
+          // 全局调色盘。
+          color: [
+            '#dd6b66',
+            '#759aa0',
+            '#e69d87',
+          ],
+          series: [
+          {
+            type: 'bar',
+            // 此系列自己的调色盘。
+            color: [
+              '#dd6b66',
+              '#759aa0',
+              '#e69d87',
+            ]
+            // ...
+          },
+          {
+            type: 'pie',
+            // 此系列自己的调色盘。
+            color: [
+              '#37A2DA',
+              '#32C5E9',
+              '#67E0E3',
+            ]
+            // ...
+          }
+        }
+      </xmp>
+    </pre>
+    <h4>參考</h4>
+    <ul>
+      <li>
+        <a href="https://echarts.apache.org/handbook/zh/concepts/style">echarts style</a>
+      </li>
+    </ul>
 
 
     <h2>Apache服務器運行Node.js服務器</h2>

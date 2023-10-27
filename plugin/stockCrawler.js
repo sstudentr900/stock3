@@ -1244,13 +1244,13 @@ async function stockCrawler_market({id,twii,threecargo,ranking,threefutures,exdi
   const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
   threeFutures?result.threefutures = threeFutures:'';
 
-  console.log(`抓取上市類股漲跌`)
-  const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
-  listedUpDown?result.listed = listedUpDown:'';
+  // console.log(`抓取上市類股漲跌`)
+  // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
+  // listedUpDown?result.listed = listedUpDown:'';
 
-  console.log(`抓取除息股票`)
-  const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
-  exdividendData?result.exdividend = exdividendData:'';
+  // console.log(`抓取除息股票`)
+  // const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
+  // exdividendData?result.exdividend = exdividendData:'';
 
   console.log(`抓取上下跌家數`)
   const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})

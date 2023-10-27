@@ -196,6 +196,11 @@ window.onload=async function(){
     }]
   };
   const threecargo_chart_option = {
+    color: [
+      '#56934f',
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
@@ -280,6 +285,10 @@ window.onload=async function(){
     ]
   };
   const threefutures_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
@@ -351,6 +360,10 @@ window.onload=async function(){
     ]
   };
   const updownnumber_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
@@ -362,7 +375,9 @@ window.onload=async function(){
     },
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' }
+      axisPointer: { 
+        type: 'cross',
+      }
     },
     legend: {
       show: false //圖例
@@ -403,7 +418,7 @@ window.onload=async function(){
         data: pageJson['updownnumber_data'],
         itemStyle: {
           color: '#a3b3b5', // 柱子颜色
-        }
+        },
       },
       {
         name: '大盤指數',
@@ -417,11 +432,16 @@ window.onload=async function(){
         },
         itemStyle: {
           opacity: 0, //點隱蔽
-        }
+        },
       }
     ]
   };
   const prosperity_chart_option = {
+    color: [
+      '#F95F53',
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
@@ -530,6 +550,10 @@ window.onload=async function(){
     ]
   };
   const dollars_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
@@ -609,6 +633,10 @@ window.onload=async function(){
     ]
   };
   const vix_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
@@ -685,6 +713,10 @@ window.onload=async function(){
     ]
   };
   const greedy_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+    ],
     title: {
       show: false //標題
     },
