@@ -100,7 +100,7 @@ async function nowPage({row}) {
   row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
   const yieldObj = stockYieldPrice(row['yielddata'],data['stockdata']);
   data['stockYield'] = yieldObj.stockYield;//每年殖利率
-  // data['average'] = yieldObj.average;//平均股利
+  data['average'] = yieldObj.average;//平均股利
   // data['averageYield'] =yieldObj.averageYield;//平均殖利率
   data['nowYield'] = yieldObj.nowYield;//目前殖利率
   data['cheapPrice']  = yieldObj.cheapPrice;//便宜 

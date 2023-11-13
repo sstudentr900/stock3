@@ -216,8 +216,8 @@
                 <% });} %>
                 <% if(data['nowYield']){ %>
                   <ul class="table_content">
-                    <li class='date'><p>目前殖利率</p></li>
-                    <li><p><%= data['nowYield'] %>%</p></li>
+                    <li class='date'><p>目前股利/殖利率</p></li>
+                    <li><p><%= data['average'] %> / <%= data['nowYield'] %>%</p></li>
                   </ul>
                 <% } %>
               </div>
