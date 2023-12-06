@@ -32,7 +32,7 @@ async function nowPage({row}) {
   //今年每月報酬
   data['stockPayMonth'] = stockPayMoreMonth(stockdata,3);
   //最近6年每年報酬
-  data['stockPayYear'] = await stockPayMoreYear(stockdata,6);
+  data['stockPayYear'] = await stockPayMoreYear(stockdata,8);
   //年化報酬率
   data['stockCagr'] = stockCagr(data['stockPayYear']);
   //淨值

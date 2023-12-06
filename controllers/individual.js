@@ -90,7 +90,7 @@ async function nowPage({row}) {
   //今年每月報酬
   // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
   //最近5年每年報酬
-  data['stockPayYear'] = await stockPayMoreYear(data['stockdata'],10);
+  data['stockPayYear'] = await stockPayMoreYear(data['stockdata'],5);
   //年化報酬率
   data['stockCagr'] = stockCagr(data['stockPayYear']);
   //淨值
