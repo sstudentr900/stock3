@@ -456,6 +456,7 @@ function stockKdData(stockdata,day){
 function stockKdFn(stockdata){
   console.log(`stockKdFn,跑KD`)
   // console.log(`stockKdFn,${stockdata}`)
+  // console.log(stockdata)
   if(!stockdata.length){
     console.log(`stockKdFn,沒有股票資料`)
     return {
@@ -468,6 +469,16 @@ function stockKdFn(stockdata){
   }
   //有值
   const kdDatas = stockKdData(stockdata)
+  if(!kdDatas.length){
+    console.log(`stockKdFn,沒有股票資料`)
+    return {
+      'datas': '0',
+      'last_data': '0',
+      'last_date': '0',
+      'last_d': '0',
+      'last_k': '0',
+    }
+  }
   return {
     'datas': kdDatas,
     'last_data': kdDatas[kdDatas.length-1],
