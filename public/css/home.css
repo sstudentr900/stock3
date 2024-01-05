@@ -7,9 +7,20 @@
   flex: 0 0 102px;
   text-align: right;
 }
-.home .customNav .customTable .table_title li{
-  padding: 12px 8px;
+.home .customNav  .monthlystatistics .customTable li{
+  display: flex;
+  justify-content: center;
 }
+.home .customNav  .monthlystatistics .customTable li:nth-child(2){
+  flex: 1 1;
+}
+.home .customNav  .monthlystatistics .customTable li:first-child{
+  flex: 0 0 48px;
+}
+.home .customNav  .monthlystatistics .customTable li:last-child{
+  flex: 0 0 94px;
+}
+.home .customNav .customTable .table_title li,
 .home .customNav .customTable .table_content li{
   padding: 6px 8px;
 }

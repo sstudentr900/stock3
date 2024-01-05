@@ -235,6 +235,9 @@ input:focus{
 .customTable .table_content p{
   color: #5e5e5e;
 }
+.customTable .table_content p.red{
+  color: red;
+}
 .customTable .table_content p.green{
   color: #15b303;
 }

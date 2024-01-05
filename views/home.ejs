@@ -11,14 +11,6 @@
       <div class="publicWidth">
         <div class="publicRowFlex">
           <div class="publicCol-7 customMian">
-            <div class="publicBox weighted">
-              <!-- <div class="publictitle">
-                <div class="title">
-                  <h4>加權指數</h4>
-                </div>
-              </div> -->
-              <div id="weighted_chart"></div>
-            </div>
             <% /* %>
             <!-- <div class="publicBox updownnumber">
               <div class="publictitle">
@@ -42,11 +34,64 @@
                 <% });} %>
               </div>
             </div> -->
+            <!-- <div class="publicBox updownnumber">
+              <div class="publictitle">
+                <div class="title">
+                  <h4><a href="https://agdstock.club/udc-p" target="_blank">大盤上下跌家數</a></h4>
+                  <p class="time">更新時間 : <%= data['updownnumber']?data['updownnumber'][0]['date']:'' %></p>
+                </div>
+              </div>
+              <div id="updownnumber_chart"></div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>日期</p></li>
+                  <li><p>上漲家數</p></li>
+                  <li><p>下跌家數</p></li>
+                  <li><p>合計家數</p></li>
+                  <li><p>權值上漲</p></li>
+                  <li><p>權值下跌</p></li>
+                  <li><p>註解</p></li>
+                </ul>
+                <% if(data['updownnumber']){ data['updownnumber'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li><p><%= o.date %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.uphome))<0){%>green<%}%>"><%= o.uphome %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.downhome))<0){%>green<%}%>"><%= o.downhome %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.Diffhome))<0){%>green<%}%>"><%= o.Diffhome %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.upweighted))<0){%>green<%}%>"><%= o.upweighted %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.downweighted))<0){%>green<%}%>"><%= o.downweighted %></p></li>
+                  <li><p><%= o.annotation %></p></li>
+                </ul>
+                <% });} %>
+              </div>
+            </div> -->
+            <!-- <div class="publicBox vix">
+              <div class="publictitle">
+                <div class="title">
+                  <h4><a href="https://histock.tw/index/VIX" target="_blank">恐慌指數VIX</a></h4>
+                  <ul class="item">
+                    <li>低於20 市場處於穩定</li>
+                    <li>接近20 市場可能出現波動</li>
+                    <li>20~30	市場出現波動</li>
+                    <li>高於30 市場波動增強</li>
+                  </ul>
+                </div>
+              </div>
+              <div id="vix_chart"></div>
+            </div> -->
             <% */ %>
+            <div class="publicBox weighted">
+              <!-- <div class="publictitle">
+                <div class="title">
+                  <h4>加權指數</h4>
+                </div>
+              </div> -->
+              <div id="weighted_chart"></div>
+            </div>
             <div class="publicBox threecargofinancing">
               <div class="publictitle">
                 <div class="title">
-                  <h4>三大法人買賣超</h4>
+                  <h4><a href="https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365" target="_blank">三大法人買賣超</a></h4>
                   <p class="time">更新時間 : <%= data['threecargofinancing']?data['threecargofinancing'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -77,7 +122,7 @@
             <div class="publicBox threefutures">
               <div class="publictitle">
                 <div class="title">
-                  <h4>期貨買賣超</h4>
+                  <h4><a href="https://stock.wearn.com/taifexphoto.asp" target="_blank">期貨買賣超</a></h4>
                   <p class="time">更新時間 : <%= data['threefutures']?data['threefutures'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -103,55 +148,10 @@
                 <% });} %>
               </div>
             </div>
-            <div class="publicBox updownnumber">
-              <div class="publictitle">
-                <div class="title">
-                  <h4>大盤上下跌家數</h4>
-                  <p class="time">更新時間 : <%= data['updownnumber']?data['updownnumber'][0]['date']:'' %></p>
-                </div>
-              </div>
-              <div id="updownnumber_chart"></div>
-              <div class="customTable">
-                <ul class="table_title">
-                  <li><p>日期</p></li>
-                  <li><p>上漲家數</p></li>
-                  <li><p>下跌家數</p></li>
-                  <li><p>合計家數</p></li>
-                  <li><p>權值上漲</p></li>
-                  <li><p>權值下跌</p></li>
-                  <li><p>註解</p></li>
-                </ul>
-                <% if(data['updownnumber']){ data['updownnumber'].forEach(function(o) { %>
-                <ul class="table_content">
-                  <li><p><%= o.date %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.uphome))<0){%>green<%}%>"><%= o.uphome %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.downhome))<0){%>green<%}%>"><%= o.downhome %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.Diffhome))<0){%>green<%}%>"><%= o.Diffhome %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.upweighted))<0){%>green<%}%>"><%= o.upweighted %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.downweighted))<0){%>green<%}%>"><%= o.downweighted %></p></li>
-                  <li><p><%= o.annotation %></p></li>
-                </ul>
-                <% });} %>
-              </div>
-            </div>
-            <div class="publicBox vix">
-              <div class="publictitle">
-                <div class="title">
-                  <h4>恐慌指數VIX</h4>
-                  <ul class="item">
-                    <li>低於20 市場處於穩定</li>
-                    <li>接近20 市場可能出現波動</li>
-                    <li>20~30	市場出現波動</li>
-                    <li>高於30 市場波動增強</li>
-                  </ul>
-                </div>
-              </div>
-              <div id="vix_chart"></div>
-            </div>
             <div class="publicBox greedy">
               <div class="publictitle">
                 <div class="title">
-                  <h4>貪婪指數</h4>
+                  <h4><a href="https://production.dataviz.cnn.io/index/fearandgreed/graphdata" target="_blank">貪婪指數</a></h4>
                   <ul class="item">
                     <li>極度恐懼 0-25分</li>
                     <li>恐懼 25-45分</li>
@@ -166,7 +166,7 @@
             <div class="publicBox prosperity">
               <div class="publictitle">
                 <div class="title">
-                  <h4>景氣對策信號</h4>
+                  <h4><a href="https://index.ndc.gov.tw/n/zh_tw/data/eco/indicators_table1" target="_blank">景氣對策信號</a></h4>
                   <ul class="item">
                     <li>低迷 0-16分</li>
                     <li>穩定 23-31分</li>
@@ -180,7 +180,7 @@
             <div class="publicBox dollars">
               <div class="publictitle">
                 <div class="title">
-                  <h4>美元匯率</h4>
+                  <h4><a href="https://www.taifex.com.tw/cht/3/dailyFXRate" target="_blank">美元匯率</a></h4>
                 </div>
               </div>
               <div id="dollars_chart"></div>
@@ -212,7 +212,7 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
-                  <h4>上市法人買賣排名</h4>
+                  <h4><a href="https://agdstock.club/slgpd-p" target="_blank">上市法人買賣排名</a></h4>
                   <p class="time">更新時間 : <%= data['ranking']?data['ranking'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -224,7 +224,7 @@
                 <% if(data['ranking']){ data['ranking'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}else{%>red<%} %>"><%= o.number %></p></li>
                 </ul>
                 <% });}%>
               </div>
@@ -232,7 +232,7 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
-                  <h4>大股東持股增減</h4>
+                  <h4><a href="https://agdstock.club/udc-p" target="_blank">大股東持股增減</a></h4>
                   <p class="time">更新時間 : <%= data['holder']?data['holder'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -244,7 +244,7 @@
                 <% if(data['holder']){ data['holder'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}else{%>red<%} %>"><%= o.number %></p></li>
                 </ul>
                 <% });}%>
               </div>
@@ -252,7 +252,7 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
-                  <h4>散戶持股增減</h4>
+                  <h4><a href="https://agdstock.club/flock-p" target="_blank">散戶持股增減</a></h4>
                   <p class="time">更新時間 : <%= data['retail']?data['retail'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -264,7 +264,29 @@
                 <% if(data['retail']){ data['retail'].forEach(function(o) { %>
                 <ul class="table_content" data-date="<%= o.date %>">
                   <li><p class="publicEllipsis1"><%= o.name %></p></li>
-                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}%>"><%= o.number %></p></li>
+                  <li><p class="<% if(Math.sign(parseInt(o.number))<0){%>green<%}else{%>red<%} %>"><%= o.number %></p></li>
+                </ul>
+                <% });} %>
+              </div>
+            </div>
+            <div class="publicBox monthlystatistics">
+              <div class="publictitle">
+                <div class="title">
+                  <h4><a href="https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8" target="_blank">加權月統計</a></h4>
+                  <p class="time">更新時間 : </p>
+                </div>
+              </div>
+              <div class="customTable">
+                <ul class="table_title">
+                  <li><p>月份</p></li>
+                  <li><p>總數/漲數/跌數</p></li>
+                  <li><p>統計結果</p></li>
+                </ul>
+                <% if(data['monthlystatistics']){ data['monthlystatistics'].forEach(function(o) { %>
+                <ul class="table_content">
+                  <li><p><%= ('0'+(o.date)).slice(-2) %></p></li>
+                  <li><p><%= ('0'+(o.years)).slice(-2) %></p>/<p class="red"><%= ('0'+(o.rises)).slice(-2) %></p>/<p class="green"><%= ('0'+(o.drops)).slice(-2) %></p></li>
+                  <li><p class="<% if(o.statistics.indexOf('跌')>=0){%>green<%}else{%>red<%} %>"><%= o.statistics %></p></li>
                 </ul>
                 <% });} %>
               </div>

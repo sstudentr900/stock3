@@ -8,7 +8,7 @@ const {
 } = require("../plugin/stockFn");
 async function search(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
-
+  console.log(rows[0]['monthlystatistics'])
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
      //加權指數
@@ -40,6 +40,9 @@ async function search(req, res) {
       const obj = data.find(obj=>date==obj.date)
       return obj?Number(obj.close):0
     })
+    //月統計
+    row['monthlystatistics'] = JSON.parse(row['monthlystatistics'])
+
     //期貨買賣超
     const threefutures = JSON.parse(row['threefutures'])
     row['threefutures'] = getSort({obj:row['threefutures'],number:10})
@@ -47,7 +50,6 @@ async function search(req, res) {
     row['threefutures_date'] = threefutures.map(({date})=>date)
     //期貨買賣超_資料
     row['threefutures_data'] = threefutures.map(({foreign,letter,proprietor})=>(Number(foreign)+Number(letter)+Number(proprietor)).toFixed(2))
-  
     // row['threefutures_data'] = getAccumulate({obj:threefutures_data})
     // row['threefutures_data'] = threefutures.map(({foreign})=>foreign)
     //期貨買賣超_加權指數
@@ -59,58 +61,10 @@ async function search(req, res) {
       })
       return obj?Number(obj.close):Number(data[number].close)
     })
-    //上下跌家數
-    const updownnumber = JSON.parse(row['updownnumber'])
-    row['updownnumber'] = getSort({obj:row['updownnumber'],number:10})
-    //上下跌家數_日期
-    row['updownnumber_date'] = updownnumber.map(({date})=>date)
-    //上下跌家數_資料
-    row['updownnumber_data'] = updownnumber.map(({Diffhome})=>Number(Diffhome))
-    //上下跌家數__加權指數
-    row['updownnumber_market'] = updownnumber.map(({date})=>{
-      let number = 0
-      const obj = data.find((obj,index)=>{
-        number = index;
-        return date==obj.date
-      })
-      return obj?Number(obj.close):Number(data[number].close)
-    })
-    //上市類股漲跌
-    row['listed'] = getSort({obj:row['listed'],number:54})
-    //除息股票
-    row['exdividend'] = getSort({obj:row['exdividend'],number:54}).filter((item,index)=>{
-      console.log()
-      const date = item.ex_date.split('/').join('-')
-      if(date>=getNowTimeObj()['date']){
-        return item;
-      }
-    })
     //大股東增減
     row['holder'] = getSort({obj:row['holder'],number:20})
     //羊群增減
     row['retail'] = getSort({obj:row['retail'],number:20})
-    //恐慌指數
-    if(row['vix']){
-      const vix = JSON.parse(row['vix'])
-      //恐慌指數日期
-      row['vix_date'] = vix.map(({date})=>date)
-      //恐慌指數資料
-      row['vix_data'] = vix.map(({number})=>Number(number))
-      //恐慌指數_加權指數
-      // row['vix_market'] = vix.map(({date})=>{
-      //   const obj = data.find(obj=>date==obj.date)
-      //   return obj?Number(obj.close):0
-      // })
-      row['vix_market'] = vix.map(({date})=>{
-        let number = 0
-        const obj = data.find((obj,index)=>{
-          number = index;
-          return date==obj.date
-        })
-        return obj?Number(obj.close):Number(data[number].close)
-      })
-      delete row.vix
-    }
     //貪婪指數
     if(row['greedy']){
       const greedy = JSON.parse(row['greedy'])
@@ -166,10 +120,62 @@ async function search(req, res) {
         return obj?Number(obj.close):Number(data[number].close)
       })
     }
+    // //上下跌家數
+    // const updownnumber = JSON.parse(row['updownnumber'])
+    // row['updownnumber'] = getSort({obj:row['updownnumber'],number:10})
+    // //上下跌家數_日期
+    // row['updownnumber_date'] = updownnumber.map(({date})=>date)
+    // //上下跌家數_資料
+    // row['updownnumber_data'] = updownnumber.map(({Diffhome})=>Number(Diffhome))
+    // //上下跌家數__加權指數
+    // row['updownnumber_market'] = updownnumber.map(({date})=>{
+    //   let number = 0
+    //   const obj = data.find((obj,index)=>{
+    //     number = index;
+    //     return date==obj.date
+    //   })
+    //   return obj?Number(obj.close):Number(data[number].close)
+    // })
+    // //上市類股漲跌
+    // row['listed'] = getSort({obj:row['listed'],number:54})
+    // //除息股票
+    // row['exdividend'] = getSort({obj:row['exdividend'],number:54}).filter((item,index)=>{
+    //   console.log()
+    //   const date = item.ex_date.split('/').join('-')
+    //   if(date>=getNowTimeObj()['date']){
+    //     return item;
+    //   }
+    // })
+    // //恐慌指數
+    // if(row['vix']){
+    //   const vix = JSON.parse(row['vix'])
+    //   //恐慌指數日期
+    //   row['vix_date'] = vix.map(({date})=>date)
+    //   //恐慌指數資料
+    //   row['vix_data'] = vix.map(({number})=>Number(number))
+    //   //恐慌指數_加權指數
+    //   // row['vix_market'] = vix.map(({date})=>{
+    //   //   const obj = data.find(obj=>date==obj.date)
+    //   //   return obj?Number(obj.close):0
+    //   // })
+    //   row['vix_market'] = vix.map(({date})=>{
+    //     let number = 0
+    //     const obj = data.find((obj,index)=>{
+    //       number = index;
+    //       return date==obj.date
+    //     })
+    //     return obj?Number(obj.close):Number(data[number].close)
+    //   })
+    //   delete row.vix
+    // }
+    
 
 
     //移除不需要的值和值沒有轉JSON.parse
-    // delete row.ranking
+    delete row.vix
+    delete row.updownnumber
+    delete row.listed
+    delete row.exdividend
     delete row.threecargo
     delete row.prosperity
     delete row.dollars

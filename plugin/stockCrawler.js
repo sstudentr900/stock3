@@ -120,6 +120,52 @@ async function stockGetThreeCargo({dataDate}){
     return false
   })
 }
+async function stockGetMonthlystatistics({dataDate}){
+  console.log(`stockGetMonthlystatistics,月統計,https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
+  await sleep(20000)
+  return await stockPromise({
+    url: `https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  })
+  .then(body=>{
+    const json = []
+    const $ = cheerio.load(body);
+    const trs = $("div.r0_10.box_shadow").eq(0).find("table tr[align='center']");
+    // console.log(trs.text())
+    for (let i = 0; i < trs.length; i++) {
+      const td = trs.eq(i).find('td');
+      //1月份
+      const obj = {}
+      // console.log(td.eq(0).text())
+      obj['date'] = td.eq(0).text()
+      obj['years'] = td.eq(1).text();//年數
+      obj['rises'] = td.eq(2).text();//上漲次數
+      obj['drops'] = td.eq(3).text();//下跌次數
+      obj['statistics'] = td.eq(7).text();// 統計
+      json.push(obj)
+      //7月份
+      const obj2 = {}
+      obj2['date'] = td.eq(8).text()
+      obj2['years'] = td.eq(9).text();//年數
+      obj2['rises'] = td.eq(10).text();//上漲次數
+      obj2['drops'] = td.eq(11).text();//下跌次數
+      obj2['statistics'] = td.eq(15).text();// 統計
+      json.push(obj2)
+  
+    }
+    //排序小到大
+    json.sort((o1,o2)=>Number(o1['date'])-Number(o2['date']))
+    // console.log(json)
+    return json
+  })
+  .catch((error)=>{
+    console.log(`stockGetMonthlystatistics,抓取錯誤,${error}`)
+    return false
+  })
+}
 async function stockGetListedUpDown({dataDate}){
   console.log(`stockGetListedUpDown,抓取上市類股漲跌,https://goodinfo.tw/tw/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
   await sleep(20000)
@@ -422,7 +468,7 @@ async function stockGetThreeFutures({dataDate}){
   })
 }
 async function stockGetProsperity({dataDate}){
-  console.log(`stockProsperity,景氣對策信號,https://index.ndc.gov.tw/n/json/data/eco/indicators`)
+  console.log(`stockProsperity,景氣對策信號,https://index.ndc.gov.tw/n/zh_tw/data/eco/indicators_table1`)
   // console.log(`stockGetProsperity,抓取景氣對策信號`)
   // const json = []
   // const dt = getNowTimeObj();
@@ -436,7 +482,7 @@ async function stockGetProsperity({dataDate}){
   }
   // console.log(`stockGetProsperity,time,${time},${dataDate}`)
   const options  = {
-    url: `https://index.ndc.gov.tw/n/json/data/eco/indicators`,
+    url: `https://index.ndc.gov.tw/n/zh_tw/data/eco/indicators_table1`,
     method: 'POST',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -459,7 +505,7 @@ async function stockGetProsperity({dataDate}){
     return json
   })
   .catch((error)=>{
-    console.log(`stockGetProsperity,抓取三大法人買賣錯誤,${error}`)
+    console.log(`stockGetProsperity,景氣對策信號錯誤,${error}`)
     return false
   })
 }
@@ -1223,7 +1269,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
   console.log(`stockCrawler,結束`)
 }
-async function stockCrawler_market({id,twii,threecargo,ranking,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,vix,greedy}){
+async function stockCrawler_market({id,twii,monthlystatistics,threecargo,ranking,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,vix,greedy}){
   console.log(`stockCrawler_market開始`)
   //result
   const result = {}
@@ -1244,17 +1290,9 @@ async function stockCrawler_market({id,twii,threecargo,ranking,threefutures,exdi
   const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
   threeFutures?result.threefutures = threeFutures:'';
 
-  // console.log(`抓取上市類股漲跌`)
-  // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
-  // listedUpDown?result.listed = listedUpDown:'';
-
-  // console.log(`抓取除息股票`)
-  // const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
-  // exdividendData?result.exdividend = exdividendData:'';
-
-  console.log(`抓取上下跌家數`)
-  const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
-  upDownNumber?result.updownnumber = upDownNumber:'';
+  console.log(`月統計`)
+  const monthlystatisticsValue = await stockIsGetValue({'fnName': stockGetMonthlystatistics,'stockdata':monthlystatistics})
+  monthlystatisticsValue?result.monthlystatistics = monthlystatisticsValue:'';
 
   console.log(`股東增減`)
   const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
@@ -1268,19 +1306,32 @@ async function stockCrawler_market({id,twii,threecargo,ranking,threefutures,exdi
   const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,'stockdata':prosperity})
   prosperityData?result.prosperity = prosperityData:'';
 
-  console.log(`美金`)
+  console.log(`美元`)
   const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
   dollarsData?result.dollars = dollarsData:'';
-
-  console.log(`恐慌指數`)
-  const vixData = await stockIsGetValue({'fnName': stockVix,'stockdata':vix})
-  vixData?result.vix = vixData:'';
 
   console.log(`貪婪指數`)
   const greedyData = await stockIsGetValue({'fnName': stockGreedy,'stockdata':greedy})
   greedyData?result.greedy = greedyData:'';
 
-  //判斷沒有資料跳出
+
+  // console.log(`抓取上市類股漲跌`)
+  // const listedUpDown = await stockIsGetValue({'fnName': stockGetListedUpDown,'stockdata':listed})
+  // listedUpDown?result.listed = listedUpDown:'';
+
+  // console.log(`抓取除息股票`)
+  // const exdividendData = await stockIsGetValue({'fnName': stockGetExdividend,'stockdata':exdividend})
+  // exdividendData?result.exdividend = exdividendData:'';
+
+  // console.log(`抓取上下跌家數`)
+  // const upDownNumber = await stockIsGetValue({'fnName': stockGetUpDownNumber,'stockdata':updownnumber})
+  // upDownNumber?result.updownnumber = upDownNumber:'';
+
+  // console.log(`恐慌指數`)
+  // const vixData = await stockIsGetValue({'fnName': stockVix,'stockdata':vix})
+  // vixData?result.vix = vixData:'';
+
+  console.log(`判斷沒有資料跳出`)
   if(!Object.values(result).length){
     console.log(`stockCrawler_market,沒有資料跳出`)
     // return false;

@@ -30,9 +30,9 @@ async function nowPage({row}) {
   //20日報酬
   data['stockPayTwentyDay'] = stockPay(stockdata,20);
   //今年每月報酬
-  data['stockPayMonth'] = stockPayMoreMonth(stockdata,3);
-  //最近6年每年報酬
-  data['stockPayYear'] = await stockPayMoreYear(stockdata,8);
+  data['stockPayMonth'] = stockPayMoreMonth(stockdata,6);
+  //最近10年每年報酬
+  data['stockPayYear'] = await stockPayMoreYear(stockdata,10);
   //年化報酬率
   data['stockCagr'] = stockCagr(data['stockPayYear']);
   //淨值
@@ -70,6 +70,7 @@ async function search(req, res) {
   console.log(`---------查詢股票---------`)
   const data = []
   const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at,sharpedata from stock ORDER BY sort ASC' )
+  // const rows = await dbQuery( 'SELECT id,sort,networthdata,stockname,stockno,stockdata,yielddata,updated_at,sharpedata from stock WHERE stockno="00888"' )
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
     console.log(`--stockno:${row['stockno']}--`)

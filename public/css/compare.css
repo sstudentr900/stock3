@@ -22,7 +22,7 @@
   border-bottom: 1px solid #dee2e6;
 }
 .compare .customTable ul{
-  width: calc(140px * 19);
+  width: calc(140px * 26);
 }
 .compare .customTable ul.table_content{
   cursor: move;

@@ -2,9 +2,11 @@ function getNowTimeObj(obj){
   const objDate = obj?.date
   const objDay = obj?.day
   const objYear= obj?.year
+  const objMonth= obj?.month
   const dt = objDate?new Date(objDate):new Date();
   objDay?dt.setDate(dt.getDate()+Number(objDay)):'';//加減日
-  objYear?dt.setFullYear(dt.getFullYear()+Number(objYear)):'';//加減日
+  objMonth?dt.setMonth(dt.getMonth()+Number(objMonth)):'';//加減月
+  objYear?dt.setFullYear(dt.getFullYear()+Number(objYear)):'';//加減年
   // const year = Number(dt.getFullYear());//取幾年-2022
   // let month = Number(dt.getMonth())+1;//取幾月-8
   // month = month>9?month:'0'+month//08
@@ -237,10 +239,12 @@ function stockPayOneYear(stockdata,year){
   if(!stockdata.length)return;
   console.log(`stockPayOneYear,跑${year}報酬`)
   // stockdata = JSON.parse(stockdata)
+  
   const array = stockdata.filter(({date})=>{
+    // console.log(date,date>'2024-01-01')
     return date>=`${year}-01-01` && date<=`${year}-12-31`;
   })
-  // console.log(array)
+
   if(array.length){
     const start = array[0]['close']
     const end = array.pop()['close']
@@ -258,8 +262,8 @@ function stockPayMoreYear(stockdata,number){
   let year = nowTimeObj['year'] - number + 1;
 
   //沒值
-  if(!stockdata.length){console.log('stockYieldPrice,沒有股利資料')}
-  if(!number){console.log('stockYieldPrice,沒有年數')}
+  if(!stockdata.length){console.log('stockPayMoreYear,沒有資料')}
+  if(!number){console.log('stockPayMoreYear,沒有年數')}
   if(!stockdata.length || !number){
     // let year = nowTimeObj['year'] - number;
     while (year <= nowTimeObj['year']){
@@ -289,39 +293,7 @@ function stockPayMoreYear(stockdata,number){
 }
 function stockPayMoreMonth(stockdata,number){
   console.log(`stockPayMoreMonth,跑每月報酬`)
-  const nowTimeObj = getNowTimeObj()
-  const year = nowTimeObj['year']
-  const nowMonth = Number(nowTimeObj['month'])
   const row = [];
-  let month_s = '';
-  let month_e = '';
-  number = Number(number)
-  if(nowMonth>number){
-    month_e = nowMonth
-    month_s = (nowMonth-number+1)
-    // nowMonth = 7
-    // month_s = 5
-    // XX      = 6        
-    // month_e = 7
-
-    // nowMonth = 9
-    // month_s = 7
-    // XX      = 8        
-    // month_e = 9
-  }else{
-    month_s = number-nowMonth
-    month_e = month_s+number-1
-    // nowMonth = 2
-    // month_s = 1
-    // XX      = 2        
-    // month_e = 3
-
-    // nowMonth = 1
-    // month_s = 2
-    // XX      = 3        
-    // month_e = 4
-  }
-  //沒值
   if(!stockdata.length){
     console.log('stockPayMoreMonth,沒有股票資料')
     for(let i=1;i<=number;i++){
@@ -332,27 +304,26 @@ function stockPayMoreMonth(stockdata,number){
     }
     return row;
   }
-
   //有值
-  for(let i=month_s;i<=month_e;i++){
+  number = Number(number) - 1;
+  for(let i= number;i>=0;i--){
     const obj = {}
-    const month = ('0'+i).slice(-2)
-    // console.log(`${year}-${month}-01`)
+    const timeObj = getNowTimeObj({ month: -1*(i) });
+    const year = Number(timeObj['year'])
+    const month =('0'+Number(timeObj['month'])).slice(-2)
     const dates = stockdata.filter(({date})=>{
       return date>=`${year}-${month}-01` && date<=`${year}-${month}-31`;
     })
+    // console.log('dates',dates)
     obj['month'] = month
     if(dates.length){
-      // obj['Date_s'] = date[0]['Date']
-      // obj['Date_e'] = date[date.length-1]['Date']
-      // obj['Close_s'] = date[0]['Close'].toString()
-      // obj['Close_e'] = date[date.length-1]['Close'].toString()
       obj['avenge'] = stockAvenge(dates[0]['close'],dates[dates.length-1]['close'])
     }else{
       obj['avenge'] = 0
     }
     row.push(obj)
   }
+  // console.log('row',row)
   return row;
 }
 function stockCagr(stockPayYear){
@@ -362,10 +333,14 @@ function stockCagr(stockPayYear){
   // (200%+1)^(1/10)-1 = 3^(0.1)-1 = (1.116–1)*100 = 11.6%
   // 3^(0.1)==3**(0.1) 指數運算子 js寫法
   
-  //year
-  const date = stockPayYear.filter(({avenge})=>{
-    return avenge!=0;
-  })
+  //year 移除avenge是o的
+  // console.log(`stockCagr`,stockPayYear)
+  let date = stockPayYear.filter(({avenge})=>avenge!=0)
+  // console.log(`移除avenge是o的`,date)
+  //移除第一年和最後一年
+  date.shift()
+  date.pop()
+  // console.log(`移除第一年和最後一年`,date)
   //total
   const total = date.reduce((accumulator, currentValue, currentIndex, array)=>{
     const avengeValue = currentValue.avenge*1;

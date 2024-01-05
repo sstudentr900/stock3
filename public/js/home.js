@@ -12,23 +12,23 @@ window.onload=async function(){
   //期貨買賣
   const threefutures_chart = echarts.init(document.getElementById('threefutures_chart'));
   //上下跌家數
-  const updownnumber_chart = echarts.init(document.getElementById('updownnumber_chart'));
+  // const updownnumber_chart = echarts.init(document.getElementById('updownnumber_chart'));
   //景氣
   const prosperity_chart = echarts.init(document.getElementById('prosperity_chart'));
   //美元
   const dollars_chart = echarts.init(document.getElementById('dollars_chart'));
   //恐慌指數
-  const vix_chart = echarts.init(document.getElementById('vix_chart'));
+  // const vix_chart = echarts.init(document.getElementById('vix_chart'));
   //貪婪指數
   const greedy_chart = echarts.init(document.getElementById('greedy_chart'));
   window.addEventListener('resize', function() {
     prosperity_chart.resize();
     threecargo_chart.resize();
     threefutures_chart.resize();
-    updownnumber_chart.resize();
+    // updownnumber_chart.resize();
     dollars_chart.resize();
     weighted_chart.resize();
-    vix_chart.resize();
+    // vix_chart.resize();
     greedy_chart.resize();
   });
   let color = {
@@ -359,83 +359,83 @@ window.onload=async function(){
       }
     ]
   };
-  const updownnumber_chart_option = {
-    color: [
-      '#058296',
-      '#a3b3b5',
-    ],
-    title: {
-      show: false //標題
-    },
-    grid: {
-      left: 50, //畫面編距
-      right: 50,
-      top: 30,
-      bottom: 50
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { 
-        type: 'cross',
-      }
-    },
-    legend: {
-      show: false //圖例
-    },
-    xAxis: [
-      {
-        type: 'category',
-        axisTick: {
-          // alignWithLabel: true,
-          show: false,//刻度
-        },
-        // axisLine: {
-        //   show: false,//線
-        // },
-        data: pageJson['updownnumber_date']
-      }
-    ],
-    yAxis: [
-      {
-        type: 'value',
-        position: 'right',
-        scale: true, //顯示最大
-      },
-      {
-        type: 'value',
-        position: 'left',
-        scale: true, //顯示最大
-        splitLine: {
-          show: false, //分線關閉
-        },
-      }
-    ],
-    series: [
-      {
-        name: '合計家數',
-        type: 'bar',
-        yAxisIndex: 0,
-        data: pageJson['updownnumber_data'],
-        itemStyle: {
-          color: '#a3b3b5', // 柱子颜色
-        },
-      },
-      {
-        name: '大盤指數',
-        type: 'line',
-        smooth: true,
-        yAxisIndex: 1,
-        data: pageJson['updownnumber_market'],
-        lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      //線寬
-        },
-        itemStyle: {
-          opacity: 0, //點隱蔽
-        },
-      }
-    ]
-  };
+  // const updownnumber_chart_option = {
+  //   color: [
+  //     '#058296',
+  //     '#a3b3b5',
+  //   ],
+  //   title: {
+  //     show: false //標題
+  //   },
+  //   grid: {
+  //     left: 50, //畫面編距
+  //     right: 50,
+  //     top: 30,
+  //     bottom: 50
+  //   },
+  //   tooltip: {
+  //     trigger: 'axis',
+  //     axisPointer: { 
+  //       type: 'cross',
+  //     }
+  //   },
+  //   legend: {
+  //     show: false //圖例
+  //   },
+  //   xAxis: [
+  //     {
+  //       type: 'category',
+  //       axisTick: {
+  //         // alignWithLabel: true,
+  //         show: false,//刻度
+  //       },
+  //       // axisLine: {
+  //       //   show: false,//線
+  //       // },
+  //       data: pageJson['updownnumber_date']
+  //     }
+  //   ],
+  //   yAxis: [
+  //     {
+  //       type: 'value',
+  //       position: 'right',
+  //       scale: true, //顯示最大
+  //     },
+  //     {
+  //       type: 'value',
+  //       position: 'left',
+  //       scale: true, //顯示最大
+  //       splitLine: {
+  //         show: false, //分線關閉
+  //       },
+  //     }
+  //   ],
+  //   series: [
+  //     {
+  //       name: '合計家數',
+  //       type: 'bar',
+  //       yAxisIndex: 0,
+  //       data: pageJson['updownnumber_data'],
+  //       itemStyle: {
+  //         color: '#a3b3b5', // 柱子颜色
+  //       },
+  //     },
+  //     {
+  //       name: '大盤指數',
+  //       type: 'line',
+  //       smooth: true,
+  //       yAxisIndex: 1,
+  //       data: pageJson['updownnumber_market'],
+  //       lineStyle: {
+  //         color: '#058296', // 线条颜色
+  //         width: 3,      //線寬
+  //       },
+  //       itemStyle: {
+  //         opacity: 0, //點隱蔽
+  //       },
+  //     }
+  //   ]
+  // };
   const prosperity_chart_option = {
     color: [
       '#F95F53',
@@ -632,86 +632,86 @@ window.onload=async function(){
       }
     ]
   };
-  const vix_chart_option = {
-    color: [
-      '#058296',
-      '#a3b3b5',
-    ],
-    title: {
-      show: false //標題
-    },
-    grid: {
-      left: 50, //畫面編距
-      right: 30,
-      top: 30,
-      bottom: 20
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' }
-    },
-    legend: {
-      show: false //圖例
-    },
-    xAxis: [
-      {
-        type: 'category',
-        axisTick: {
-          alignWithLabel: true,
-          show: false,//刻度
-        },
-        // axisLine: {
-        //   show: false,//線
-        // },
-        data: pageJson['vix_date']
-      }
-    ],
-    yAxis: [
-      {
-        type: 'value',
-        position: 'right',
-        scale: true, //顯示最大
-      },
-      {
-        type: 'value',
-        scale: true, //顯示最大
-        position: 'left',
-        splitLine: {
-          show: false, //分線關閉
-        },
-      }
-    ],
-    series: [
-      {
-        name: '恐慌指數',
-        type: 'bar',
-        yAxisIndex: 0,
-        data: pageJson['vix_data'],
-        itemStyle: {
-          color: '#a3b3b5', // 柱子颜色
-          // borderColor: 'green', // 柱子边框颜色
-          // borderWidth: 2, // 柱子边框宽度
-          // barBorderRadius: 5, // 柱子边框圆角
-          // shadowBlur: 10, // 阴影模糊度
-          // shadowColor: 'rgba(0, 0, 0, 0.5)' // 阴影颜色
-        }
-      },
-      {
-        name: '大盤指數',
-        type: 'line',
-        smooth: true,
-        yAxisIndex: 1,
-        data: pageJson['vix_market'],
-        lineStyle: {
-          color: '#058296', // 线条颜色
-          width: 3,      //線寬
-        },
-        itemStyle: {
-          opacity: 0, //點隱蔽
-        }
-      }
-    ]
-  };
+  // const vix_chart_option = {
+  //   color: [
+  //     '#058296',
+  //     '#a3b3b5',
+  //   ],
+  //   title: {
+  //     show: false //標題
+  //   },
+  //   grid: {
+  //     left: 50, //畫面編距
+  //     right: 30,
+  //     top: 30,
+  //     bottom: 20
+  //   },
+  //   tooltip: {
+  //     trigger: 'axis',
+  //     axisPointer: { type: 'cross' }
+  //   },
+  //   legend: {
+  //     show: false //圖例
+  //   },
+  //   xAxis: [
+  //     {
+  //       type: 'category',
+  //       axisTick: {
+  //         alignWithLabel: true,
+  //         show: false,//刻度
+  //       },
+  //       // axisLine: {
+  //       //   show: false,//線
+  //       // },
+  //       data: pageJson['vix_date']
+  //     }
+  //   ],
+  //   yAxis: [
+  //     {
+  //       type: 'value',
+  //       position: 'right',
+  //       scale: true, //顯示最大
+  //     },
+  //     {
+  //       type: 'value',
+  //       scale: true, //顯示最大
+  //       position: 'left',
+  //       splitLine: {
+  //         show: false, //分線關閉
+  //       },
+  //     }
+  //   ],
+  //   series: [
+  //     {
+  //       name: '恐慌指數',
+  //       type: 'bar',
+  //       yAxisIndex: 0,
+  //       data: pageJson['vix_data'],
+  //       itemStyle: {
+  //         color: '#a3b3b5', // 柱子颜色
+  //         // borderColor: 'green', // 柱子边框颜色
+  //         // borderWidth: 2, // 柱子边框宽度
+  //         // barBorderRadius: 5, // 柱子边框圆角
+  //         // shadowBlur: 10, // 阴影模糊度
+  //         // shadowColor: 'rgba(0, 0, 0, 0.5)' // 阴影颜色
+  //       }
+  //     },
+  //     {
+  //       name: '大盤指數',
+  //       type: 'line',
+  //       smooth: true,
+  //       yAxisIndex: 1,
+  //       data: pageJson['vix_market'],
+  //       lineStyle: {
+  //         color: '#058296', // 线条颜色
+  //         width: 3,      //線寬
+  //       },
+  //       itemStyle: {
+  //         opacity: 0, //點隱蔽
+  //       }
+  //     }
+  //   ]
+  // };
   const greedy_chart_option = {
     color: [
       '#058296',
@@ -832,10 +832,10 @@ window.onload=async function(){
   weighted_chart.setOption(weighted_chart_option);
   threecargo_chart.setOption(threecargo_chart_option);
   threefutures_chart.setOption(threefutures_chart_option);
-  updownnumber_chart.setOption(updownnumber_chart_option);
+  // updownnumber_chart.setOption(updownnumber_chart_option);
   prosperity_chart.setOption(prosperity_chart_option);
   dollars_chart.setOption(dollars_chart_option);
-  vix_chart.setOption(vix_chart_option);
+  // vix_chart.setOption(vix_chart_option);
   greedy_chart.setOption(greedy_chart_option);
 
 }
