@@ -41,7 +41,11 @@ async function search(req, res) {
       return obj?Number(obj.close):0
     })
     //月統計
+<<<<<<< HEAD
     row['monthlystatistics'] = row['monthlystatistics']?JSON.parse(row['monthlystatistics']):''
+=======
+    row['monthlystatistics'] = getSort({obj:row['monthlystatistics'],number:12,sort:'asc'})
+>>>>>>> 53e167e9c602a1421462542310a8d8d345ba6da8
 
     //期貨買賣超
     const threefutures = JSON.parse(row['threefutures'])

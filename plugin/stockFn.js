@@ -60,10 +60,16 @@ function getMonthly({year,json}){
   })
   return array;
 }
-function getSort({obj,number}){
+function getSort({obj,number,sort}){
   if(obj){
     return JSON.parse(obj).slice(-1*Number(number))
-    .sort((o1,o2)=>Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join('')));
+    .sort((o1,o2)=>{
+      if(sort=='asc'){
+        return Number(o1.date.split('-').join(''))-Number(o2.date.split('-').join(''))
+      }else{
+        return Number(o2.date.split('-').join(''))-Number(o1.date.split('-').join(''))
+      }
+    });
   }else{
     return false;
   }
