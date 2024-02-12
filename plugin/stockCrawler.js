@@ -940,6 +940,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
         }
       }
     })
+    console.log(943,array)
     if(!array.length){
       console.log(`stockGetData,array,沒有資料跳出`)
       return false
