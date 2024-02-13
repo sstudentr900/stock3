@@ -120,6 +120,24 @@ async function search(req, res) {
         return obj?Number(obj.close):Number(data[number].close)
       })
     }
+    //散戶多空比
+    if(row['smallhouseholds']){
+      const smallhouseholds = JSON.parse(row['smallhouseholds'])
+      //散戶多空比_日期
+      row['smallhouseholds_date'] = smallhouseholds.map(({date})=>date)
+      //散戶多空比_資料
+      row['smallhouseholds_data'] = smallhouseholds.map(({data})=>Number(data))
+      //散戶多空比_加權指數
+      row['smallhouseholds_market'] = smallhouseholds.map(({date})=>{
+        let number = 0
+        const obj = data.find((obj,index)=>{
+          number = index;
+          return date==obj.date
+        })
+        return obj?Number(obj.close):Number(data[number].close)
+      })
+      delete row.smallhouseholds
+    }
     // //上下跌家數
     // const updownnumber = JSON.parse(row['updownnumber'])
     // row['updownnumber'] = getSort({obj:row['updownnumber'],number:10})

@@ -38,16 +38,16 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
       console.log(`stockIsGetValue,資料日期:${dataDate},不能大於今天日期:${nowDate} 跳出`)
       return false;
     }else{
-      console.log(`stockIsGetValue,有值,抓取範圍${dataDate}以上`)
+      console.log(`stockIsGetValue,資料庫有值,抓取範圍${dataDate}以上`)
       // console.log('stockdata',stockdata)
       const datas = await fnName({nowDate,dataDate,stockno,stockdata})
-      // console.log(`stockIsGetValue,有值,${JSON.stringify(datas)}`)
+      // console.log(`stockIsGetValue,資料庫有值,${JSON.stringify(datas)}`)
       if(!datas || !datas.length){
-        console.log(`stockIsGetValue,有值,抓取不到資料跳出`)
+        console.log(`stockIsGetValue,資料庫有值,抓取不到資料跳出`)
         return false;
       }
       for(data of datas){
-        console.log(`stockIsGetValue,有值,抓取資料存入${JSON.stringify(data)}`)
+        console.log(`stockIsGetValue,資料庫有值,抓取資料存入${JSON.stringify(data)}`)
         stockdata.push(data)
       }
       // console.log(`stockIsGetValue全部資料:${stockdata}`)
@@ -57,11 +57,11 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
   //沒有值
   stockdata = await fnName({nowDate,stockno})
   if(!stockdata){
-    console.log(`stockIsGetValue,沒有值,抓取不到資料跳出`)
+    console.log(`stockIsGetValue,資料庫沒有值,抓取不到資料跳出`)
     return false;
   } 
   // console.log(`stockIsGetValue,沒有值,抓取資料數量:${JSON.stringify(stockdata)}`)
-  console.log(`stockIsGetValue,沒有值,抓取資料數量:${stockdata.length}`)
+  console.log(`stockIsGetValue,資料庫沒有值,抓取資料數量:${stockdata.length}`)
   return JSON.stringify(stockdata);
 }
 async function stockGetThreeCargo({dataDate}){
@@ -1207,27 +1207,36 @@ async function stockGetname({stockno}){
     return false
   })
 }
-async function stockSmallhouseholds({stockno}){
-  console.log(`stockSmallhouseholds,https://www.wantgoo.com/futures/open-interest-full-contract?contract=mtx&after=1703779200000`)
+async function stockSmallhouseholds({dataDate}){
+  console.log(`stockSmallhouseholds(散戶多空比),https://ai-all-e25e5ccde503.herokuapp.com/get-sheet-data`)
   return await stockPromise({
-    url: `https://www.wantgoo.com/futures/retail-anti-indicator`,
+    url: `https://ai-all-e25e5ccde503.herokuapp.com/get-sheet-data`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
     }
   })
   .then(body=>{
-    console.log(body)
-    // const $ = cheerio.load(body);
-    // const name = $("h1.page-title").text().split('-')[0].split(' ')[1]
-    // if(!name){
-    //   console.log(`stockSmallhouseholds,抓取不到資料跳出`)
-    //   return false;
-    // }
-    // return name;
+    body = JSON.parse(body);
+    const json=[];
+    const labels = body['labels']; //日期
+    // console.log(body)
+    for (let i = 0; i < labels.length; i++) {
+      const date = labels[i].replaceAll('/','-')
+      // console.log('1227',dataDate,date,dataDate>=date)
+      if(dataDate && dataDate>=date){continue;}
+      json.push({
+        date: date,
+        data: body['percentageData'][i],//多空比
+        // indexData: body['indexData'][i],//加權
+        // realRetailRatios: body['realRetailRatios'][i], //真實散戶多空比
+        // realRetailPositions: body['realRetailPositions'][i], //真實散戶未平倉口數
+      })
+    }
+    return json;
   })
   .catch((error)=>{
-    console.log(`stockSmallhouseholds,抓取錯誤,${error}`)
+    console.log(`stockSmallhouseholds(散戶多空比),抓取錯誤,${error}`)
     return false
   })
 }
@@ -1308,67 +1317,68 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   //result
   const result = {}
 
-  console.log(`抓取加權資料`)
-  const twiiValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':twii,'stockno':'^TWII'})
-  twiiValue?result.twii = twiiValue:'';
+  // console.log(`抓取加權資料`)
+  // const twiiValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':twii,'stockno':'^TWII'})
+  // twiiValue?result.twii = twiiValue:'';
 
-  console.log(`上市三大法人排名`)
-  const rankingValue = await stockIsGetValue({'fnName': stockRanking,'stockdata':ranking})
-  rankingValue?result.ranking = rankingValue:'';
+  // console.log(`上市三大法人排名`)
+  // const rankingValue = await stockIsGetValue({'fnName': stockRanking,'stockdata':ranking})
+  // rankingValue?result.ranking = rankingValue:'';
 
-  console.log(`3大法人買賣超`)
-  const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
-  threeCargo?result.threecargo = threeCargo:'';
+  // console.log(`3大法人買賣超`)
+  // const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
+  // threeCargo?result.threecargo = threeCargo:'';
 
-  console.log(`3大法人期貨`)
-  const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
-  threeFutures?result.threefutures = threeFutures:'';
+  // console.log(`3大法人期貨`)
+  // const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
+  // threeFutures?result.threefutures = threeFutures:'';
 
-  console.log(`月統計`)
-  const monthlystatisticsValue = await stockIsGetValue({'fnName': stockGetMonthlystatistics,'stockdata':monthlystatistics})
-  monthlystatisticsValue?result.monthlystatistics = monthlystatisticsValue:'';
+  // console.log(`月統計`)
+  // const monthlystatisticsValue = await stockIsGetValue({'fnName': stockGetMonthlystatistics,'stockdata':monthlystatistics})
+  // monthlystatisticsValue?result.monthlystatistics = monthlystatisticsValue:'';
 
-  console.log(`股東增減`)
-  const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
-  shareholder?result.holder = shareholder:'';
+  // console.log(`股東增減`)
+  // const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
+  // shareholder?result.holder = shareholder:'';
 
-  console.log(`羊群增減`)
-  const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
-  stockRetail?result.retail = stockRetail:'';
+  // console.log(`羊群增減`)
+  // const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
+  // stockRetail?result.retail = stockRetail:'';
 
-  console.log(`景氣對策信號`)
-  const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,'stockdata':prosperity})
-  prosperityData?result.prosperity = prosperityData:'';
+  // console.log(`景氣對策信號`)
+  // const prosperityData = await stockIsGetValue({'fnName': stockGetProsperity,'stockdata':prosperity})
+  // prosperityData?result.prosperity = prosperityData:'';
 
-  console.log(`美元`)
-  const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
-  dollarsData?result.dollars = dollarsData:'';
+  // console.log(`美元`)
+  // const dollarsData = await stockIsGetValue({'fnName': stockDollars,'stockdata':dollars})
+  // dollarsData?result.dollars = dollarsData:'';
 
-  console.log(`貪婪指數`)
-  const greedyData = await stockIsGetValue({'fnName': stockGreedy,'stockdata':greedy})
-  greedyData?result.greedy = greedyData:'';
+  // console.log(`貪婪指數`)
+  // const greedyData = await stockIsGetValue({'fnName': stockGreedy,'stockdata':greedy})
+  // greedyData?result.greedy = greedyData:'';
 
-  console.log(`小戶多空比`)
+  console.log(`散戶多空比`)
   const smallhouseholdsData = await stockIsGetValue({'fnName': stockSmallhouseholds,'stockdata':smallhouseholds})
   smallhouseholdsData?result.smallhouseholds = smallhouseholdsData:'';
 
+
   // console.log(`判斷沒有資料跳出`)
-  // if(!Object.values(result).length){
-  //   console.log(`stockCrawler_market,沒有資料跳出`)
-  //   // return false;
-  // }else{
-  //   //存資料庫
-  //   // console.log(`stockCrawler_market,更新`)
-  //   // await dbUpdata('market',result,id)
-  //   if(id){
-  //     console.log(`stockCrawler_market,更新`)
-  //     await dbUpdata('market',result,id)
-  //   }else{
-  //     console.log(`stockCrawler_market,新增`)
-  //     await dbInsert('market',result)
-  //   }
-  // }
-  // console.log(`stockCrawler_market,結束`)
+  if(!Object.values(result).length){
+    console.log(`stockCrawler_market,沒有資料跳出`)
+    // return false;
+  }else{
+    //存資料庫
+    // console.log(`stockCrawler_market,更新`)
+    // await dbUpdata('market',result,id)
+    if(id){
+      console.log(`stockCrawler_market,更新`)
+      await dbUpdata('market',result,id)
+    }else{
+      console.log(`stockCrawler_market,新增`)
+      await dbInsert('market',result)
+    }
+  }
+  console.log(`stockCrawler_market,結束`)
 }
 module.exports={
   stockCrawler_market,

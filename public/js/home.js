@@ -17,6 +17,8 @@ window.onload=async function(){
   const prosperity_chart = echarts.init(document.getElementById('prosperity_chart'));
   //美元
   const dollars_chart = echarts.init(document.getElementById('dollars_chart'));
+  //小台散戶多空比
+  const smallhouseholds_chart = echarts.init(document.getElementById('smallhouseholds_chart'));
   //恐慌指數
   // const vix_chart = echarts.init(document.getElementById('vix_chart'));
   //貪婪指數
@@ -30,6 +32,7 @@ window.onload=async function(){
     weighted_chart.resize();
     // vix_chart.resize();
     greedy_chart.resize();
+    smallhouseholds_chart.resize();
   });
   let color = {
     up: '#c40f0fd3',
@@ -632,6 +635,81 @@ window.onload=async function(){
       }
     ]
   };
+  const smallhouseholds_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+    ],
+    title: {
+      show: false //標題
+    },
+    grid: {
+      left: 50, //畫面編距
+      right: 80,
+      top: 30,
+      bottom: 50
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      show: false //圖例
+    },
+    xAxis: [
+      {
+        type: 'category',
+        axisTick: {
+          alignWithLabel: true,
+          show: false,//刻度
+        },
+        // axisLine: {
+        //   show: false,//線
+        // },
+        data: pageJson['smallhouseholds_date']
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        position: 'right',
+        scale: true, //顯示最大
+      },
+      {
+        type: 'value',
+        position: 'left',
+        scale: true, //顯示最大
+        splitLine: {
+          show: false, //分線關閉
+        },
+      }
+    ],
+    series: [
+      {
+        name: '合計',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['smallhouseholds_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['smallhouseholds_market'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 3,      //線寬
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
   // const vix_chart_option = {
   //   color: [
   //     '#058296',
@@ -828,6 +906,8 @@ window.onload=async function(){
       },
     ],
   };
+  // console.log(pageJson['smallhouseholds_date'],pageJson['smallhouseholds_data'],pageJson['smallhouseholds_market']);
+  // console.log(pageJson['dollars_date'],pageJson['dollars_data'],pageJson['dollars_market']);
   // 使用刚指定的配置项和数据显示图表。
   weighted_chart.setOption(weighted_chart_option);
   threecargo_chart.setOption(threecargo_chart_option);
@@ -837,5 +917,6 @@ window.onload=async function(){
   dollars_chart.setOption(dollars_chart_option);
   // vix_chart.setOption(vix_chart_option);
   greedy_chart.setOption(greedy_chart_option);
+  smallhouseholds_chart.setOption(smallhouseholds_chart_option);
 
 }

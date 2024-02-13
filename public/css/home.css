@@ -1,42 +1,51 @@
-
-.home .customNav .customTable li:nth-child(1){
+.home .customNav .customTable li:nth-child(1) {
   /* width: 66%; */
   flex: 1 1;
 }
-.home .customNav .customTable li:nth-child(2){
+
+.home .customNav .customTable li:nth-child(2) {
   flex: 0 0 102px;
   text-align: right;
 }
-.home .customNav  .monthlystatistics .customTable li{
+
+.home .customNav .monthlystatistics .customTable li {
   display: flex;
   justify-content: center;
 }
-.home .customNav  .monthlystatistics .customTable li:nth-child(2){
+
+.home .customNav .monthlystatistics .customTable li:nth-child(2) {
   flex: 1 1;
 }
-.home .customNav  .monthlystatistics .customTable li:first-child{
+
+.home .customNav .monthlystatistics .customTable li:first-child {
   flex: 0 0 48px;
 }
-.home .customNav  .monthlystatistics .customTable li:last-child{
+
+.home .customNav .monthlystatistics .customTable li:last-child {
   flex: 0 0 94px;
 }
+
 .home .customNav .customTable .table_title li,
-.home .customNav .customTable .table_content li{
+.home .customNav .customTable .table_content li {
   padding: 6px 8px;
 }
+
 .home .dollars .publictitle,
-.home .prosperity .publictitle{
+.home .prosperity .publictitle {
   margin-bottom: 0;
 }
-.home .updownnumber .customTable{
+
+.home .updownnumber .customTable {
   max-height: 420px;
   overflow: auto;
 }
-.home .updownnumber .customTable .table_title{
+
+.home .updownnumber .customTable .table_title {
   position: sticky;
   top: 0;
   z-index: 1;
 }
+
 /* .home .prosperity .title{
   display: block;
 } */
@@ -44,14 +53,16 @@
   height: 400px;
   width: 100%;
 } */
-.home .title .item{
+.home .title .item {
   display: flex;
 }
-.home .title .item li{
+
+.home .title .item li {
   font-size: 12px;
   color: #7d7b8a;
 }
-.home .title .item li+li{
+
+.home .title .item li+li {
   margin-left: 10px;
 }
 
@@ -62,7 +73,8 @@
 .home #updownnumber_chart,
 .home #prosperity_chart,
 .home #dollars_chart,
-.home #weighted_chart{
+.home #smallhouseholds_chart,
+.home #weighted_chart {
   width: 100%;
   height: 400px;
 }
