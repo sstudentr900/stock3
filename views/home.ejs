@@ -153,6 +153,7 @@
                 <div class="title">
                   <h4><a href="https://production.dataviz.cnn.io/index/fearandgreed/graphdata" target="_blank">貪婪指數</a></h4>
                   <ul class="item">
+                    <li>更新時間 : <%= data['greedy_date']?data['greedy_date'].at(-1):'' %></li>
                     <li>極度恐懼 0-25分</li>
                     <li>恐懼 25-45分</li>
                     <li>中性 45-55分</li>
@@ -168,6 +169,7 @@
                 <div class="title">
                   <h4><a href="https://index.ndc.gov.tw/n/zh_tw/data/eco/indicators_table1" target="_blank">景氣對策信號</a></h4>
                   <ul class="item">
+                    <li>更新時間 : <%= data['prosperity_date']?data['prosperity_date'].at(-1):'' %></li>
                     <li>低迷 0-16分</li>
                     <li>穩定 23-31分</li>
                     <!-- <li class="publicTextRed">熱絡 38-45分</li> -->
@@ -181,6 +183,7 @@
               <div class="publictitle">
                 <div class="title">
                   <h4><a href="https://www.taifex.com.tw/cht/3/dailyFXRate" target="_blank">美元匯率</a></h4>
+                  <p class="time">更新時間 : <%= data['dollars_date']?data['dollars_date'].at(-1):'' %></p>
                 </div>
               </div>
               <div id="dollars_chart"></div>
@@ -273,7 +276,7 @@
               <div class="publictitle">
                 <div class="title">
                   <h4><a href="https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8" target="_blank">加權月統計</a></h4>
-                  <p class="time">更新時間 : </p>
+                  <p class="time">更新時間 : <%= data['monthlystatistics']?data['monthlystatistics'][date]:'' %></p>
                 </div>
               </div>
               <div class="customTable">

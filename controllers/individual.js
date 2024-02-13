@@ -10,6 +10,7 @@ const {
   stockdataFn_w,
   stockKdFn,
   getSort,
+  getLastTime,
   getMa,
   getAccumulate
 } = require("../plugin/stockFn");
@@ -89,7 +90,7 @@ async function nowPage({row}) {
   })
   //今年每月報酬
   // row['stockPayMonth'] = stockPayMoreMonth(row['stockdata']);
-  //最近5年每年報酬
+  //最近5年報酬
   data['stockPayYear'] = await stockPayMoreYear(data['stockdata'],5);
   //年化報酬率
   data['stockCagr'] = stockCagr(data['stockPayYear']);
@@ -107,12 +108,13 @@ async function nowPage({row}) {
   data['fairPrice'] = yieldObj.fairPrice;//合理
   data['expensivePrice'] =yieldObj.expensivePrice;//昂貴
   //持股產業
-  data['industry'] = row['industry']?JSON.parse(row['industry']):'';
+  // console.log('持股產業',row['industry'],getLastTime(row['industry']))
+  data['industry'] = getLastTime({obj:row['industry']});
   //持股明細
-  data['shareholding'] = row['shareholding']?JSON.parse(row['shareholding']):'';
+  data['shareholding'] = getLastTime({obj:row['shareholding']});
   //夏普值
   data['sharpedata'] = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7):'';
-  //5年高低點
+  //6年高低點
   data['highLowPrice'] = stockHighLowPriceMoreYear(data['stockdata'],5);
   //周kd
   // data['wkd_d'] = stockKdFn(stockdataFn_w(data['stockdata']))['last_d'];
@@ -137,7 +139,7 @@ async function search(req, res) {
   if(rows.length){
     console.log(`serch有值`)
     data = await nowPage({row:rows[0]})
-    console.log(data)
+    // console.log(data)
   }else{
     console.log(`serch沒有該股重新抓取，stockno:${stockno}`)
     //抓取資料

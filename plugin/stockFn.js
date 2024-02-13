@@ -74,6 +74,16 @@ function getSort({obj,number,sort}){
     return false;
   }
 }
+function getLastTime({obj}){
+  if(obj){
+    obj = JSON.parse(obj)
+    const lastDate = obj.at(-1)['date']
+    // console.log('81',lastDate)
+    return obj.filter(({date})=>lastDate==date)
+  }else{
+    return false;
+  }
+}
 function getAccumulate({obj}){
   //累加
   // obj = JSON.parse(obj)
@@ -373,7 +383,7 @@ function stockHighLowPrice(stockdata,year){
 function stockHighLowPriceMoreYear(stockdata,number){
   if(!stockdata.length){console.log(`stockHighLowPriceMoreYear,沒有股票資料`)}
   if(!number){console.log(`stockHighLowPriceMoreYear,沒有年資料`)}
-  console.log(`stockHighLowPriceMoreYear,${number}年高低點`)
+  console.log(`stockHighLowPriceMoreYear,${number+1}年高低點`)
   const json = [];
   const nowTimeObj = getNowTimeObj();
   let before_year = nowTimeObj['year'] - number;
@@ -564,6 +574,7 @@ module.exports={
   stockCagr,
   getMonthly,
   getSort,
+  getLastTime,
   getMa,
   getAccumulate,
   stockAvenge,
