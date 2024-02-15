@@ -364,7 +364,7 @@ function stockCagr(stockPayYear){
   },0).toFixed(2) 
   //結果
   // console.log(`total,${Boolean(total)},date,${Boolean(date.length)}`)
-  if(total && date.length>0){
+  if(total && date.length>1){
     // console.log(`626${(((total/100+1)**(1/date.length)-1)*100).toFixed(2)}`)
     return (((total/100+1)**(1/date.length)-1)*100).toFixed(2);
   }else {
