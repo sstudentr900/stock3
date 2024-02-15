@@ -8,7 +8,7 @@ const {
 } = require("../plugin/stockFn");
 async function search(req, res) {
   let rows = await dbQuery( 'SELECT * from market' )
-  console.log(rows[0]['monthlystatistics'])
+  // console.log(rows[0]['monthlystatistics'])
   if(!rows.length){console.log(`serch,dbQuery失敗跳出`)}
   for (const row of rows) {
      //加權指數
