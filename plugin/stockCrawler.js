@@ -860,13 +860,8 @@ async function stockGetData2({dataDate,stockno,nowDate}){
       const obj = {}
       const td = trs.eq(i).find('td');
       //日期
-      // const dates = td.eq(0).text().trim().split('/').join('-')
-      // const date = `${year}-${dates}`
-      //日期
-      const dates = td.eq(0).text().trim().split('/')
-      //1月變12月，年要減1
-      if(i>1 && trs.eq(i-1).find('td').eq(0).text().split('/')[0]==1 && dates[0]==12){year = year-1}
-      const date = `${year}-${dates[0]}-${dates[1]}`
+      const dates = td.eq(0).text().trim().replace("'","").split('/')
+      const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
       // console.log(`stockGetData2,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate && dataDate>date){continue;}
       obj['date'] = date
