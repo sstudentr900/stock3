@@ -85,10 +85,12 @@ async function stockGetThreeCargo({dataDate}){
     for (let i = 1; i < table.length; i++) {
       const obj = {}
       const td = table.eq(i).find('td');
-      const dates = td.eq(0).text().split('/')
-      //1月變12月，年要減1
-      if(table.eq(i-1).find('td').eq(0).text().split('/')[0]==1 && dates[0]==12){year = year-1}
-      const date = `${year}-${dates[0]}-${dates[1]}`
+      // const dates = td.eq(0).text().split('/')
+      // //1月變12月，年要減1
+      // if(table.eq(i-1).find('td').eq(0).text().split('/')[0]==1 && dates[0]==12){year = year-1}
+      // const date = `${year}-${dates[0]}-${dates[1]}`
+      const dates = td.eq(0).text().replace("'","").split('/')
+      const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
       // if(dataDate && !(dataDate<=obj['date'])){continue;}
       // console.log(`stockGetThreeCargo,${dataDate},${date},${dataDate>=date}`)
       if(dataDate && dataDate>=date){continue;}
@@ -478,7 +480,6 @@ async function stockGetThreeFutures({dataDate}){
 }
 async function stockGetProsperity({dataDate}){
   console.log(`stockProsperity,景氣對策信號,https://index.ndc.gov.tw/n/zh_tw/data/eco/indicators_table1`)
-  // console.log(`stockGetProsperity,抓取景氣對策信號`)
   // const json = []
   // const dt = getNowTimeObj();
   // const year = dt['year']; //抓取前年
@@ -491,16 +492,32 @@ async function stockGetProsperity({dataDate}){
   }
   // console.log(`stockGetProsperity,time,${time},${dataDate}`)
   const options  = {
-    url: `https://index.ndc.gov.tw/n/zh_tw/data/eco/indicators_table1`,
+    url: `https://index.ndc.gov.tw/n/json/data/eco/indicators`,
     method: 'POST',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
     }
   }
   return await stockPromise(options)
+  // .then(body=>{
+  //   console.log(body)
+  //   const $ = cheerio.load(body);
+  //   const trs = $("tbody tr");
+  //   for (let i = 1; i < trs.length; i++) {
+  //     const obj = {}
+  //     const td = trs.eq(i).find('td');
+  //     let date = td.eq(0).text();//日期
+  //     obj['date'] = `${date}-01` //2023-06-30
+  //     console.log(dataDate,obj['date'],dataDate>=obj['date'])
+  //     if(dataDate && dataDate>=obj['date']){continue;}
+  //     obj['point'] = td.eq(2).text();//景氣對策信號(分)
+  //     json.unshift(obj)
+  //   }
+  //   return json
+  // })
   .then(body=>JSON.parse(body)['line']['12']['data'])
   .then(datas=>{
-    // console.log(`stockGetProsperity,datas,${datas}`)
+    // console.log(`stockGetProsperity,datas,${datas}`,time)
     const json = datas.filter(row=>{
       // console.log(`stockProsperity,${row.x},${time},${row.x>time}`)
       return row.x>time && row.y
