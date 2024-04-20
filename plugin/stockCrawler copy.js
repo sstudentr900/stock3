@@ -1395,7 +1395,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
   }).then(async function(jsons){
 
     // console.log(`stockGetData,jsons資料: ${JSON.stringify(jsons)}`)
-    if(!jsons.length){
+    if(!jsons || jsons.length){
       console.log(`stockGetData,yahooFinance沒有資料跑stockGetData2`)
       stockno = stockno.split('.')[0];
       jsons = await stockGetData2({dataDate,stockno,nowDate})
@@ -1443,7 +1443,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
 
     return array;
   }).catch(reason=>{
-    console.log('crud error',reason)
+    console.log('stockGetData yahooFinance error',reason)
     return false
   });
 }

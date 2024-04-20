@@ -81,7 +81,7 @@ async function stockGetThreeCargo({dataDate}){
     // let moon = ''; 
     // console.log(body)
     const $ = cheerio.load(body);
-    const table = $("#divPriceDetail table tr[align='center']");
+    const table = $("#tblPriceDetail tr[align='center']");
     for (let i = 1; i < table.length; i++) {
       const obj = {}
       const td = table.eq(i).find('td');
@@ -352,11 +352,14 @@ async function stockRanking({dataDate}){
     //上市三大法人排名
     const card = $("aside .row>.col-12").eq(2).find('.card');
     const date = card.find('.row .col-5.box-title.text-right').text().trim();
-    if(!date){
-      console.log(`stockRanking,抓取上市三大法人排名,${date}`)
-    }
+    // if(!date){
+    //   console.log(`stockRanking,抓取上市三大法人排名,${date}`)
+    // }
     // console.log(848,dataDate,date)
-    if(dataDate>=date){console.log(`stockRanking,抓取上市三大法人排名,${dataDate}>=${date}跳出`);return false;}
+    if(!date || dataDate>=date){
+      console.log(`stockRanking,抓取上市三大法人排名,${dataDate}>=${date},跳出`);
+      return false;
+    }
     const trs = card.find('.row+.box-sub-title+.table-responsive-md tr');
     const trs2 = card.find('.row+.box-sub-title+.table-responsive-md+.box-sub-title+.table-responsive-md tr');
     const json = [
@@ -854,9 +857,10 @@ async function stocksharpe({stockno,nowDate}){
 }
 async function stockGetData2({dataDate,stockno,nowDate}){
   // await sleep(2000);
+  stockno = stockno.split('.')[0];
   stockno = stockno=='^TWII'?'加權指數':stockno
   // console.log(`stockGetData2,抓取個股,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
-  console.log(`stockGetData2,抓取個股,抓取範圍${nowDate}以上,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
+  console.log(`stockGetData2,抓取加權資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
   const options  = {
     url: encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`),
     method: 'GET',
@@ -869,7 +873,7 @@ async function stockGetData2({dataDate,stockno,nowDate}){
     // console.log(body)
 
     const json=[]
-    let year = nowDate.split('-')[0]
+    // let year = nowDate.split('-')[0]
     const $ = cheerio.load(body);
     const trs = $("#divPriceDetail table#tblPriceDetail tbody tr[align='center']");
     // console.log(trs.text())
@@ -880,7 +884,10 @@ async function stockGetData2({dataDate,stockno,nowDate}){
       const dates = td.eq(0).text().trim().replace("'","").split('/')
       const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
       // console.log(`stockGetData2,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
-      if(dataDate && dataDate>date){continue;}
+      if(dataDate && dataDate>=date){
+        console.log(`stockGetData2,抓取加權資料,${dataDate}>=${date},${dataDate>=date},跳出`)
+        continue;
+      }
       obj['date'] = date
       obj['open'] = td.eq(1).text().trim().split(',').join('');
       obj['high'] = td.eq(2).text().trim().split(',').join('');
@@ -919,7 +926,7 @@ async function stockGetData({stockno,dataDate,nowDate}){
   }).then(async function(jsons){
 
     // console.log(`stockGetData,jsons資料: ${JSON.stringify(jsons)}`)
-    if(!jsons.length){
+    if(!jsons && jsons.length){
       console.log(`stockGetData,yahooFinance沒有資料跑stockGetData2`)
       stockno = stockno.split('.')[0];
       jsons = await stockGetData2({dataDate,stockno,nowDate})
@@ -1269,7 +1276,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
 
   console.log(`抓取${stockno}股票資料`)
-  const stockdataValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':stockdata,'stockno':`${stockno}.TW`})
+  const stockdataValue = await stockIsGetValue({'fnName': stockGetData2,'stockdata':stockdata,'stockno':`${stockno}.TW`})
   stockdataValue?result.stockdata = stockdataValue:'';
 
   console.log(`抓取${stockno}殖利率`)
@@ -1330,7 +1337,7 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   const result = {}
 
   console.log(`抓取加權資料`)
-  const twiiValue = await stockIsGetValue({'fnName': stockGetData,'stockdata':twii,'stockno':'^TWII'})
+  const twiiValue = await stockIsGetValue({'fnName': stockGetData2,'stockdata':twii,'stockno':'^TWII'})
   twiiValue?result.twii = twiiValue:'';
 
   console.log(`上市三大法人排名`)
