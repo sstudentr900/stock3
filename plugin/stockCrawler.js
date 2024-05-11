@@ -1,5 +1,6 @@
 const { dbQuery,dbInsert,dbUpdata,dbDelete } = require('../plugin/db')
 const request = require("request");//抓取整個網頁的程式碼
+const puppeteer = require('puppeteer');
 const cheerio = require("cheerio");//後端的 jQuery
 const yahooFinance = require('yahoo-finance');
 const { getNowTimeObj,getToISOString } = require("./stockFn");
@@ -66,62 +67,55 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
 }
 async function stockGetThreeCargo({dataDate}){
   console.log(`stockGetThreeCargo,抓取3大法人買賣超融資融卷,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365`)
-  await sleep(20000)
-  const options  = {
-    url: `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365`,
-    method: 'GET',
-    headers:{
-      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
-    }
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  const url = 'https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365';
+  await page.goto(url);
+  // 等待元素載入完成
+  await page.waitForSelector("#divPriceDetail");
+  //把網頁的body抓出來
+  const body = await page.content();
+  // console.log('stockGetThreeCargo-body',body)
+  //接著我們把他丟給cheerio去處理
+  const $ = await cheerio.load(body);
+  const table = await $("table#tblPriceDetail tbody tr[align='center']");
+  const json = []
+  for (let i = 1; i < table.length; i++) {
+    const obj = {}
+    const td = table.eq(i).find('td');
+    // const dates = td.eq(0).text().split('/')
+    // //1月變12月，年要減1
+    // if(table.eq(i-1).find('td').eq(0).text().split('/')[0]==1 && dates[0]==12){year = year-1}
+    // const date = `${year}-${dates[0]}-${dates[1]}`
+    const dates = td.eq(0).text().replace("'","").split('/')
+    const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
+    // if(dataDate && !(dataDate<=obj['date'])){continue;}
+    // console.log(`stockGetThreeCargo,${dataDate},${date},${dataDate>=date}`)
+    if(dataDate && dataDate>=date){continue;}
+    // obj['open'] = td.eq(1).text();//指數
+    // obj['high'] = td.eq(2).text();//指數
+    // obj['low'] = td.eq(3).text();//指數
+    // obj['close'] = td.eq(4).text();//指數收盤
+    // obj['Volume'] = td.eq(8).text();//指數
+    obj['date'] = date
+    obj['foreign'] = td.eq(10).text();//外資
+    obj['letter'] = td.eq(11).text();//投信
+    obj['proprietor'] = td.eq(12).text();//自營商
+    obj['total'] = td.eq(13).text();// 合計
+    obj['financing'] = td.eq(14).text();// 融資
+    obj['lending'] = td.eq(16).text();// 融卷
+    // console.log(obj)
+    json.push(obj)
   }
-  return await stockPromise(options)
-  .then(body=>{
-    const json = []
-    let year = getNowTimeObj()['year']; 
-    // let moon = ''; 
-    // console.log(body)
-    const $ = cheerio.load(body);
-    const table = $("#tblPriceDetail tr[align='center']");
-    for (let i = 1; i < table.length; i++) {
-      const obj = {}
-      const td = table.eq(i).find('td');
-      // const dates = td.eq(0).text().split('/')
-      // //1月變12月，年要減1
-      // if(table.eq(i-1).find('td').eq(0).text().split('/')[0]==1 && dates[0]==12){year = year-1}
-      // const date = `${year}-${dates[0]}-${dates[1]}`
-      const dates = td.eq(0).text().replace("'","").split('/')
-      const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
-      // if(dataDate && !(dataDate<=obj['date'])){continue;}
-      // console.log(`stockGetThreeCargo,${dataDate},${date},${dataDate>=date}`)
-      if(dataDate && dataDate>=date){continue;}
-      // obj['open'] = td.eq(1).text();//指數
-      // obj['high'] = td.eq(2).text();//指數
-      // obj['low'] = td.eq(3).text();//指數
-      // obj['close'] = td.eq(4).text();//指數收盤
-      // obj['Volume'] = td.eq(8).text();//指數
-      obj['date'] = date
-      obj['foreign'] = td.eq(10).text();//外資
-      obj['letter'] = td.eq(11).text();//投信
-      obj['proprietor'] = td.eq(12).text();//自營商
-      obj['total'] = td.eq(13).text();// 合計
-      obj['financing'] = td.eq(14).text();// 融資
-      obj['lending'] = td.eq(16).text();// 融卷
-      // console.log(obj)
-      json.push(obj)
-    }
-    //排序小到大
-    json.sort((o1,o2)=>{
-      o1 = Number(o1['date'].split('-').join(''))
-      o2 = Number(o2['date'].split('-').join(''))
-      return o1-o2;
-    })
-    // console.log(json)
-    return json
+  //排序小到大
+  json.sort((o1,o2)=>{
+    o1 = Number(o1['date'].split('-').join(''))
+    o2 = Number(o2['date'].split('-').join(''))
+    return o1-o2;
   })
-  .catch((error)=>{
-    console.log(`stockGetThreeCargo,抓取錯誤,${error}`)
-    return false
-  })
+  // console.log(json)
+  await browser.close();
+  return json
 }
 async function stockGetMonthlystatistics({stockdata}){
   console.log(`stockGetMonthlystatistics,月統計,https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
@@ -855,12 +849,59 @@ async function stocksharpe({stockno,nowDate}){
     return false;
   })
 }
+async function stockGetData3({dataDate,stockno,nowDate}){
+  stockno = stockno.split('.')[0];
+  stockno = stockno=='^TWII'?'加權指數':stockno
+  console.log(`stockGetData3,抓取加權資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  const url = encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`);
+  await page.goto(url);
+  // 等待元素載入完成
+  await page.waitForSelector("#divPriceDetail tr[align='center']");
+  //把網頁的body抓出來
+  const body = await page.content();
+  //接著我們把他丟給cheerio去處理
+  const json=[]
+  // let year = nowDate.split('-')[0]
+  const $ = cheerio.load(body);
+  const trs = $("table#tblPriceDetail tbody tr[align='center']");
+  // console.log('stockGetData3-trs',trs.text())
+  for (let i = 0; i < trs.length; i++) {
+    const obj = {}
+    const td = trs.eq(i).find('td');
+    //日期
+    const dates = td.eq(0).text().trim().replace("'","").split('/')
+    const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
+    // console.log(`stockGetData3,${dates},${date}`)
+    if(dataDate && dataDate>=date){
+      // console.log(`stockGetData3,抓取加權資料,${dataDate}>=${date},${dataDate>=date},跳出`)
+      continue;
+    }
+    obj['date'] = date
+    obj['open'] = td.eq(1).text().trim().split(',').join('');
+    obj['high'] = td.eq(2).text().trim().split(',').join('');
+    obj['low'] = td.eq(3).text().trim().split(',').join('');
+    obj['close'] = td.eq(4).text().trim().split(',').join('');
+    obj['volume'] = td.eq(8).text().trim().split(',').join('');
+    json.push(obj)
+  }
+  //排小到大
+  json.sort((o1,o2)=>{
+    o1 = o1['date'].split('-').join('')
+    o2 = o2['date'].split('-').join('')
+    return o1-o2;
+  })
+  await browser.close();
+  return json
+}
 async function stockGetData2({dataDate,stockno,nowDate}){
   // await sleep(2000);
   stockno = stockno.split('.')[0];
   stockno = stockno=='^TWII'?'加權指數':stockno
   // console.log(`stockGetData2,抓取個股,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE`)
   console.log(`stockGetData2,抓取加權資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
+  await sleep(20000)
   const options  = {
     url: encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`),
     method: 'GET',
@@ -870,20 +911,20 @@ async function stockGetData2({dataDate,stockno,nowDate}){
   }
   return await stockPromise(options)
   .then(body=>{
-    // console.log(body)
+    // console.log('stockGetData2-body',body)
 
     const json=[]
     // let year = nowDate.split('-')[0]
     const $ = cheerio.load(body);
-    const trs = $("#divPriceDetail table#tblPriceDetail tbody tr[align='center']");
-    // console.log(trs.text())
+    const trs = $("table#tblPriceDetail tbody tr[align='center']");
+    // console.log('stockGetData2-trs',trs.text())
     for (let i = 0; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
       //日期
       const dates = td.eq(0).text().trim().replace("'","").split('/')
       const date = `20${dates[0]}-${dates[1]}-${dates[2]}`
-      // console.log(`stockGetData2,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
+      console.log(`stockGetData2,${dates},${date}`)
       if(dataDate && dataDate>=date){
         console.log(`stockGetData2,抓取加權資料,${dataDate}>=${date},${dataDate>=date},跳出`)
         continue;
@@ -1276,7 +1317,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
 
   console.log(`抓取${stockno}股票資料`)
-  const stockdataValue = await stockIsGetValue({'fnName': stockGetData2,'stockdata':stockdata,'stockno':`${stockno}.TW`})
+  const stockdataValue = await stockIsGetValue({'fnName': stockGetData3,'stockdata':stockdata,'stockno':`${stockno}.TW`})
   stockdataValue?result.stockdata = stockdataValue:'';
 
   console.log(`抓取${stockno}殖利率`)
@@ -1337,7 +1378,7 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   const result = {}
 
   console.log(`抓取加權資料`)
-  const twiiValue = await stockIsGetValue({'fnName': stockGetData2,'stockdata':twii,'stockno':'^TWII'})
+  const twiiValue = await stockIsGetValue({'fnName': stockGetData3,'stockdata':twii,'stockno':'^TWII'})
   twiiValue?result.twii = twiiValue:'';
 
   console.log(`上市三大法人排名`)

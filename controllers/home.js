@@ -73,13 +73,16 @@ async function search(req, res) {
       //貪婪指數資料
       row['greedy_data'] = greedy.map(({data})=>Number(data))
       //貪婪指數_加權指數
+      let greedy_number = 0
       row['greedy_market'] = greedy.map(({date})=>{
-        let number = 0
         const obj = data.find((obj,index)=>{
-          number = index;
+          if(date==obj.date){
+            greedy_number = index;
+          }
           return date==obj.date
         })
-        return obj?Number(obj.close):Number(data[number].close)
+        // console.log(date,number,data[greedy_number].close,obj?.close)
+        return obj?Number(obj.close):Number(data[greedy_number].close)
       })
       delete row.greedy
     }
