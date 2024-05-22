@@ -317,7 +317,9 @@ async function stockGetShareholder({dataDate}){
         obj['date'] = shareholder_date//日期
         // console.log(`stockGetShareholder,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
         if(dataDate && dataDate>=obj['date']){continue;}
-        obj['name'] = td.eq(0).text().trim();//名稱
+        const texts = td.eq(0).text().trim().split(' ')
+        // console.log('texts',texts)
+        obj['name'] = texts[0].trim()+' '+texts.at(-1).trim();//名稱
         obj['number'] = td.eq(1).text().trim();//數量
         obj['annotation'] = shareholder_annotation;//數量
         json.push(obj)

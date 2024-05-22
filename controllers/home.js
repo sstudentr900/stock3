@@ -204,7 +204,7 @@ async function search(req, res) {
     delete row.id
     delete row.updated_at
   }
-  // console.log(rows[0])
+  console.log(rows[0])
   res.render('home',{
     'active': 'home',
     'data': rows[0],
