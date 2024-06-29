@@ -174,19 +174,19 @@
                 </ul>
                 <% if(data['cheapPrice']){ %>
                 <ul class="table_content">
-                  <li><p>便宜</p></li>
+                  <li><p>便宜(股利*16)</p></li>
                   <li><p><%= data['cheapPrice'] %></p></li>
                 </ul>
                 <% } %>
                 <% if(data['fairPrice']){ %>
                   <ul class="table_content">
-                    <li><p>合理</p></li>
+                    <li><p>合理(股利*20)</p></li>
                     <li><p><%= data['fairPrice'] %></p></li>
                   </ul>
                 <% } %>
                 <% if(data['expensivePrice']){ %>
                   <ul class="table_content">
-                    <li><p>昂貴</p></li>
+                    <li><p>昂貴(股利*32)</p></li>
                     <li><p><%= data['expensivePrice'] %></p></li>
                   </ul>
                 <% } %>
@@ -199,7 +199,7 @@
             <div class="publicBox stockYield">
               <div class="publictitle">
                 <div class="title">
-                  <a href="https://histock.tw/stock/00713/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF" target="_blank"><h4>最近5年殖利率</h4></a>
+                  <a href="https://histock.tw/stock/00713/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF" target="_blank"><h4>最近<%= data['stockYield'].length %>年殖利率</h4></a>
                   <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
                 </div>
               </div>
@@ -216,7 +216,7 @@
                 <% });} %>
                 <% if(data['nowYield']){ %>
                   <ul class="table_content">
-                    <li class='date'><p>目前股利/殖利率</p></li>
+                    <li class='date'><p>平均股利/殖利率</p></li>
                     <li><p><%= data['average'] %> / <%= data['nowYield'] %>%</p></li>
                   </ul>
                 <% } %>
@@ -252,12 +252,12 @@
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>
-                  <li><p>報酬</p></li>
+                  <li><p>買點 / 賣點 / 報酬</p></li>
                 </ul>
                 <% if(data['stockPayYear']){data['stockPayYear'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li class='date'><p><%= o.year %>年</p></li>
-                  <li><p><%= o.avenge %>%</p></li>
+                  <li><p><%= o.bull %> / <%= o.sell %> / <%= o.avenge %>%</p></li>
                 </ul>
                 <% });} %>
                 <% if(data['stockCagr']){%>
@@ -265,7 +265,7 @@
                     <li class='date'><p>年化報酬率</p></li>
                     <li><p><%= data['stockCagr'] %>%</p></li>
                   </ul>
-                  <%} %>
+                <%} %>
               </div>
             </div>
             <div class="publicBox networthdata">
@@ -278,12 +278,12 @@
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>
-                  <li><p>高點 / 低點</p></li>
+                  <li><p>高點 / 低點 / 平均 / 高低點報酬</p></li>
                 </ul>
                 <% if(data['highLowPrice']){data['highLowPrice'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li class='date'><p><%= o.year %>年</p></li>
-                  <li><p><%= o.max %> / <%= o.min %></p></li>
+                  <li><p><%= o.max %> / <%= o.min %> / <%= o.average %> / <%= o.diffind %></p></li>
                 </ul>
                 <% });} %>
               </div>

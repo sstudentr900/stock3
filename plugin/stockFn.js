@@ -115,18 +115,18 @@ function getMa(dayCount, data) {
 function stockAvenge(startPrice,endPrice){
   return (((endPrice-startPrice)/startPrice)*100).toFixed(2)
 }
-function stockYieldPrice(yielddata,stockdata){
+function stockYieldPrice(yielddata,stockdata,number=5){
   console.log(`stockYieldPrice,股利便宜昂貴價`)
   //判斷沒值
   // console.log(`stockYieldPrice,${yielddata.length},${stockdata.length}`)
-  if(!yielddata.length){console.log(`stockYieldPrice,沒有股利資料`)}
-  if(!stockdata.length){console.log(`stockYieldPrice,沒有股票資料`)}
   if(!yielddata.length || !stockdata.length){
+    if(!yielddata.length){console.log(`stockYieldPrice,沒有股利資料`)}
+    if(!stockdata.length){console.log(`stockYieldPrice,沒有股票資料`)}
     const json = [];
     const dt = getNowTimeObj();
     const year = dt['year']; //今年
     const before_year = ((year*1)-1); //前年
-    let before5_year = ((year*1)-5); //5前年
+    let before5_year = ((year*1)-number); //5前年
     for(before5_year;before5_year<=before_year;before5_year++){
       json.push({
         'nowYear': before5_year,
@@ -146,8 +146,16 @@ function stockYieldPrice(yielddata,stockdata){
     }
   }
 
+  //只取number年
+  //console.log('length',yielddata.length)
+  if(yielddata.length>number){
+    yielddata = yielddata.slice(-number)
+  }
+  //console.log('yielddata',yielddata)
+
   //有值
   //(5年)平均股利
+  //console.log(number,'平均股利',yielddata)
   const yearTotle = yielddata.reduce((previous,current)=>previous+Number(current.dividend),0)
   const yearLength = yielddata.length
   const average = Number((yearTotle/yearLength).toFixed(2))
@@ -175,7 +183,7 @@ function stockYieldPrice(yielddata,stockdata){
   }
 
   //不到5年捕5年
-  const stockYieldFn = (yielddata)=>{
+  const stockYieldFn = (yielddata,number)=>{
     // console.log(`yielddata,${JSON.stringify(yielddata)}`)
     const yieldLength = yielddata.length
     let json = JSON.parse(JSON.stringify(yielddata))
@@ -189,7 +197,7 @@ function stockYieldPrice(yielddata,stockdata){
       }
     })
     // console.log(`json,${JSON.stringify(json)}`)
-    if(yieldLength<5){
+    if(yieldLength<number){
       const dt = getNowTimeObj();
       const year = dt['year']; //今年
       const before_year = ((year*1)-1); //前年
@@ -229,10 +237,10 @@ function stockYieldPrice(yielddata,stockdata){
     // average,
     // yearArray:JSON.stringify(yearArray), //殖利率資料
     yearLength: yearLength,//年數
-    average: `${yearLength}年,${average}`, //平均股利
-    averageYield: `${yearLength}年,${averageYieldFn(yielddata)}`, //平均殖利率
+    average: `${average}`, //平均股利
+    averageYield: `${averageYieldFn(yielddata)}`, //平均殖利率
     nowYield: yieldFn(stockdata,average,1)['yield'],//目前殖利率
-    stockYield: stockYieldFn(yielddata),//各年殖利率
+    stockYield: stockYieldFn(yielddata,number),//各年殖利率
     cheapPrice: (average*16).toFixed(2), //便宜 
     fairPrice: (average*20).toFixed(2), //合理
     expensivePrice: (average*32).toFixed(2), //昂貴
@@ -256,19 +264,27 @@ function stockPayOneYear(stockdata,year){
   console.log(`stockPayOneYear,跑${year}報酬`)
   // stockdata = JSON.parse(stockdata)
   
-  const array = stockdata.filter(({date})=>{
-    // console.log(date,date>'2024-01-01')
-    return date>=`${year}-01-01` && date<=`${year}-12-31`;
-  })
+  // const array = stockdata.filter(({date})=>{
+  //   // console.log(date,date>'2024-01-01')
+  //   return date>=`${year}-01-01` && date<=`${year}-12-31`;
+  // })
 
-  if(array.length){
-    const start = array[0]['close']
-    const end = array.pop()['close']
-    const avenge = stockAvenge(start,end)
+  if(stockdata.length){
+    const bull = stockdata[0]['close']
+    const sell = stockdata.pop()['close']
+    const avenge = stockAvenge(bull,sell)
     // console.log(avenge)
-    return avenge;
+    return {
+      'avenge':avenge,
+      'bull':bull,
+      'sell':sell,
+    };
   }else{
-    return '0';
+    return {
+      'avenge':'0',
+      'bull':'0',
+      'sell':'0',
+    };
   }
 }
 function stockPayMoreYear(stockdata,number){
@@ -278,9 +294,9 @@ function stockPayMoreYear(stockdata,number){
   let year = nowTimeObj['year'] - number + 1;
 
   //沒值
-  if(!stockdata.length){console.log('stockPayMoreYear,沒有資料')}
-  if(!number){console.log('stockPayMoreYear,沒有年數')}
   if(!stockdata.length || !number){
+    if(!stockdata.length){console.log('stockPayMoreYear,沒有資料')}
+    if(!number){console.log('stockPayMoreYear,沒有年數')}
     // let year = nowTimeObj['year'] - number;
     while (year <= nowTimeObj['year']){
       row.push({
@@ -299,9 +315,19 @@ function stockPayMoreYear(stockdata,number){
     // obj['year'] = year+'';
     // obj['avenge'] = stockPayOneYear(stockdata,year);
     // row.push(obj)
+    const array = stockdata.filter(({date})=>{
+      // console.log(date,date>'2024-01-01')
+      return date>=`${year}-01-01` && date<=`${year}-12-31`;
+    })
+
+    // const max = array.reduce((a,b)=>a.close>=b.close?a:b)
+    // const min = array.reduce((a,b)=>a.close<=b.close?a:b)
+    const objs = stockPayOneYear(array,year)
     row.push({
       'year': year+'',
-      'avenge': stockPayOneYear(stockdata,year)
+      'avenge': objs.avenge,
+      'bull': objs.bull,
+      'sell': objs.sell,
     })
     year++
   }
@@ -342,6 +368,60 @@ function stockPayMoreMonth(stockdata,number){
   // console.log('row',row)
   return row;
 }
+function stockRate(stockPayYear){
+  console.log(`stockRate,跑報酬率`)
+  // 總投資金額：
+  // 第一次：60元
+  // 第二次：30元
+  // 第三次：55元
+  // 第四次：80元
+  // 總投資 = 60 + 30 + 55 + 80 = 225元
+
+  // 總出售金額：
+  // 每股30元，共4股
+  // 總出售金額 = 4 * 30 = 120元
+
+  // 計算報酬：
+  // 報酬 = 總出售金額 - 總投資金額 = 120 - 225 = -105元
+
+  // 計算報酬率：
+  // 報酬率 = (報酬 / 總投資金額) * 100%
+  // 報酬率 = (-105 / 225) * 100% ≈ -46.67%
+  function rateFn(stockPayYear,pric){
+    //轉換格式
+    const arrayValue = stockPayYear.map(i=>{
+      return {
+        year: i.year,
+        pric: i[pric],
+        average: i.average
+      }
+    })
+
+    //總投資金額
+    console.log(`array`,arrayValue)
+    const total = arrayValue.reduce((accumulator, currentValue, currentIndex, array)=>{  
+      return accumulator + Number(currentValue.pric);
+    },0)
+    console.log(`total`,total)
+    //總出售金額
+    const sell = arrayValue.length*Number(arrayValue.slice(-1)[0]['average'])
+    console.log(`sell`,arrayValue.length,Number(arrayValue.slice(-1)[0]['average']),arrayValue.length*Number(arrayValue.slice(-1)[0]['average']))
+    //計算報酬
+    const pay = Number(sell) - Number(total) 
+    //報酬率 
+    const rate = ((pay/total)*100).toFixed(2) 
+    console.log(`rate,${rate}`)
+    return rate;
+  }
+
+  console.log('max',rateFn(stockPayYear,'max'))
+  console.log('min',rateFn(stockPayYear,'min'))
+  console.log('average',rateFn(stockPayYear,'average'))
+  // return{
+  //   max:rateFn(stockPayYear,'max'),
+  //   min:rateFn(stockPayYear,'min'),
+  // }
+}
 function stockCagr(stockPayYear){
   console.log(`stockCagr,跑年化報酬率`)
   //年化報酬率(%) = (總報酬率+1)^(1/年數) -1
@@ -353,16 +433,17 @@ function stockCagr(stockPayYear){
   // console.log(`stockCagr`,stockPayYear)
   let date = stockPayYear.filter(({avenge})=>avenge!=0)
   // console.log(`移除avenge是o的`,date)
-  //移除第一年和最後一年
+  //移除第一年
   date.shift()
-  date.pop()
+  //移除最後一年
+  //date.pop()
   // console.log(`移除第一年和最後一年`,date)
   //total
   const total = date.reduce((accumulator, currentValue, currentIndex, array)=>{
     const avengeValue = currentValue.avenge*1;
     return accumulator + avengeValue;
   },0).toFixed(2) 
-  //結果
+  //資料最少要3年
   // console.log(`total,${Boolean(total)},date,${Boolean(date.length)}`)
   if(total && date.length>1){
     // console.log(`626${(((total/100+1)**(1/date.length)-1)*100).toFixed(2)}`)
@@ -375,10 +456,19 @@ function stockCagr(stockPayYear){
 function stockHighLowPrice(stockdata,year){
   // console.log(`stockHighLowPrice,跑${year}年高低點`)
   //有值
-  let maxClose = stockdata.reduce((a,b)=>a.close>=b.close?a:b)['close']
-  let minClose = stockdata.reduce((a,b)=>a.close<=b.close?a:b)['close']
-  let diffind = (((maxClose-minClose)/maxClose)*100).toFixed(2)+'%'
-  return {'max':Number(maxClose).toFixed(2),'min':Number(minClose).toFixed(2),'diffind': diffind,'year':year} 
+  const max = stockdata.reduce((a,b)=>a.close>=b.close?a:b)
+  const min = stockdata.reduce((a,b)=>a.close<=b.close?a:b)
+  const maxClose = max['close']
+  const minClose = min['close']
+  const average = ((Number(maxClose)+Number(minClose))/2).toFixed(2)
+  let diffind = (((Number(maxClose)-Number(minClose))/Number(minClose))*100).toFixed(2)+'%'
+  if(max.date<min.date){
+    diffind = (((Number(maxClose)-Number(minClose))/Number(maxClose))*100).toFixed(2)
+    diffind = (diffind*-1)+'%'
+  }
+  //diffind = ?diffind:'-'+diffind
+  //console.log('date',max.date,min.date,)
+  return {'max':Number(maxClose).toFixed(2),'min':Number(minClose).toFixed(2),'average':average,'diffind': diffind,'year':year} 
 }
 function stockHighLowPriceMoreYear(stockdata,number){
   if(!stockdata.length){console.log(`stockHighLowPriceMoreYear,沒有股票資料`)}
@@ -392,14 +482,14 @@ function stockHighLowPriceMoreYear(stockdata,number){
     // console.log(`before_year,${before_year}`)
     if(!stockdata.length || !number){
       console.log(`stockHighLowPriceMoreYear,datalength,沒有值`)
-      json.push({'max':'0','min':'0','diffind': '0','year':before_year}) 
+      json.push({'max':'0','min':'0','diffind': '0','average':'0','year':before_year}) 
       continue;
     }
     // console.log(`stockHighLowPriceMoreYear,stockdata,${JSON.stringify(stockdata)}`)
     const data = stockdata.filter(item=>item.date.split('-')[0]==before_year)
     if(!data.length){
       console.log(`stockHighLowPriceMoreYear,data,沒有值`)
-      json.push({'max':'0','min':'0','diffind': '0','year':before_year}) 
+      json.push({'max':'0','min':'0','diffind': '0','average':'0','year':before_year}) 
       continue;
     }
     // console.log(`data,${JSON.stringify(data)}`)
@@ -578,4 +668,5 @@ module.exports={
   getMa,
   getAccumulate,
   stockAvenge,
+  stockRate
 }

@@ -29,6 +29,10 @@ async function nowPage({row}) {
   data['stockPayTenDay'] = stockPay(stockdata,10);
   //20日報酬
   data['stockPayTwentyDay'] = stockPay(stockdata,20);
+  //60日報酬
+  data['stockPaySixtyDay'] = stockPay(stockdata,60);
+  //120日報酬
+  data['stockPayOneHundredDay'] = stockPay(stockdata,120);
   //今年每月報酬
   data['stockPayMonth'] = stockPayMoreMonth(stockdata,6);
   //最近10年每年報酬
@@ -45,7 +49,7 @@ async function nowPage({row}) {
   // }
   //殖利率
   let yieldObj = row['yielddata']?JSON.parse(row['yielddata']):'';
-  yieldObj = stockYieldPrice(yieldObj,stockdata);
+  yieldObj = stockYieldPrice(yieldObj,stockdata,3);
   // row['stockYield'] = yieldObj.stockYield;//每年殖利率
   // data['average'] = yieldObj.average;//平均股利
   // data['averageYield'] =yieldObj.averageYield;//平均殖利率

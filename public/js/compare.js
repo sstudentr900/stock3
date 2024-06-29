@@ -163,6 +163,8 @@ function creatStrockHtml(data){
     <li><p>${data['stockPayFiveDay']}%</p></li>
     <li><p>${data['stockPayTenDay']}%</p></li>
     <li><p>${data['stockPayTwentyDay']}%</p></li>
+    <li><p>${data['stockPaySixtyDay']}%</p></li>
+    <li><p>${data['stockPayOneHundredDay']}%</p></li>
     ${stockPayMonth}
     ${stockPayYear}
     <li><p>${data['stockCagr']}%</p></li>

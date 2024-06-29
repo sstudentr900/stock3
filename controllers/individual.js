@@ -12,7 +12,8 @@ const {
   getSort,
   getLastTime,
   getMa,
-  getAccumulate
+  getAccumulate,
+  stockRate
 } = require("../plugin/stockFn");
 
 async function nowPage({row}) {
@@ -94,12 +95,17 @@ async function nowPage({row}) {
   data['stockPayYear'] = await stockPayMoreYear(data['stockdata'],5);
   //年化報酬率
   data['stockCagr'] = stockCagr(data['stockPayYear']);
+  //6年高低點
+  data['highLowPrice'] = stockHighLowPriceMoreYear(data['stockdata'],5);
+  //高點低點年化報酬率
+  //console.log(stockHightCagr,stockCagr(stockHightCagr),stockCagr(stockLowCagr))
+  //data['stockRate'] = stockRate(data['highLowPrice']);
   //淨值
   // row['networthdata'] = row['networthdata']?JSON.parse(row['networthdata']):''
   data['networthdata'] = getSort({obj:row['networthdata'],number:6})
   //殖利率
   row['yielddata'] = row['yielddata']?JSON.parse(row['yielddata']):''
-  const yieldObj = stockYieldPrice(row['yielddata'],data['stockdata']);
+  const yieldObj = stockYieldPrice(row['yielddata'],data['stockdata'],3);
   data['stockYield'] = yieldObj.stockYield;//每年殖利率
   data['average'] = yieldObj.average;//平均股利
   // data['averageYield'] =yieldObj.averageYield;//平均殖利率
@@ -114,8 +120,6 @@ async function nowPage({row}) {
   data['shareholding'] = getLastTime({obj:row['shareholding']});
   //夏普值
   data['sharpedata'] = row['sharpedata']?JSON.parse(row['sharpedata']).slice(-7):'';
-  //6年高低點
-  data['highLowPrice'] = stockHighLowPriceMoreYear(data['stockdata'],5);
   //周kd
   // data['wkd_d'] = stockKdFn(stockdataFn_w(data['stockdata']))['last_d'];
 
