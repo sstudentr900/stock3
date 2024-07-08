@@ -254,7 +254,7 @@ async function stockNetWorthX(stockno,networth){
 }
 async function stockGetStockHolderX({dataDate='2015-01-01',stockno}){
   // await sleep(2000);
-  console.log(`stockGetStockHolder,抓取股東持股分級週統計圖,https://goodinfo.tw/tw/EquityDistributionClassHis.asp?STOCK_ID=${stockno}`)
+  console.log(`stockGetStockHolder,抓取股東持股人數,https://goodinfo.tw/tw/EquityDistributionClassHis.asp?STOCK_ID=${stockno}`)
   await sleep(20000)
   // const year = nowDate.split('-')[0]
   const options  = {
@@ -1621,7 +1621,7 @@ async function stockGetfinancing({dataDate='2015-01-01',stockno}){
 }
 async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
   // await sleep(2000);
-  console.log(`stockGetStockHolder,抓取股東持股分級週統計圖,https://agdstock.club/EquityDistribution/${stockno}`)
+  console.log(`stockGetStockHolder,抓取股東持股人數,https://agdstock.club/EquityDistribution/${stockno}`)
   // await sleep(20000)
   // const year = nowDate.split('-')[0]
   const options  = {
@@ -1734,7 +1734,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   const financingValue = await stockIsGetValue({'fnName': stockGetfinancing,'stockdata':financing,'stockno':stockno})
   financingValue?result.financing = financingValue:'';
 
-  console.log(`抓取${stockno}股東持股分級週統計圖`)
+  console.log(`抓取${stockno}股東持股人數`)
   const holderValue = await stockIsGetValue({'fnName': stockGetStockHolder,'stockdata':holder,'stockno':stockno})
   holderValue?result.holder = holderValue:'';
 

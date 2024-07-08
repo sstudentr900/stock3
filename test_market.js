@@ -519,7 +519,7 @@ async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno,nowDate}){
   })
 }
 async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
-  console.log(`stockGetStockHolder,抓取股東持股分級週統計圖`)
+  console.log(`stockGetStockHolder,抓取股東持股人數`)
   // const year = nowDate.split('-')[0]
   const options  = {
     url: `https://goodinfo.tw/tw/EquityDistributionClassHis.asp?STOCK_ID=${stockno}`,
@@ -611,7 +611,7 @@ async function aa(){
   //抓取個股法人買賣超和融資融劵
   // const StockThreeCargo = await stockIsGetValue({'fnName': stockGetStockThreeCargo,stockno:'00888','stockdata':JSON.stringify([{ date: '2023-08-01'}])})
   // console.log(StockThreeCargo)
-  //抓取股東持股分級週統計圖
+  //抓取股東持股人數
   // const stockHolder = await stockIsGetValue({'fnName': stockGetStockHolder,stockno:'00888','stockdata':''})
   // console.log(stockHolder)
 }

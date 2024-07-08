@@ -88,7 +88,8 @@ async function search(req, res) {
     }
     //景氣對策信號
     if(row['prosperity']){
-      const prosperity =  JSON.parse(row['prosperity']).slice(-100)
+      //const prosperity =  JSON.parse(row['prosperity']).slice(-100)
+      const prosperity =  JSON.parse(row['prosperity'])
       //日期
       // row['prosperity_date'] = prosperity.map(({date})=>`${date.split('-')[0].slice(-2)}-${date.split('-')[1]}`)
       row['prosperity_date'] = prosperity.map(({date})=>date)

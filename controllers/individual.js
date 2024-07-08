@@ -66,17 +66,19 @@ async function nowPage({row}) {
     const obj = data['stockdata'].find(item=>date==item.date)
     return obj?Number(obj.close):0
   })
-  //股東持股分級週統計圖	
+  //股東持股人數	
   const holder = JSON.parse(row['holder'])
+  //股東持股分級_列表
   data['holder'] = getSort({obj:row['holder'],number:18})
   //股東持股分級_日期
   data['holder_date'] = holder.map(({date})=>date)
   //股東持股分級
   data['holder_data'] = holder.map(({big50,big100,big400,big800,big1000,big1001})=>{
-    return Number(big400.split(',').join(''))+Number(big800.split(',').join(''))+Number(big1000.split(',').join(''))+Number(big1001.split(',').join(''))
+    return Number(big400.split(',').join(''))
+    //return Number(big400.split(',').join(''))+Number(big800.split(',').join(''))+Number(big1000.split(',').join(''))+Number(big1001.split(',').join(''))
     // return Number(big50.split(',').join(''))+Number(big100.split(',').join(''))
   })
-  data['holder_data'] = getAccumulate({ obj:data['holder_data'] })
+  //data['holder_data'] = getAccumulate({ obj:data['holder_data'] })
   //股東持股分級_加權指數
   data['holder_market'] = holder.map(({date})=>{
     // const obj = data['stockdata'].find(item=>item.date == date)

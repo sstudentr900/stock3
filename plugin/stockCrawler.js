@@ -854,7 +854,7 @@ async function stocksharpe({stockno,nowDate}){
 async function stockGetData3({dataDate,stockno,nowDate}){
   stockno = stockno.split('.')[0];
   stockno = stockno=='^TWII'?'加權指數':stockno
-  console.log(`stockGetData3,抓取加權資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
+  console.log(`stockGetData3,抓取資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   const url = encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`);
@@ -1196,7 +1196,7 @@ async function stockGetfinancing({dataDate='2015-01-01',stockno}){
 }
 async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
   // await sleep(2000);
-  console.log(`stockGetStockHolder,抓取股東持股分級週統計圖,https://agdstock.club/EquityDistribution/${stockno}`)
+  console.log(`stockGetStockHolder,抓取股東持股人數,https://agdstock.club/EquityDistribution/${stockno}`)
   // await sleep(20000)
   // const year = nowDate.split('-')[0]
   const options  = {
@@ -1211,13 +1211,14 @@ async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
     // console.log(body)
     const $ = cheerio.load(body);
     const json=[]
-    const trs = $("#t01 tr");
+    const trs = $("#t04 tr");
     for (let i = 1; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
       obj['date'] = td.eq(0).text().trim()
       // console.log(`stockGetStockHolder,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
       if(dataDate>=obj['date']){continue;}
+      obj['totle'] = td.eq(1).text().trim().split(',').join('');//總人數
       obj['big50'] = td.eq(2).text().trim().split(',').join('');//大於10張
       obj['big100'] = td.eq(3).text().trim().split(',').join('');//大於50張
       obj['big400'] = td.eq(4).text().trim().split(',').join('');//大於100張
@@ -1342,7 +1343,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   const financingValue = await stockIsGetValue({'fnName': stockGetfinancing,'stockdata':financing,'stockno':stockno})
   financingValue?result.financing = financingValue:'';
 
-  console.log(`抓取${stockno}股東持股分級週統計圖`)
+  console.log(`抓取${stockno}股東持股人數`)
   const holderValue = await stockIsGetValue({'fnName': stockGetStockHolder,'stockdata':holder,'stockno':stockno})
   holderValue?result.holder = holderValue:'';
 

@@ -11,7 +11,7 @@ window.onload=async function(){
   //三大法人和融資融劵
   const threecargo_chart = echarts.init(document.getElementById('threecargo_chart'));
   const financing_chart = echarts.init(document.getElementById('financing_chart'));
-  //股東持股分級週統計圖
+  //股東持股人數
   const holder_chart = echarts.init(document.getElementById('holder_chart'));
   window.addEventListener('resize', function() {
     line_chart.resize();

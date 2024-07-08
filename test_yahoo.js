@@ -17,16 +17,16 @@ async function stockGetData(stockno,from,to){
   })
 }
 
-//
-// $stockno = '^TWII';
-$stockno = '00713.TW';
-stockGetData($stockno,'2023-09-15','2023-09-27').then((jsons)=>{
+//抓取範例
+$stockno = '^TWII';
+//$stockno = '00713.TW';
+stockGetData($stockno,'2014-01-01','2014-12-31').then((jsons)=>{
   console.log('21',jsons)
-  if(!jsons){
-    console.log('y')
-  }else{
-    console.log('n')
-  }
+  // if(!jsons){
+  //   console.log('y')
+  // }else{
+  //   console.log('n')
+  // }
 }).catch((jsons)=>{
   console.log('23',jsons)
 })

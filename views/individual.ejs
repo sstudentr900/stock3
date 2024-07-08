@@ -30,7 +30,7 @@
             <div class="publicBox threecargo">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://agdstock.club/lgpd/2330" target="_blank">三大法人</a></h4>
+                  <h4><a href="https://agdstock.club/lgpd/<%=data['stockno']%>" target="_blank">三大法人</a></h4>
                   <p class="time">更新時間 : <%= data['threecargo']?data['threecargo'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -64,7 +64,7 @@
             <div class="publicBox financing">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://agdstock.club/LoanAndLending/2330" target="_blank">融資融劵</a></h4>
+                  <h4><a href="https://agdstock.club/LoanAndLending/<%=data['stockno']%>" target="_blank">融資融劵</a></h4>
                   <p class="time">更新時間 : <%= data['financing']?data['financing'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -101,7 +101,7 @@
             <div class="publicBox holder">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://agdstock.club/EquityDistribution/2330" target="_blank">股東持股分級週統計圖</a></h4>
+                  <h4><a href="https://agdstock.club/EquityDistribution/<%=data['stockno']%>" target="_blank">股東持股人數</a></h4>
                   <p class="time">更新時間 : <%= data['holder']?data['holder'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -109,16 +109,18 @@
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>
+                  <li><p>總人數</p></li>
                   <li><p>50張以下</p></li>
-                  <li><p>100張以下</p></li>
-                  <li><p>400張以下</p></li>
-                  <li><p>800張以下</p></li>
-                  <li><p>1000張以下</p></li>
+                  <li><p>50-100張</p></li>
+                  <li><p>100-400張</p></li>
+                  <li><p>400-800張</p></li>
+                  <li><p>800-1000張</p></li>
                   <li><p>1000張以上</p></li>
                 </ul>
                 <% if(data['holder']){ data['holder'].forEach(function(o) { %>
                 <ul class="table_content">
                   <li class='date'><p><%= o.date %></p></li>
+                  <li><p><%= o.totle %></p></li>
                   <li><p><%= o.big50 %></p></li>
                   <li><p><%= o.big100 %></p></li>
                   <li><p><%= o.big400 %></p></li>
@@ -132,7 +134,7 @@
             <div class="publicBox sharpedata">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://www.moneydj.com/ETF/X/Basic/Basic0010.xdjhtm?etfid=00713.TW" target="_blank">報酬率比較表</a></h4>
+                  <h4><a href="https://www.moneydj.com/ETF/X/Basic/Basic0010.xdjhtm?etfid=<%=data['stockno']%>.TW" target="_blank">報酬率比較表</a></h4>
                   <p class="time">更新時間 : <%= data['sharpedata']?data['sharpedata'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -174,32 +176,32 @@
                 </ul>
                 <% if(data['cheapPrice']){ %>
                 <ul class="table_content">
-                  <li><p>便宜(股利*16)</p></li>
+                  <li><p>便宜(股利*16約6%)</p></li>
                   <li><p><%= data['cheapPrice'] %></p></li>
                 </ul>
                 <% } %>
                 <% if(data['fairPrice']){ %>
                   <ul class="table_content">
-                    <li><p>合理(股利*20)</p></li>
+                    <li><p>合理(股利*20約5%)</p></li>
                     <li><p><%= data['fairPrice'] %></p></li>
                   </ul>
                 <% } %>
                 <% if(data['expensivePrice']){ %>
                   <ul class="table_content">
-                    <li><p>昂貴(股利*32)</p></li>
+                    <li><p>昂貴(股利*32約3%)</p></li>
                     <li><p><%= data['expensivePrice'] %></p></li>
                   </ul>
                 <% } %>
                 <ul class="table_content">
-                  <li><p>目前價格</p></li>
-                  <li><p><%= data['stock_price'][data['stock_price'].length - 1][1] %></p></li>
+                  <li><p>平均股利/目前價格</p></li>
+                  <li><p><%= data['average'] %>/<%= data['stock_price'][data['stock_price'].length - 1][1] %></p></li>
                 </ul>
               </div>
             </div>
             <div class="publicBox stockYield">
               <div class="publictitle">
                 <div class="title">
-                  <a href="https://histock.tw/stock/00713/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF" target="_blank"><h4>最近<%= data['stockYield'].length %>年殖利率</h4></a>
+                  <a href="https://histock.tw/stock/<%=data['stockno']%>/%E9%99%A4%E6%AC%8A%E9%99%A4%E6%81%AF" target="_blank"><h4>最近<%= data['stockYield'].length %>年殖利率</h4></a>
                   <!-- <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p> -->
                 </div>
               </div>
@@ -225,7 +227,7 @@
             <div class="publicBox networthdata">
               <div class="publictitle">
                 <div class="title">
-                  <a href="https://www.moneydj.com/ETF/X/Basic/Basic0003.xdjhtm?etfid=00713.TW" target="_blank"><h4>最近淨值</h4></a>
+                  <a href="https://www.moneydj.com/ETF/X/Basic/Basic0003.xdjhtm?etfid=<%=data['stockno']%>.TW" target="_blank"><h4>最近淨值</h4></a>
                   <p class="time">更新時間 : <%= data['networthdata']?data['networthdata'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -252,7 +254,7 @@
               <div class="customTable">
                 <ul class="table_title">
                   <li class='date'><p>日期</p></li>
-                  <li><p>買點 / 賣點 / 報酬</p></li>
+                  <li><p>年初買 / 年尾賣 / 報酬</p></li>
                 </ul>
                 <% if(data['stockPayYear']){data['stockPayYear'].forEach(function(o) { %>
                 <ul class="table_content">
@@ -291,7 +293,7 @@
             <div class="publicBox industry">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=00713.TW" target="_blank">持股產業</a></h4>
+                  <h4><a href="https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=<%=data['stockno']%>.TW" target="_blank">持股產業</a></h4>
                   <p class="time">更新時間 : <%= data['industry']?data['industry'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -311,7 +313,7 @@
             <div class="publicBox shareholding">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=00713.TW" target="_blank">持股明細</a></h4>
+                  <h4><a href="https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=<%=data['stockno']%>.TW" target="_blank">持股明細</a></h4>
                   <p class="time">更新時間 : <%= data['shareholding']?data['shareholding'][0]['date']:'' %></p>
                 </div>
               </div>

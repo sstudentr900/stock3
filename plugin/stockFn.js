@@ -309,6 +309,7 @@ function stockPayMoreYear(stockdata,number){
   }
 
   //有值
+  //console.log('nowTimeObj',nowTimeObj['year'],year)
   while (year <= nowTimeObj['year']){
     // const obj = {}
     // obj[`${year}`] = stockPayOneYear(stockdata,year)
@@ -316,19 +317,29 @@ function stockPayMoreYear(stockdata,number){
     // obj['avenge'] = stockPayOneYear(stockdata,year);
     // row.push(obj)
     const array = stockdata.filter(({date})=>{
-      // console.log(date,date>'2024-01-01')
+      //console.log(date,`${year}-01-01`,`${year}-12-31`,date>=`${year}-01-01`&& date<=`${year}-12-31`)
       return date>=`${year}-01-01` && date<=`${year}-12-31`;
     })
-
+    //console.log('array',array)
     // const max = array.reduce((a,b)=>a.close>=b.close?a:b)
     // const min = array.reduce((a,b)=>a.close<=b.close?a:b)
-    const objs = stockPayOneYear(array,year)
-    row.push({
-      'year': year+'',
-      'avenge': objs.avenge,
-      'bull': objs.bull,
-      'sell': objs.sell,
-    })
+    if(array.length){
+      const objs = stockPayOneYear(array,year)
+      //console.log('objs',objs)
+      row.push({
+        'year': year+'',
+        'avenge': objs.avenge,
+        'bull': objs.bull,
+        'sell': objs.sell,
+      })
+    }else{
+      row.push({
+        'year': year+'',
+        'avenge': '0',
+        'bull': '0',
+        'sell': '0',
+      })
+    }
     year++
   }
   return row;
