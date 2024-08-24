@@ -197,6 +197,19 @@
               </div>
               <div id="smallhouseholds_chart"></div>
             </div>
+            <div class="publicBox bigcargo">
+              <div class="publictitle">
+                <div class="title">
+                  <h4><a href="https://www.kgi.com.tw/zh-tw/product-market/stock-market-overview/tw-stock-market/tw-stock-market-detail?a=B658010E71E243C4A1D6B5F7BE914BDC&b=5D48401A7CE148CD8ABAC965F9B5AFBF" target="_blank">台股大盤融資維持率</a></h4>
+                  <ul class="item">
+                    <li>更新時間 : <%= data['bigcargo_date']?data['bigcargo_date'].at(-1):'' %></li>
+                    <li>140~130%可能是波段低點</li>
+                    <!-- <li>股票下跌22%，維持率低130%,斷頭</li> -->
+                  </ul>
+                </div>
+              </div>
+              <div id="bigcargo_chart"></div>
+            </div>
           </div>
           <div class="publicCol-3 customNav">
             <% /* %>
@@ -224,7 +237,7 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://agdstock.club/slgpd-p" target="_blank">上市法人買賣排名</a></h4>
+                  <h4><a href="https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB" target="_blank">上市法人買賣排名</a></h4>
                   <p class="time">更新時間 : <%= data['ranking']?data['ranking'][0]['date']:'' %></p>
                 </div>
               </div>
@@ -245,7 +258,7 @@
             <div class="publicBox">
               <div class="publictitle">
                 <div class="title">
-                  <h4><a href="https://agdstock.club/udc-p" target="_blank">大股東持股增減</a></h4>
+                  <h4><a href="https://agdstock.club/eqc/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB" target="_blank">大股東持股增減</a></h4>
                   <p class="time">更新時間 : <%= data['holder']?data['holder'][0]['date']:'' %></p>
                 </div>
               </div>

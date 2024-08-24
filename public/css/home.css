@@ -74,6 +74,7 @@
 .home #prosperity_chart,
 .home #dollars_chart,
 .home #smallhouseholds_chart,
+.home #bigcargo_chart,
 .home #weighted_chart {
   width: 100%;
   height: 400px;

@@ -117,6 +117,47 @@ async function stockGetThreeCargo({dataDate}){
   await browser.close();
   return json
 }
+async function stockGetBigCargo({dataDate}){
+  console.log(`stockGetBigCargo,大盤融資,https://kgiweb.moneydj.com/b2brwdCommon/jsondata/32/06/4a/twstockdata.xdjjson?x=afterHours-market0002-1&b=d&c=61&revision=2018_07_31_1`)
+  const options  = {
+    url: `https://kgiweb.moneydj.com/b2brwdCommon/jsondata/32/06/4a/twstockdata.xdjjson?x=afterHours-market0002-1&b=d&c=61&revision=2018_07_31_1`,
+    method: 'GET',
+    headers:{
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    }
+  }
+  return await stockPromise(options)
+  .then(body=>{
+    const infos = JSON.parse(body).ResultSet.Result;
+    //console.log(infos.length)
+    const json = []
+    for (let i = 0; i < infos.length; i++) {
+      const obj = {}
+      //console.log(i,infos[i],infos[i]['V1'])
+      obj['date'] = infos[i]['V1'].replace(/\//g, '-');//日期
+      //console.log(`stockGetBigCargo,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
+      if(dataDate && dataDate>=obj['date']){continue;}
+      //obj[''] = infos[i][''];//融資增減(億)
+      obj['fi'] = infos[i]['V3'];//融資餘額(億)
+      //obj[''] = infos[i][''];//融券增減(張)
+      obj['se'] = infos[i]['V4'];//融券餘額(張)
+      obj['ma'] = infos[i]['V6'];//融資維持率(%)
+      json.push(obj)
+    }
+    //排序小到大
+    json.sort((o1,o2)=>{
+      o1 = Number(o1['date'].split('-').join(''))
+      o2 = Number(o2['date'].split('-').join(''))
+      return o1-o2;
+    })
+    //console.log(json)
+    return json;
+  })
+  .catch((error)=>{
+    console.log(`stockGetBigCargo,大盤融資,${error}`)
+    return false
+  })
+}
 async function stockGetMonthlystatistics({stockdata}){
   console.log(`stockGetMonthlystatistics,月統計,https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8`)
   await sleep(20000)
@@ -245,11 +286,11 @@ async function stockGetExdividend({stockdata}){
   })
 }
 async function stockGetUpDownNumber({dataDate}){
-  console.log(`stockUpDownNumber,上下跌家數大盤上下漲,https://agdstock.club/udc-p`)
+  console.log(`stockUpDownNumber,上下跌家數大盤上下漲,https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`)
   // const dt = getNowTimeObj();
   // const year = dt['year']; //抓取前年
   const options  = {
-    url: `https://agdstock.club/udc-p`,
+    url: `https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -291,9 +332,9 @@ async function stockGetUpDownNumber({dataDate}){
   })
 }
 async function stockGetShareholder({dataDate}){
-  console.log(`stockGetShareholder,抓取股東增減,https://agdstock.club/udc-p`)
+  console.log(`stockGetShareholder,上市大股東增減排名,https://agdstock.club/eqc/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`)
   const options  = {
-    url: `https://agdstock.club/udc-p`,
+    url: `https://agdstock.club/eqc/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -305,8 +346,8 @@ async function stockGetShareholder({dataDate}){
     const $ = cheerio.load(body);
     const json = []
     //股東
-    const shareholder_date = $("aside>div.row>div.col-12").eq(2).find("div.col-5.box-title.text-right").text();
-    const shareholder = $("aside>div.row>div.col-12").eq(2).find("tbody tr");
+    const shareholder_date = $("aside>div.row>div.col-12").eq(1).find("div.col-5.box-title.text-right").text();
+    const shareholder = $("aside>div.row>div.col-12").eq(1).find("tbody tr");
     // console.log('shareholder_date',shareholder_date)
     let shareholder_annotation = 'add';
     for (let i = 1; i < shareholder.length; i++) {
@@ -325,17 +366,18 @@ async function stockGetShareholder({dataDate}){
         json.push(obj)
       }
     }
+    console.log('stockGetShareholder',json)
     return json;
   })
   .catch((error)=>{
-    console.log(`stockGetShareholder,抓取上下跌家數錯誤,${error}`)
+    console.log(`stockGetShareholder,上市大股東增減排名,${error}`)
     return false
   })
 }
 async function stockRanking({dataDate}){
-  console.log(`stockRanking,抓取上市三大法人排名,https://agdstock.club/slgpd-p`)
+  console.log(`stockRanking,抓取上市三大法人排名,https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`)
   const options  = {
-    url: `https://agdstock.club/slgpd-p`,
+    url: `https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -346,7 +388,7 @@ async function stockRanking({dataDate}){
     // console.log(body)
     const $ = cheerio.load(body);
     //上市三大法人排名
-    const card = $("aside .row>.col-12").eq(2).find('.card');
+    const card = $("aside>div.row>.col-12").eq(0).find('.card');
     const date = card.find('.row .col-5.box-title.text-right').text().trim();
     // if(!date){
     //   console.log(`stockRanking,抓取上市三大法人排名,${date}`)
@@ -401,17 +443,20 @@ async function stockGetRetail({dataDate}){
     const $ = cheerio.load(body);
     const json= [];
     //羊群
-    const flock_date = $("main>div.row>div.col-12").eq(2).find("div.col-12.box-sub-title").eq(0).text();
-    const flock1 = $("main>div.row>div.col-12").eq(2).find("div.col-12.col-md-6").eq(0).find("tbody tr");
-    const flock2 = $("main>div.row>div.col-12").eq(2).find("div.col-12.col-md-6").eq(1).find("tbody tr");
-    // console.log(flock_date)
+    let nowDates = getNowTimeObj()['date']
+    nowDates = nowDates.split('-')
+    let date = $("main>div.row>div.col-12").eq(5).find("div.row>div.col-12").eq(0).text().split('/');//日期
+    const flock1 = $("main>div.row>div.col-12").eq(5).find("div.row>div.col-12").eq(1).find("tbody tr");
+    const flock2 = $("main>div.row>div.col-12").eq(5).find("div.row>div.col-12").eq(2).find("tbody tr");
+    date = `${nowDates[0]}-${date[0]}-${date[1]}` 
+    //console.log(dataDate,obj['date'])
     for (let i = 1; i < flock1.length; i++) {
       const obj = {}
       const td = flock1.eq(i).find('td');
       if(td.length==2){
-        obj['date'] = flock_date//日期
+        obj['date'] = date
         if(dataDate && dataDate>=obj['date']){continue;}
-        obj['name'] = td.eq(0).text().trim();//名稱
+        obj['name'] = td.eq(0).text().replace(/\s/g, '');//名稱
         obj['number'] = td.eq(1).text().trim();//數量
         obj['annotation'] = 'add';//數量
         json.push(obj)
@@ -421,9 +466,9 @@ async function stockGetRetail({dataDate}){
       const obj = {}
       const td = flock2.eq(i).find('td');
       if(td.length==2){
-        obj['date'] = flock_date//日期
+        obj['date'] = date//日期
         if(dataDate && dataDate>=obj['date']){continue;}
-        obj['name'] = td.eq(0).text().trim();//名稱
+        obj['name'] = td.eq(0).text().replace(/\s/g, '');//名稱
         obj['number'] = td.eq(1).text().trim();//數量
         obj['annotation'] = 'reduce';//數量
         json.push(obj)
@@ -1375,7 +1420,7 @@ async function stockCrawler({id,stockno,stockdata,yielddata,networthdata,threeca
   }
   console.log(`stockCrawler,結束`)
 }
-async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,threecargo,ranking,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,vix,greedy}){
+async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,threecargo,ranking,threefutures,exdividend,listed,updownnumber,holder,retail,prosperity,dollars,vix,greedy,bigcargo}){
   console.log(`stockCrawler_market開始`)
   //result
   const result = {}
@@ -1388,9 +1433,14 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   const rankingValue = await stockIsGetValue({'fnName': stockRanking,'stockdata':ranking})
   rankingValue?result.ranking = rankingValue:'';
 
-  console.log(`3大法人買賣超`)
+  console.log(`抓取3大法人買賣超融資融卷`)
   const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
   threeCargo?result.threecargo = threeCargo:'';
+
+  console.log(`大盤融資`)
+  const bigCargo = await stockIsGetValue({'fnName': stockGetBigCargo,'stockdata':bigcargo})
+  bigCargo?result.bigcargo = bigCargo:'';
+
 
   console.log(`3大法人期貨`)
   const threeFutures =  await stockIsGetValue({'fnName': stockGetThreeFutures,'stockdata':threefutures})
@@ -1400,7 +1450,7 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   const monthlystatisticsValue = await stockIsGetValue({'fnName': stockGetMonthlystatistics,'stockdata':monthlystatistics})
   monthlystatisticsValue?result.monthlystatistics = monthlystatisticsValue:'';
 
-  console.log(`股東增減`)
+  console.log(`上市大股東增減排名`)
   const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
   shareholder?result.holder = shareholder:'';
 
@@ -1423,6 +1473,7 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   console.log(`散戶多空比`)
   const smallhouseholdsData = await stockIsGetValue({'fnName': stockSmallhouseholds,'stockdata':smallhouseholds})
   smallhouseholdsData?result.smallhouseholds = smallhouseholdsData:'';
+
 
 
   // console.log(`判斷沒有資料跳出`)

@@ -142,6 +142,24 @@ async function search(req, res) {
       })
       delete row.smallhouseholds
     }
+    //大盤融資
+    if(row['bigcargo']){
+      const bigcargo = JSON.parse(row['bigcargo'])
+      //日期
+      row['bigcargo_date'] = bigcargo.map(({date})=>date)
+      //資料
+      row['bigcargo_data'] = bigcargo.map(({ma})=>Number(ma))
+      //加權指數
+      row['bigcargo_market'] = bigcargo.map(({date})=>{
+        let number = 0
+        const obj = data.find((obj,index)=>{
+          number = index;
+          return date==obj.date
+        })
+        return obj?Number(obj.close):Number(data[number].close)
+      })
+      delete row.bigcargo
+    }
     // //上下跌家數
     // const updownnumber = JSON.parse(row['updownnumber'])
     // row['updownnumber'] = getSort({obj:row['updownnumber'],number:10})
@@ -194,6 +212,7 @@ async function search(req, res) {
 
 
     //移除不需要的值和值沒有轉JSON.parse
+    //delete row.bigcargo
     delete row.vix
     delete row.updownnumber
     delete row.listed
