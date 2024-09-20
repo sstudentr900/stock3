@@ -23,8 +23,7 @@ async function search(req, res) {
     row['wii_ma20'] = getMa(20,twii)
     //時間
     row['date'] = getNowTimeObj({'date':row['updated_at']})['date']
-    //上市三大法人排名
-    row['ranking'] = getSort({obj:row['ranking'],number:18})
+    
     //3大法人_買賣超融資卷
     row['threecargofinancing'] = getSort({obj:row['threecargo'],number:10})
     const threecargo = JSON.parse(row['threecargo'])
@@ -61,9 +60,11 @@ async function search(req, res) {
       })
       return obj?Number(obj.close):Number(data[number].close)
     })
-    //大股東增減
+    //三大法人買賣超
+    row['ranking'] = getSort({obj:row['ranking'],number:30})
+    //漲跌家數
     row['holder'] = getSort({obj:row['holder'],number:20})
-    //羊群增減
+    //散戶持股增減
     row['retail'] = getSort({obj:row['retail'],number:20})
     //貪婪指數
     if(row['greedy']){

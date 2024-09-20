@@ -4,6 +4,9 @@ const puppeteer = require('puppeteer');
 const cheerio = require("cheerio");//後端的 jQuery
 const yahooFinance = require('yahoo-finance');
 const { getNowTimeObj,getToISOString } = require("./stockFn");
+const googleUrlObj = {
+  executablePath: "c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+}
 function sleep(ms) {
   return new Promise(resolve=>setTimeout(resolve, ms));
 }
@@ -67,7 +70,7 @@ async function stockIsGetValue({stockdata,fnName,stockno=''}){
 }
 async function stockGetThreeCargo({dataDate}){
   console.log(`stockGetThreeCargo,抓取3大法人買賣超融資融卷,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365`)
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch(googleUrlObj);
   const page = await browser.newPage();
   const url = 'https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT2=DATE&PERIOD=365';
   await page.goto(url);
@@ -332,9 +335,9 @@ async function stockGetUpDownNumber({dataDate}){
   })
 }
 async function stockGetShareholder({dataDate}){
-  console.log(`stockGetShareholder,上市大股東增減排名,https://agdstock.club/eqc/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`)
+  console.log(`stockGetShareholder,漲跌家數,https://agdstock.club/udc-p`)
   const options  = {
-    url: `https://agdstock.club/eqc/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`,
+    url: `https://agdstock.club/udc-p`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -345,39 +348,53 @@ async function stockGetShareholder({dataDate}){
     // console.log(body)
     const $ = cheerio.load(body);
     const json = []
-    //股東
-    const shareholder_date = $("aside>div.row>div.col-12").eq(1).find("div.col-5.box-title.text-right").text();
-    const shareholder = $("aside>div.row>div.col-12").eq(1).find("tbody tr");
-    // console.log('shareholder_date',shareholder_date)
-    let shareholder_annotation = 'add';
-    for (let i = 1; i < shareholder.length; i++) {
+    let nowDates = getNowTimeObj()['date']
+    nowDates = nowDates.split('-')
+    let date = $('.bg1+.table-responsive-md tbody tr td').eq(0).text().split('/');//日期
+    date = `${nowDates[0]}-${date[0]}-${date[1]}` 
+    //console.log(`stockGetShareholder,抓取三大法人買賣超 date,${date}`)
+    if(!date || dataDate>=date){
+      console.log(`stockGetShareholder,抓取三大法人買賣超,${dataDate}>=${date},跳出`);
+      return false;
+    }
+    //買
+    const bg4 = $('.bg4+.table-responsive-md tbody tr');
+    for (let i = 0; i < bg4.length; i++) {
       const obj = {}
-      const td = shareholder.eq(i).find('td');
-      if(i>1 && td.length==1)shareholder_annotation = 'reduce';//註解
+      const td = bg4.eq(i).find('td');
       if(td.length==2){
-        obj['date'] = shareholder_date//日期
-        // console.log(`stockGetShareholder,${dataDate},${obj['date']},${dataDate>=obj['date']}`)
-        if(dataDate && dataDate>=obj['date']){continue;}
-        const texts = td.eq(0).text().trim().split(' ')
-        // console.log('texts',texts)
-        obj['name'] = texts[0].trim()+' '+texts.at(-1).trim();//名稱
+        obj['date'] = date
+        obj['name'] = td.eq(0).text().replace(/\s/g, '');//名稱
         obj['number'] = td.eq(1).text().trim();//數量
-        obj['annotation'] = shareholder_annotation;//數量
+        obj['annotation'] = 'add';//數量
         json.push(obj)
       }
     }
-    console.log('stockGetShareholder',json)
+    //賣
+    const bg5 = $('.bg5+.table-responsive-md tbody tr');
+    for (let i = 0; i < bg5.length; i++) {
+      const obj = {}
+      const td = bg5.eq(i).find('td');
+      if(td.length==2){
+        obj['date'] = date
+        obj['name'] = td.eq(0).text().replace(/\s/g, '');//名稱
+        obj['number'] = td.eq(1).text().trim();//數量
+        obj['annotation'] = 'reduce';//數量
+        json.push(obj)
+      }
+    }
+    // console.log(json)
     return json;
   })
   .catch((error)=>{
-    console.log(`stockGetShareholder,上市大股東增減排名,${error}`)
+    console.log(`stockGetShareholder,漲跌家數,${error}`)
     return false
   })
 }
 async function stockRanking({dataDate}){
-  console.log(`stockRanking,抓取上市三大法人排名,https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`)
+  console.log(`stockRanking,抓取三大法人買賣超,https://agdstock.club/slgpd-p`)
   const options  = {
-    url: `https://agdstock.club/lgpd/2330-%E5%8F%B0%E7%A9%8D%E9%9B%BB`,
+    url: `https://agdstock.club/slgpd-p`,
     method: 'GET',
     headers:{
       'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
@@ -387,49 +404,52 @@ async function stockRanking({dataDate}){
   .then(body=>{
     // console.log(body)
     const $ = cheerio.load(body);
-    //上市三大法人排名
-    const card = $("aside>div.row>.col-12").eq(0).find('.card');
-    const date = card.find('.row .col-5.box-title.text-right').text().trim();
-    // if(!date){
-    //   console.log(`stockRanking,抓取上市三大法人排名,${date}`)
-    // }
-    // console.log(848,dataDate,date)
+    const json= [];
+    let nowDates = getNowTimeObj()['date']
+    nowDates = nowDates.split('-')
+    let date = $('.bg1+.table-responsive-md tbody tr td').eq(0).text().split('/');//日期
+    date = `${nowDates[0]}-${date[0]}-${date[1]}` 
+    //console.log(`stockRanking,抓取三大法人買賣超 date,${date}`)
     if(!date || dataDate>=date){
-      console.log(`stockRanking,抓取上市三大法人排名,${dataDate}>=${date},跳出`);
+      console.log(`stockRanking,抓取三大法人買賣超,${dataDate}>=${date},跳出`);
       return false;
     }
-    const trs = card.find('.row+.box-sub-title+.table-responsive-md tr');
-    const trs2 = card.find('.row+.box-sub-title+.table-responsive-md+.box-sub-title+.table-responsive-md tr');
-    const json = [
-      {'name':trs.eq(1).find('.read-more-dark').text().trim(),'number':trs.eq(1).find('.box-text').text().trim(),'annotation':'add','people':'foreign','date':date},
-      {'name':trs.eq(2).find('.read-more-dark').text().trim(),'number':trs.eq(2).find('.box-text').text().trim(),'annotation':'add','people':'foreign','date':date},
-      {'name':trs.eq(3).find('.read-more-dark').text().trim(),'number':trs.eq(3).find('.box-text').text().trim(),'annotation':'add','people':'foreign','date':date},
-      {'name':trs.eq(5).find('.read-more-dark').text().trim(),'number':trs.eq(5).find('.box-text').text().trim(),'annotation':'add','people':'letter','date':date},
-      {'name':trs.eq(6).find('.read-more-dark').text().trim(),'number':trs.eq(6).find('.box-text').text().trim(),'annotation':'add','people':'letter','date':date},
-      {'name':trs.eq(7).find('.read-more-dark').text().trim(),'number':trs.eq(7).find('.box-text').text().trim(),'annotation':'add','people':'letter','date':date},
-      {'name':trs.eq(9).find('.read-more-dark').text().trim(),'number':trs.eq(9).find('.box-text').text().trim(),'annotation':'add','people':'proprietor','date':date},
-      {'name':trs.eq(10).find('.read-more-dark').text().trim(),'number':trs.eq(10).find('.box-text').text().trim(),'annotation':'add','people':'proprietor','date':date},
-      {'name':trs.eq(11).find('.read-more-dark').text().trim(),'number':trs.eq(11).find('.box-text').text().trim(),'annotation':'add','people':'proprietor','date':date},
-      {'name':trs2.eq(1).find('.read-more-dark').text().trim(),'number':trs2.eq(1).find('.box-text').text().trim(),'annotation':'reduce','people':'foreign','date':date},
-      {'name':trs2.eq(2).find('.read-more-dark').text().trim(),'number':trs2.eq(2).find('.box-text').text().trim(),'annotation':'reduce','people':'foreign','date':date},
-      {'name':trs2.eq(3).find('.read-more-dark').text().trim(),'number':trs2.eq(3).find('.box-text').text().trim(),'annotation':'reduce','people':'foreign','date':date},
-      {'name':trs2.eq(5).find('.read-more-dark').text().trim(),'number':trs2.eq(5).find('.box-text').text().trim(),'annotation':'reduce','people':'letter','date':date},
-      {'name':trs2.eq(6).find('.read-more-dark').text().trim(),'number':trs2.eq(6).find('.box-text').text().trim(),'annotation':'reduce','people':'letter','date':date},
-      {'name':trs2.eq(7).find('.read-more-dark').text().trim(),'number':trs2.eq(7).find('.box-text').text().trim(),'annotation':'reduce','people':'letter','date':date},
-      {'name':trs2.eq(9).find('.read-more-dark').text().trim(),'number':trs2.eq(9).find('.box-text').text().trim(),'annotation':'reduce','people':'proprietor','date':date},
-      {'name':trs2.eq(10).find('.read-more-dark').text().trim(),'number':trs2.eq(10).find('.box-text').text().trim(),'annotation':'reduce','people':'proprietor','date':date},
-      {'name':trs2.eq(11).find('.read-more-dark').text().trim(),'number':trs2.eq(11).find('.box-text').text().trim(),'annotation':'reduce','people':'proprietor','date':date},
-    ]
+    //買
+    const bg4 = $('.bg4+.table-responsive-md tbody tr');
+    for (let i = 0; i < bg4.length; i++) {
+      const obj = {}
+      const td = bg4.eq(i).find('td');
+      if(td.length==2){
+        obj['date'] = date
+        obj['name'] = td.eq(0).text().replace(/\s/g, '');//名稱
+        obj['number'] = td.eq(1).text().trim();//數量
+        obj['annotation'] = 'add';//數量
+        json.push(obj)
+      }
+    }
+    //賣
+    const bg5 = $('.bg5+.table-responsive-md tbody tr');
+    for (let i = 0; i < bg5.length; i++) {
+      const obj = {}
+      const td = bg5.eq(i).find('td');
+      if(td.length==2){
+        obj['date'] = date
+        obj['name'] = td.eq(0).text().replace(/\s/g, '');//名稱
+        obj['number'] = td.eq(1).text().trim();//數量
+        obj['annotation'] = 'reduce';//數量
+        json.push(obj)
+      }
+    }
     // console.log(json)
     return json;
   })
   .catch((error)=>{
-    console.log(`stockRanking,抓取上市三大法人排名,${error}`)
+    console.log(`stockRanking,抓取三大法人買賣超,${error}`)
     return false
   })
 }
 async function stockGetRetail({dataDate}){
-  console.log(`stockGetRetail,抓取羊群增減,https://agdstock.club/flock-p`)
+  console.log(`stockGetRetail,抓取散戶持股增減,https://agdstock.club/flock-p`)
   const options  = {
     url: `https://agdstock.club/flock-p`,
     method: 'GET',
@@ -450,7 +470,7 @@ async function stockGetRetail({dataDate}){
     const flock2 = $("main>div.row>div.col-12").eq(5).find("div.row>div.col-12").eq(2).find("tbody tr");
     date = `${nowDates[0]}-${date[0]}-${date[1]}` 
     //console.log(dataDate,obj['date'])
-    for (let i = 1; i < flock1.length; i++) {
+    for (let i = 0; i < flock1.length; i++) {
       const obj = {}
       const td = flock1.eq(i).find('td');
       if(td.length==2){
@@ -462,7 +482,7 @@ async function stockGetRetail({dataDate}){
         json.push(obj)
       }
     }
-    for (let i = 1; i < flock2.length; i++) {
+    for (let i = 0; i < flock2.length; i++) {
       const obj = {}
       const td = flock2.eq(i).find('td');
       if(td.length==2){
@@ -539,7 +559,8 @@ async function stockGetProsperity({dataDate}){
     url: `https://index.ndc.gov.tw/n/json/data/eco/indicators`,
     method: 'POST',
     headers:{
-      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+      'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+      'Accept': 'application/json'
     }
   }
   return await stockPromise(options)
@@ -561,7 +582,7 @@ async function stockGetProsperity({dataDate}){
   // })
   .then(body=>JSON.parse(body)['line']['12']['data'])
   .then(datas=>{
-    // console.log(`stockGetProsperity,datas,${datas}`,time)
+    //console.log(`stockGetProsperity,datas:`,datas,time)
     const json = datas.filter(row=>{
       // console.log(`stockProsperity,${row.x},${time},${row.x>time}`)
       return row.x>time && row.y
@@ -900,7 +921,7 @@ async function stockGetData3({dataDate,stockno,nowDate}){
   stockno = stockno.split('.')[0];
   stockno = stockno=='^TWII'?'加權指數':stockno
   console.log(`stockGetData3,抓取資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch(googleUrlObj);
   const page = await browser.newPage();
   const url = encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`);
   await page.goto(url);
@@ -1429,10 +1450,6 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   const twiiValue = await stockIsGetValue({'fnName': stockGetData3,'stockdata':twii,'stockno':'^TWII'})
   twiiValue?result.twii = twiiValue:'';
 
-  console.log(`上市三大法人排名`)
-  const rankingValue = await stockIsGetValue({'fnName': stockRanking,'stockdata':ranking})
-  rankingValue?result.ranking = rankingValue:'';
-
   console.log(`抓取3大法人買賣超融資融卷`)
   const threeCargo = await stockIsGetValue({'fnName': stockGetThreeCargo,'stockdata':threecargo})
   threeCargo?result.threecargo = threeCargo:'';
@@ -1450,11 +1467,15 @@ async function stockCrawler_market({id,twii,smallhouseholds,monthlystatistics,th
   const monthlystatisticsValue = await stockIsGetValue({'fnName': stockGetMonthlystatistics,'stockdata':monthlystatistics})
   monthlystatisticsValue?result.monthlystatistics = monthlystatisticsValue:'';
 
-  console.log(`上市大股東增減排名`)
+  console.log(`三大法人買賣超`)
+  const rankingValue = await stockIsGetValue({'fnName': stockRanking,'stockdata':ranking})
+  rankingValue?result.ranking = rankingValue:'';
+
+  console.log(`漲跌家數`)
   const shareholder = await stockIsGetValue({'fnName': stockGetShareholder,'stockdata':holder})
   shareholder?result.holder = shareholder:'';
 
-  console.log(`羊群增減`)
+  console.log(`散戶持股增減`)
   const stockRetail = await stockIsGetValue({'fnName': stockGetRetail,'stockdata':retail})
   stockRetail?result.retail = stockRetail:'';
 
