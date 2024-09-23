@@ -923,8 +923,10 @@ async function stockGetData3({dataDate,stockno,nowDate}){
   console.log(`stockGetData3,抓取資料,https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`)
   const browser = await puppeteer.launch(googleUrlObj);
   const page = await browser.newPage();
-  const url = encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`);
-  await page.goto(url);
+  //const url = encodeURI(`https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`);
+  const url = `https://goodinfo.tw/tw/ShowK_Chart.asp?STOCK_ID=${stockno}&CHT_CAT2=DATE&PERIOD=365`;
+  //await sleep(30000)
+  await page.goto(url,{timeout: 1000*120}); //超時120秒
   // 等待元素載入完成
   await page.waitForSelector("#divPriceDetail tr[align='center']");
   //把網頁的body抓出來
