@@ -22,6 +22,8 @@ window.onload=async function(){
   const smallhouseholds_chart = echarts.init(document.getElementById('smallhouseholds_chart'));
   //大盤融資
   const bigcargo_chart = echarts.init(document.getElementById('bigcargo_chart'));
+  //大盤回撤曲線
+  const retracement_chart = echarts.init(document.getElementById('retracement_chart'));
   //恐慌指數
   // const vix_chart = echarts.init(document.getElementById('vix_chart'));
 
@@ -36,6 +38,7 @@ window.onload=async function(){
     greedy_chart.resize();
     smallhouseholds_chart.resize();
     bigcargo_chart.resize();
+    retracement_chart.resize();
   });
   let color = {
     up: '#c40f0fd3',
@@ -57,16 +60,19 @@ window.onload=async function(){
       right: '2%',
       data: ['MA5', 'MA10', 'MA20']
     },
-    grid: [{
-      left: '39rem',
-      right: '2%',
-      height: '55%'
-    }, {
-      left: '39rem',
-      right: '2%',
-      bottom: '12%',
-      height: '10%'
-    }],
+    grid: [
+      {
+        left: '39rem',
+        right: '2%',
+        height: '55%'
+      }, 
+      {
+        left: '39rem',
+        right: '2%',
+        bottom: '12%',
+        height: '10%'
+      }
+    ],
     tooltip: {
       trigger: 'axis',
       axisPointer: {
@@ -212,8 +218,8 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 80,
-      top: 30,
+      right: 50,
+      top: 20,
       bottom: 50
     },
     tooltip: {
@@ -300,8 +306,8 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 80,
-      top: 30,
+      right: 60,
+      top: 20,
       bottom: 50
     },
     tooltip: {
@@ -376,7 +382,7 @@ window.onload=async function(){
   //   grid: {
   //     left: 50, //畫面編距
   //     right: 50,
-  //     top: 30,
+  //     top: 20,
   //     bottom: 50
   //   },
   //   tooltip: {
@@ -453,7 +459,7 @@ window.onload=async function(){
     grid: {
       left: 50, //畫面編距
       right: 30,
-      top: 30,
+      top: 20,
       bottom: 20
     },
     tooltip: {
@@ -570,7 +576,7 @@ window.onload=async function(){
     grid: {
       left: 50, //畫面編距
       right: 30,
-      top: 30,
+      top: 20,
       bottom: 20
     },
     tooltip: {
@@ -682,7 +688,7 @@ window.onload=async function(){
     grid: {
       left: 50, //畫面編距
       right: 30,
-      top: 30,
+      top: 20,
       bottom: 20
     },
     tooltip: {
@@ -764,9 +770,9 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 80,
-      top: 30,
-      bottom: 50
+      right: 30,
+      top: 20,
+      bottom: 20
     },
     tooltip: {
       trigger: 'axis',
@@ -839,9 +845,9 @@ window.onload=async function(){
     },
     grid: {
       left: 50, //畫面編距
-      right: 80,
-      top: 30,
-      bottom: 50
+      right: 30,
+      top: 20,
+      bottom: 20
     },
     tooltip: {
       trigger: 'axis',
@@ -928,6 +934,153 @@ window.onload=async function(){
       }
     ]
   };
+  const retracement_chart_option = {
+    color: [
+      '#058296',
+      '#a3b3b5',
+      '#e0e6f1',
+    ],
+    title: {
+      show: false //標題
+    },
+    grid: [
+      {
+        top: 20,
+        left: 50,
+        right: 50,
+        height: '79%'
+      }, 
+      {
+        left: 50,
+        right: 50,
+        bottom: 20,
+        height: '10%'
+      }
+    ],
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' }
+    },
+    // legend: {
+    //   show: false //圖例
+    // },
+    xAxis: [
+      {
+        type: 'category',
+        data: pageJson['twii_date'],
+        position: 'top', //顶部
+        axisTick: {
+          show: false,//刻度
+        },
+        axisLabel: {
+          show: false, //日期
+        },
+        axisLine: {
+          show: true, //轴线
+        },
+      },
+      {
+        type: 'category',
+        data: pageJson['twii_date'],
+        position: 'bottom', //底部
+        axisTick: {
+          alignWithLabel: true,
+          inside: false, //确保刻度线在底部
+          // length: 20,
+          // show: true,//刻度
+          // lineStyle: {
+          //   type: 'dashed'
+          // }
+        },
+        axisLabel: {
+          //日期
+        },
+        axisLine: {
+          show: true,//線
+        },
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        position: 'right',
+        scale: true, //顯示最大
+        // splitLine: {
+        //   show: false, //中間線線關閉
+        // },
+        axisLabel: {
+          formatter: '{value} %',
+          color: '#6e7079', // 文字颜色（不受轴线颜色影响）
+          //fontSize: 12 // 可选：设置文字大小
+        },
+        axisLine: {
+          show: true,//軸線
+          // lineStyle: {
+          //   color: '#e0e6f1', //线条颜色
+          //   //width: 2, // 可选：设置线条宽度
+          //   //type: 'solid' // 可选：设置线条类型（solid, dashed, dotted）
+          //   //type: 'dashed' //樣式
+          // }
+        },
+      },
+      {
+        type: 'value',
+        position: 'left',
+        scale: true, //顯示最大
+        splitLine: {
+          show: false, //中間線關閉
+        },
+        axisLabel: {
+          color: '#6e7079', // 文字颜色（不受轴线颜色影响）
+          //fontSize: 12 // 可选：设置文字大小
+        },
+        axisLine: {
+          show: true,//軸線
+          // lineStyle: {
+          //   color: '#e0e6f1', //线条颜色
+          //   //type: 'dashed' //樣式
+          // }
+        }
+      }
+    ],
+    dataZoom: [
+      {
+        type: 'slider',
+        // handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+        //xAxisIndex: [0, 1],//控制第一二窗口
+        start: 95,//0-100 左從哪邊開始
+        end: 100,//結束
+        showDetail: false,//顯示日期
+        // zoomLock: true,//不能縮放,只能平移
+        brushSelect: false,//關閉內選 刷選
+      }
+    ],
+    series: [
+      {
+        name: '回撤幅度',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: pageJson['retracement_data'],
+        itemStyle: {
+          color: '#a3b3b5', // 柱子颜色
+        }
+      },
+      {
+        name: '大盤指數',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: pageJson['retracement_close'],
+        lineStyle: {
+          color: '#058296', // 线条颜色
+          width: 2,      //線寬
+        },
+        itemStyle: {
+          opacity: 0, //點隱蔽
+        }
+      }
+    ]
+  };
   // const vix_chart_option = {
   //   color: [
   //     '#058296',
@@ -939,7 +1092,7 @@ window.onload=async function(){
   //   grid: {
   //     left: 50, //畫面編距
   //     right: 30,
-  //     top: 30,
+  //     top: 20,
   //     bottom: 20
   //   },
   //   tooltip: {
@@ -1022,6 +1175,7 @@ window.onload=async function(){
   greedy_chart.setOption(greedy_chart_option);
   smallhouseholds_chart.setOption(smallhouseholds_chart_option);
   bigcargo_chart.setOption(bigcargo_chart_option);
+  retracement_chart.setOption(retracement_chart_option);
   //console.log('smallhouseholds',smallhouseholds_chart,pageJson['smallhouseholds_date'],pageJson['smallhouseholds_data'],pageJson['smallhouseholds_market'])
   //console.log('bigcargo',bigcargo_chart,pageJson['bigcargo_date'],pageJson['bigcargo_data'],pageJson['bigcargo_market'])
 }

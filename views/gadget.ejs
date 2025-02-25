@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('publicHead') -%>
+  <link rel="stylesheet" href="css/<%= active %>.css">
+</head>
+<body>
+  <div class="publicPage <%= active %>">
+    <%- include('publicNav') %>
+    <div class="publicContent">
+      <div class="publicWidth">
+        <div class="publicRowFlex">
+          <div class="publicCol-3">
+            <div class="publicBox">
+              <div class="publictitle">
+                <div class="title">
+                  <h4><a href="#" target="_blank">股票報酬</a></h4>
+                  <p class="time">報酬百分比=((賣出價格−買入價格)/買入價格)×100%</p>
+                </div>
+              </div>
+              <div class="inputDiv">
+                <div class="flex">
+                  <div class="label">
+                    <label>買入價格</label>
+                  </div>
+                  <div class="input">
+                    <input type="text">
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="label">
+                    <label>賣出價格</label>
+                  </div>
+                  <div class="input">
+                    <input type="text">
+                  </div>
+                </div>
+              </div>
+              <div class="resultDiv">
+                <div class="flex">
+                  <div class="label">結果</div>
+                  <div class="input">0</div>
+                </div>
+              </div>
+              <button class="btn" onClick="serchStrock()">
+                送出
+                <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <%- include('publicFooter') %>
+  </div>
+  <script src="./js/<%= active %>.js"></script>
+</body>
+</html>

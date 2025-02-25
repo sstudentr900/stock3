@@ -3,6 +3,7 @@ const remuneration = require('./controllers/remuneration');
 const compare = require('./controllers/compare');
 const home = require('./controllers/home');
 const individual = require('./controllers/individual');
+const gadget = require('./controllers/gadget');
 const app = express(); //載入express模組
 const port = 3000;//設定port
 
@@ -37,14 +38,18 @@ app.get('/individual/:stockno', individual.search)
 app.get('/remuneration', remuneration.search)
 //查詢股票報酬
 app.post('/remuneration', remuneration.search_post)
-//查詢股票比較
-app.get('/compare', compare.search)
+//查詢股票報酬
+app.get('/remuneration', remuneration.search)
+//股票報酬
+app.get('/compare',compare.search)
 //增加股票報酬
 app.post('/compare',compare.add)
 //刪除股票報酬
 app.delete('/compare/:id',compare.delet)
 //排序股票報酬
 app.post('/compare/sort',compare.sort)
+//小工具
+app.get('/gadget', gadget.search)
 
 //發送文字
 // app.get('/test', function(req, res){

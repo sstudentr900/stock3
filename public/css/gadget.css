@@ -1,0 +1,41 @@
+
+.gadget input {
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+}
+.gadget .label{
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.gadget .input {
+  flex-grow: 1;
+}
+
+.gadget .flex{
+  display: flex;
+  align-items: center;
+}
+.gadget .inputDiv{
+  margin-top: 30px;
+}
+.gadget .resultDiv .flex,
+.gadget .inputDiv .flex{
+  margin-bottom: 15px;
+}
+.gadget .btn{
+  background-color: #058296;
+  padding: 12px;
+  color: #fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  width: 100%;
+  font-size: 16px;
+  border:none;
+  cursor: pointer;
+}

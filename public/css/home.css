@@ -1,3 +1,7 @@
+.home .customNav{
+  position: sticky;
+  top: 100px;
+}
 .home .customNav .customTable li:nth-child(1) {
   /* width: 66%; */
   flex: 1 1;
@@ -28,11 +32,6 @@
 .home .customNav .customTable .table_title li,
 .home .customNav .customTable .table_content li {
   padding: 6px 8px;
-}
-
-.home .dollars .publictitle,
-.home .prosperity .publictitle {
-  margin-bottom: 0;
 }
 
 .home .updownnumber .customTable {
@@ -75,6 +74,7 @@
 .home #dollars_chart,
 .home #smallhouseholds_chart,
 .home #bigcargo_chart,
+.home #retracement_chart,
 .home #weighted_chart {
   width: 100%;
   height: 400px;

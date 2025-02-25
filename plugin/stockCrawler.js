@@ -5,7 +5,8 @@ const cheerio = require("cheerio");//後端的 jQuery
 const yahooFinance = require('yahoo-finance');
 const { getNowTimeObj,getToISOString } = require("./stockFn");
 const googleUrlObj = {
-  executablePath: "c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+  executablePath: "c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  headless: true, // 設置為 true 以啟用無頭模式
 }
 function sleep(ms) {
   return new Promise(resolve=>setTimeout(resolve, ms));
@@ -928,7 +929,7 @@ async function stockGetData3({dataDate,stockno,nowDate}){
   //await sleep(30000)
   await page.goto(url,{timeout: 1000*120}); //超時120秒
   // 等待元素載入完成
-  await page.waitForSelector("#divPriceDetail tr[align='center']");
+  await page.waitForSelector("#tblDetail tr[align='center']");
   //把網頁的body抓出來
   const body = await page.content();
   //接著我們把他丟給cheerio去處理
@@ -1182,7 +1183,7 @@ async function stockGetStockThreeCargo({dataDate='2015-01-01',stockno}){
     // console.log(body)
     const $ = cheerio.load(body);
     const json=[]
-    const trs = $("table.table.table-sm.table-hover.box-table-boarded tr");
+    const trs = $("table.kanban-table tbody tr");
     for (let i = 0; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
@@ -1230,7 +1231,7 @@ async function stockGetfinancing({dataDate='2015-01-01',stockno}){
     // console.log(body)
     const $ = cheerio.load(body);
     const json=[]
-    const trs = $("table.table.table-sm.table-hover.box-table-boarded tr");
+    const trs = $("table.kanban-table tbody tr");
     for (let i = 0; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
@@ -1279,7 +1280,7 @@ async function stockGetStockHolder({dataDate='2015-01-01',stockno}){
     // console.log(body)
     const $ = cheerio.load(body);
     const json=[]
-    const trs = $("#t04 tr");
+    const trs = $("#t04 table tbody tr");
     for (let i = 1; i < trs.length; i++) {
       const obj = {}
       const td = trs.eq(i).find('td');
@@ -1326,9 +1327,9 @@ async function stockGetname({stockno}){
   .then(body=>{
     // console.log(body)
     const $ = cheerio.load(body);
-    const name = $("h1.page-title").text().split('-')[0].split(' ')[1]
+    const name = $("h1.stock-name").text().split('-')[0].split(' ')[1]
     if(!name){
-      console.log(`stockname,抓取不到資料跳出`)
+      console.log(`stockname,抓取不到股名跳出`)
       return false;
     }
     return name;

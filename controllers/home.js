@@ -161,6 +161,15 @@ async function search(req, res) {
       })
       delete row.bigcargo
     }
+    //大盤回撤曲線
+    const closeArray = twii.map(item=>item.close)
+    row['retracement_data'] = closeArray.map((price,index) => {
+      const array = closeArray.slice(0, index+1);
+      const retracement_height = Math.max(...array);
+      return ((price / retracement_height - 1) * 100).toFixed(2); // 計算回檔幅度並轉換為百分比
+    });
+    row['retracement_close'] = closeArray
+
     // //上下跌家數
     // const updownnumber = JSON.parse(row['updownnumber'])
     // row['updownnumber'] = getSort({obj:row['updownnumber'],number:10})
